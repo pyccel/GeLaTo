@@ -149,6 +149,9 @@ def apply_tensor(expr, dim, instructions=None, **settings):
         for k in range(0, dim):
             Bk_u = B + str(k+1)
             prod *= Symbol(Bk_u)
+        expr = expr.subs({Symbol(B + "_0"): prod})
+
+        # TODO this rule is not used anymore
         expr = expr.subs({Symbol(B): prod})
         # ...
 
