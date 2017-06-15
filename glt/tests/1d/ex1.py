@@ -53,8 +53,8 @@ def run(filename):
     # ...
 
     # ... compute and plot the glt symbol
-    from clapp.glt.expression import glt_symbol_from_weak_formulation
-    from clapp.glt.expression import glt_plot_eigenvalues
+    from glt.expression import glt_symbol_from_weak_formulation
+    from glt.expression import glt_plot_eigenvalues
 
     discretization = {"n_elements": bspline_params["N_ELEMENTS"], \
                       "degrees": bspline_params["DEGREES"]}
@@ -98,7 +98,7 @@ import os
 cmd = "rm -rf input"
 os.system(cmd)
 
-run(filename="inputs/1d/poisson.vl")
+run(filename="inputs/poisson.vl")
 
 cmd = "rm -rf input"
 os.system(cmd)
