@@ -149,9 +149,6 @@ def apply_tensor(expr, dim, instructions=None, **settings):
         for k in range(0, dim):
             Bk_u = B + str(k+1)
             prod *= Symbol(Bk_u)
-        expr = expr.subs({Symbol(B + "_0"): prod})
-
-        # TODO this rule is not used anymore
         expr = expr.subs({Symbol(B): prod})
         # ...
 
@@ -440,6 +437,11 @@ def glt_symbol(expr, dim, n_deriv=1, \
 
         # ...
         expr = sympify(str(expr), locals=ns)
+        # ...
+
+        # ... remove _0 for a nice printing
+        expr = expr.subs({Symbol("Ni_0"): Symbol("Ni")})
+        expr = expr.subs({Symbol("Nj_0"): Symbol("Nj")})
         # ...
     # ...
 
