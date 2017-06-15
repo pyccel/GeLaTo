@@ -49,11 +49,11 @@ def run(filename):
     # ...
 
     # ... define the constants
-    constants = {"alpha": 1., "beta": 0.5}
+    constants = {"r": 0.5}
     # ...
 
     # ...
-    assembler_a.set_constants(constants, verbose=True)
+    assembler_a.set_constants(constants, verbose=False)
     assembler_a.assemble()
     # ...
 
