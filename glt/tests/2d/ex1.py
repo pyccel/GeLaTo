@@ -98,7 +98,8 @@ import os
 cmd = "rm -rf input"
 os.system(cmd)
 
-run(filename="inputs/poisson.vl")
+#run(filename="inputs/poisson.vl")
+run(filename="inputs/poisson_block.vl")
 
 cmd = "rm -rf input"
 os.system(cmd)
