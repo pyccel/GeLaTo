@@ -395,7 +395,8 @@ def glt_symbol(expr, dim, n_deriv=1, \
     if type(expr) == dict:
         d_expr = {}
         for key, txt in expr.items():
-            # ... when using vale, we get also a coefficient.
+            print (">>>> key : " + str(key))
+            # ... when using vale, we may get also a coefficient.
             if type(txt) == list:
                 txt = str(txt[0]) + " * (" + txt[1] + ")"
             # ...
@@ -954,17 +955,17 @@ def dict_to_matrix(d, instructions=None, **settings):
     n_rows = 1
     n_cols = 1
     for key, values in d.items():
-        if key[0] > n_rows:
-            n_rows = key[0]
-        if key[1] > n_cols:
-            n_cols = key[1]
+        if key[0]+1 > n_rows:
+            n_rows = key[0] + 1
+        if key[1]+1 > n_cols:
+            n_cols = key[1] + 1
     # ...
 
     # ...
     expressions = []
-    for i_row in range(1, n_rows+1):
+    for i_row in range(0, n_rows):
         row_expr = []
-        for i_col in range(1, n_cols+1):
+        for i_col in range(0, n_cols):
             _expr = None
             try:
                 _expr = d[i_row,i_col]
