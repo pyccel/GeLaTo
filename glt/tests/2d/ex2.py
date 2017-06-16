@@ -65,7 +65,6 @@ def run(filename):
     assembler_a.set_constants(constants, verbose=False)
     assembler_a.assemble()
     # ...
-    matrix.export("matrix.mm")
 
     # ... compute and plot the glt symbol
     from glt.expression import glt_symbol_from_weak_formulation

@@ -103,7 +103,8 @@ import os
 cmd = "rm -rf input"
 os.system(cmd)
 
-run(filename="inputs/laplace.vl")
+#run(filename="inputs/laplace.vl")
+run(filename="inputs/curlcurl_divdiv.vl")
 
 cmd = "rm -rf input"
 os.system(cmd)
