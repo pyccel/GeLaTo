@@ -52,10 +52,20 @@ def run(filename):
     constants = {"alpha": 1., "beta": 0.5}
     # ...
 
+    # ... only for anisotropic diffusion test case
+    if filename == "inputs/anisotropic_diffusion.vl":
+        b1 = pde["b1"]
+        b2 = pde["b2"]
+
+        b1.set("1.0")
+        b2.set("0.0")
+    # ...
+
     # ...
     assembler_a.set_constants(constants, verbose=False)
     assembler_a.assemble()
     # ...
+    matrix.export("matrix.mm")
 
     # ... compute and plot the glt symbol
     from glt.expression import glt_symbol_from_weak_formulation
@@ -104,7 +114,10 @@ import os
 cmd = "rm -rf input"
 os.system(cmd)
 
-run(filename="inputs/laplace.vl")
+#run(filename="inputs/laplace.vl")
+#run(filename="inputs/advection.vl")
+run(filename="inputs/anisotropic_diffusion.vl")
+#run(filename="inputs/curlcurl_divdiv.vl")
 
 cmd = "rm -rf input"
 os.system(cmd)
