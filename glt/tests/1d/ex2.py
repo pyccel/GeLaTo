@@ -49,7 +49,11 @@ def run(filename):
     # ...
 
     # ... define the constants
-    constants = {"alpha": 1., "beta": 0.5}
+#    constants = {"alpha": 1., "beta": 0.5}
+
+    # convection-diffusion case
+#    constants = {"alpha": 1., "beta": 0.2}
+    constants = {"alpha": 1., "beta": 0.1}
     # ...
 
     # ...
@@ -104,7 +108,9 @@ import os
 cmd = "rm -rf input"
 os.system(cmd)
 
-run(filename="inputs/laplace.vl")
+#run(filename="inputs/laplace.vl")
+#run(filename="inputs/advection.vl")
+run(filename="inputs/convection_diffusion.vl")
 
 cmd = "rm -rf input"
 os.system(cmd)

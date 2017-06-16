@@ -1,0 +1,9 @@
+Domain(dim=1,kind='structured') :: Omega
+Space(domain=Omega,kind='h1')   :: V
+Field(space=V)                  :: phi 
+Function(x)                     :: f 
+Real                            :: alpha 
+Real                            :: beta 
+
+b(v::V) := < f * v >_Omega 
+a(v::V, u::V) := < alpha * v * dx(u) + beta * dx(v) * dx(u) >_Omega
