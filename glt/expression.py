@@ -746,23 +746,8 @@ def glt_plot_eigenvalues(expr, discretization, \
     tolerance: float
         a tolerance to check if the values are pure real numbers.
     """
-    # ... uniform sampling of the glt symbol
-    t  = glt_approximate_eigenvalues(expr, discretization, mapping=mapping)
-
-    tr = t.real.ravel()
-    ti = t.imag.ravel()
     # ...
-
-    # ... real case
-    if (np.linalg.norm(ti) < tolerance):
-        tr.sort()
-
-        plt.plot(tr, "+b", label="glt symbol")
-    else:
-        plt.plot(tr, ti, "+b", label="glt symbol")
-    # ...
-
-    # ...
+    M = None
     if matrix is not None:
         from scipy.linalg import eig
 
@@ -776,12 +761,45 @@ def glt_plot_eigenvalues(expr, discretization, \
         else:
             M = matrix.todense()
         # ...
+    # ...
+
+    # ... uniform sampling of the glt symbol
+    t  = glt_approximate_eigenvalues(expr, discretization, mapping=mapping)
+
+    tr = t.real.ravel()
+    ti = t.imag.ravel()
+    # ...
+
+    # ... real case
+    if (np.linalg.norm(ti) < tolerance):
+        # ...
+        tr.sort()
+
+        plt.plot(tr, "+b", label="glt symbol")
+        # ...
 
         # ...
-        w, v = eig(M)
-        wr = w.real
-        wr.sort()
-        plt.plot(wr, "xr", label="eigenvalues")
+        if M is not None:
+            # ...
+            w, v = eig(M)
+            wr = w.real
+            wr.sort()
+            plt.plot(wr, "xr", label="eigenvalues")
+            # ...
+        # ...
+    else:
+        # ...
+        plt.plot(tr, ti, "+b", label="glt symbol")
+        # ...
+
+        # ...
+        if M is not None:
+            # ...
+            w, v = eig(M)
+            wr = w.real
+            wi = w.imag
+            plt.plot(wr, wi, "xr", label="eigenvalues")
+            # ...
         # ...
     # ...
 # ...
