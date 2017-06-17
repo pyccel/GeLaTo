@@ -1,0 +1,9 @@
+Domain(dim=2,kind='structured')::Omega
+Space(domain=Omega,kind='h1')::V
+Field(space=V)::u
+
+f = function(x,y){return 2*x*(1-x) + 2*y*(1-y)}
+u_analytic = function(x,y){return x*(1-x)*y*(1-y)}
+
+a(phi::V, psi::V) := < grad(phi) * grad(psi) >_Omega
+b(phi::V) := < f(x,y) * phi >_Omega

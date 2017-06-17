@@ -5,6 +5,8 @@
 *build*
 *egg*
 *dist*
+doc/README.rst
+doc/tutorials/*
 
 glt/tests/1d/.clapp
 glt/tests/1d/*.mm
