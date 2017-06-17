@@ -18,13 +18,22 @@ def convert_nb(filename):
 
     fname = filename.split(".")[0]
 
+    # ... cleaning
+    cmd = "rm -rf tutorials/" + fname + "*"
+    os.system(cmd)
+    # ...
+
+    # ...
     f_out = dirname + "/" + fname + ".rst"
     cmd = "mv " + f_out + " tutorials/"
     os.system(cmd)
+    # ...
 
+    # ...
     d_out = dirname + "/" + fname + "_files"
     cmd = "mv " + d_out + " tutorials/"
     os.system(cmd)
+    # ...
 # ...
 
 # ...
@@ -39,4 +48,6 @@ os.system(cmd)
 
 # ...
 convert_nb("getting_started_1.ipynb")
+convert_nb("getting_started_2.ipynb")
+convert_nb("getting_started_3.ipynb")
 # ...

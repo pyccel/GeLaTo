@@ -23,8 +23,8 @@ Tutorials
    :caption: Contents:
 
    tutorials/getting_started_1
-
-  
+   tutorials/getting_started_2
+   tutorials/getting_started_3
 
 
 Indices and tables

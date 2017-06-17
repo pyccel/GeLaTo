@@ -179,65 +179,6 @@ As in the previous example, let's not *evaluate* the symbol::
   >>> print expr
   alpha*m1*m2 + beta*m1*s2 + m2*s1*h(x, y)
 
-Multilevel symbols
-******************
-
-Let's consider the following weak formulation, in 2D:
-
-.. math::
-
-  \int_{\Omega} \nabla v_1 \cdot \nabla u_1 + \partial_x v_1 \partial_y u_2 ~d\Omega = \ldots 
-  \\
-  \int_{\Omega} \partial_y v_2 \partial_x u_1 ~d\Omega  = \ldots 
-
-where the trial function is :math:`(u_1, u_2)` while the test function is :math:`(v_1, v_2)` where every component leaves in a discrete subspace of :math:`H^1(\Omega)`.
-
-In order to define the symbol, we use a dictionary as the following::
-
-  >>> txt = {}
-  >>> txt[1,1] = "Ni_x * Nj_x + Ni_y * Nj_y"
-  >>> txt[1,2] = "Ni_x * Nj_y"
-  >>> txt[2,1] = "Ni_y * Nj_x"
-
-  >>> discretization = {"n_elements": [16, 16], "degrees": [2,2]}
-  >>> expr = glt_symbol(txt, dim=2, \
-  >>>                   verbose=False, evaluate=False, \
-  >>>                   discretization=discretization)
-  >>> print expr
-  Matrix([[m1*s2 + m2*s1, -a1*a2], [-a1*a2, 0]])
-
-As you can see, the result is a matrix (the symbol is then called a **multilevel** symbol).
-
-You can print the associated *latex* code::
-
-  >>> print_glt_latex(expr, mode="inline")
-  
-.. math::
-
-  \left[\begin{smallmatrix}\mathfrak{m}_p(\theta_1) \mathfrak{s}_p(\theta_2) + \mathfrak{m}_p(\theta_2) \mathfrak{s}_p(\theta_1) & - \mathfrak{a}_p(\theta_1) \mathfrak{a}_p(\theta_2)\\- \mathfrak{a}_p(\theta_1) \mathfrak{a}_p(\theta_2) & 0\end{smallmatrix}\right]
-
-In the case of a multilevel symbol, the eigenvalues of the previous matrix can be evaluated on a uniform grid, to get an approximation of the eigenvalues of the linear system associated to our weak formulation::
-
-  >>> expr = glt_symbol(txt, dim=2, \
-  >>>                   verbose=False, evaluate=True, \
-  >>>                   discretization=discretization)
-
-  .. note:: be sure to set **evaluate** to **True**. 
-
-  >>> eig = glt_approximate_eigenvalues(expr, discretization)
-  >>> t = eig
-  >>> t.sort()
-  >>> plt.plot(t, "+b", label="glt symbol")
-  >>> plt.legend(loc=2)
-  >>> plt.show()
-
-.. figure:: include/examples/glt/ex9_approximate_eigen.png
-   :scale: 50 %
-   :alt: alternate text
-   :figclass: align-center
-
-   Approximation of the eigenvalues of a multilevel symbol using an uniform sampling. 
-
 Examples
 ********
 

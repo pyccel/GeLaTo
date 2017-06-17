@@ -395,7 +395,6 @@ def glt_symbol(expr, dim, n_deriv=1, \
     if type(expr) == dict:
         d_expr = {}
         for key, txt in expr.items():
-            print (">>>> key : " + str(key))
             # ... when using vale, we may get also a coefficient.
             if type(txt) == list:
                 txt = str(txt[0]) + " * (" + txt[1] + ")"
