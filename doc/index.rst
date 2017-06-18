@@ -7,7 +7,7 @@ Welcome to GLT's documentation!
 ===============================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1 
    :caption: Contents:
 
    README
@@ -19,12 +19,14 @@ Tutorials
 =========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1 
    :caption: Contents:
 
    tutorials/getting_started_1
    tutorials/getting_started_2
    tutorials/getting_started_3
+   tutorials/getting_started_4
+   tutorials/getting_started_5
 
 
 Indices and tables

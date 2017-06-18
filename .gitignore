@@ -8,6 +8,8 @@
 doc/README.rst
 doc/tutorials/*
 
+notebooks/tutorials/.clapp
+
 glt/tests/1d/.clapp
 glt/tests/1d/*.mm
 glt/tests/1d/*.txt

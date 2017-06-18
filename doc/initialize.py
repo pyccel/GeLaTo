@@ -50,4 +50,6 @@ os.system(cmd)
 convert_nb("getting_started_1.ipynb")
 convert_nb("getting_started_2.ipynb")
 convert_nb("getting_started_3.ipynb")
+convert_nb("getting_started_4.ipynb")
+convert_nb("getting_started_5.ipynb")
 # ...
