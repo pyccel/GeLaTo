@@ -51,16 +51,22 @@ Evaluating a symbol
 ^^^^^^^^^^^^^^^^^^^
 
 Evaluation has two meanings:
-    * symbolic computation of the symbol
-    * computing the value for given numbers (int, float, complex)
+
+1. symbolic computation of the symbol
+
+2. computing the value for given numbers (int, float, complex)
 
 We saw previously how to handle the first point. For the second one, you will need to **lambdify** your symbol. This must be done carefully, since you need to provide:
-    * every constant that appears in your symbol
-    * every function must be callable.
+
+1. every constant that appears in your symbol
+
+2. every function must be callable.
 
 This can be done by calling **glt_symbol** with the additional arguments:
-    * **user_constants**
-    * **user_functions**
+
+1. **user_constants**
+
+2. **user_functions**
 
 To make your symbol **callable** just run::
 
