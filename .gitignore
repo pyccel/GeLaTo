@@ -8,7 +8,7 @@
 doc/README.rst
 doc/tutorials/*
 
-notebooks/tutorials/.clapp
+notebooks/tutorials/.clapp/*.lua
 
 glt/tests/1d/.clapp
 glt/tests/1d/*.mm
