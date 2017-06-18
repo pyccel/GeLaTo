@@ -725,7 +725,7 @@ def glt_approximate_eigenvalues(expr, discretization, mapping=None):
 def glt_plot_eigenvalues(expr, discretization, \
                          mapping=None, \
                          matrix=None, \
-                         tolerance=1.e-8):
+                         tolerance=1.e-8, **settings):
     """
     plots the approximations of the eigenvalues by means of a uniform sampling
     of the glt symbol.
@@ -744,6 +744,9 @@ def glt_plot_eigenvalues(expr, discretization, \
 
     tolerance: float
         a tolerance to check if the values are pure real numbers.
+
+    settings: dict
+        dictionary for different settings
     """
     # ...
     M = None
@@ -762,6 +765,20 @@ def glt_plot_eigenvalues(expr, discretization, \
         # ...
     # ...
 
+    # ...
+    try:
+        label = settings["label"]
+    except:
+        label = "glt symbol"
+    # ...
+
+    # ...
+    try:
+        properties = settings["properties"]
+    except:
+        properties = "+b"
+    # ...
+
     # ... uniform sampling of the glt symbol
     t  = glt_approximate_eigenvalues(expr, discretization, mapping=mapping)
 
@@ -774,7 +791,7 @@ def glt_plot_eigenvalues(expr, discretization, \
         # ...
         tr.sort()
 
-        plt.plot(tr, "+b", label="glt symbol")
+        plt.plot(tr, properties, label=label)
         # ...
 
         # ...
@@ -788,7 +805,7 @@ def glt_plot_eigenvalues(expr, discretization, \
         # ...
     else:
         # ...
-        plt.plot(tr, ti, "+b", label="glt symbol")
+        plt.plot(tr, ti, properties, label=label)
         # ...
 
         # ...
