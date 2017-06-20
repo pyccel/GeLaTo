@@ -1,0 +1,5 @@
+Domain(dim=2,kind='structured') :: Omega
+Space(domain=Omega,kind='h1')   :: V
+Field(space=V)                  :: phi
+
+c(v::V, u::V) := < v * u >_Omega
