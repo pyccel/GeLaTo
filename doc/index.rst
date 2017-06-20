@@ -27,6 +27,7 @@ Tutorials
    tutorials/getting_started_3
    tutorials/getting_started_4
    tutorials/getting_started_5
+   tutorials/getting_started_6
 
 
 Indices and tables
