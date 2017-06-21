@@ -47,11 +47,11 @@ os.system(cmd)
 # ...
 
 # ...
-convert_nb("tutorial_1.ipynb")
-convert_nb("tutorial_2.ipynb")
-convert_nb("tutorial_3.ipynb")
-convert_nb("tutorial_4.ipynb")
-convert_nb("tutorial_5.ipynb")
-#convert_nb("tutorial_6.ipynb")
-convert_nb("tutorial_7.ipynb")
+#convert_nb("tutorial_1.ipynb")
+#convert_nb("tutorial_2.ipynb")
+#convert_nb("tutorial_3.ipynb")
+#convert_nb("tutorial_4.ipynb")
+#convert_nb("tutorial_5.ipynb")
+convert_nb("tutorial_6.ipynb")
+#convert_nb("tutorial_7.ipynb")
 # ...

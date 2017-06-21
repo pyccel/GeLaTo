@@ -27,6 +27,7 @@ Tutorials
    tutorials/tutorial_3
    tutorials/tutorial_4
    tutorials/tutorial_5
+   tutorials/tutorial_6
    tutorials/tutorial_7
 
 
