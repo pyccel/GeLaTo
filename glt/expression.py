@@ -521,7 +521,7 @@ def glt_symbol_from_weak_formulation(form, discretization, \
     """
     creates a glt symbol from a weak formulation.
 
-    form: clapp.vale.ast.BilinearForm
+    form: vale.BilinearForm
         a weak formulation.
 
     discretization: dict

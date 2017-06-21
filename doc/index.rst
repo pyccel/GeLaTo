@@ -22,12 +22,12 @@ Tutorials
    :maxdepth: 1 
    :caption: Contents:
 
-   tutorials/getting_started_1
-   tutorials/getting_started_2
-   tutorials/getting_started_3
-   tutorials/getting_started_4
-   tutorials/getting_started_5
-   tutorials/getting_started_6
+   tutorials/tutorial_1
+   tutorials/tutorial_2
+   tutorials/tutorial_3
+   tutorials/tutorial_4
+   tutorials/tutorial_5
+   tutorials/tutorial_7
 
 
 Indices and tables
