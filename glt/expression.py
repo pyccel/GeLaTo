@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""This module contains different functions to create and treate the GLT symbols."""
 #
 #
 # TODO use to_assign and post processing as expression and not latex => helpful
 #      for Fortran and Lua (code gen).
+"""This module contains different functions to create and treate the GLT symbols."""
 
 __all__ = ["glt_formatting", "glt_formatting_atoms"]
 
@@ -41,7 +41,8 @@ ARGS_s       = ["s", "ss"]
 BASIS_TEST   = "Ni"
 BASIS_TRIAL  = "Nj"
 BASIS_PREFIX = ["x", "y", "z", "xx", "yy", "zz", "xy", "yz", "xz"]
-TOLERANCE    = 1.e-10
+TOLERANCE    = 1.e-14
+#TOLERANCE    = 1.e-4
 SETTINGS     = ["glt_integrate", "glt_formatting", "glt_formatting_atoms"]
 
 
