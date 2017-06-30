@@ -41,7 +41,7 @@ ARGS_s       = ["s", "ss"]
 BASIS_TEST   = "Ni"
 BASIS_TRIAL  = "Nj"
 BASIS_PREFIX = ["x", "y", "z", "xx", "yy", "zz", "xy", "yz", "xz"]
-TOLERANCE    = 1.e-14
+TOLERANCE    = 1.e-10
 #TOLERANCE    = 1.e-4
 SETTINGS     = ["glt_integrate", "glt_formatting", "glt_formatting_atoms"]
 
