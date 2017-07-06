@@ -53,8 +53,8 @@ def run(filename):
     # ...
 
     # ... compute and plot the glt symbol
-    from glt.expression import glt_symbol_from_weak_formulation
-    from glt.expression import glt_plot_eigenvalues
+    from gelato.expression import glt_symbol_from_weak_formulation
+    from gelato.expression import glt_plot_eigenvalues
 
     discretization = {"n_elements": bspline_params["N_ELEMENTS"], \
                       "degrees": bspline_params["DEGREES"]}

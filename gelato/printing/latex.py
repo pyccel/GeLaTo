@@ -6,7 +6,7 @@ from sympy import latex
 from sympy.simplify.simplify import simplify
 
 # TODO find a better solution.
-#      this code is duplicated in glt.expression
+#      this code is duplicated in gelato.expression
 ARGS_x       = ["x", "y", "z"]
 ARGS_u       = ["u", "v", "w"]
 ARGS_s       = ["s", "ss"]
@@ -190,7 +190,7 @@ def glt_latex(expr, **settings):
 
     # ...
     try:
-        from glt.expression import glt_formatting
+        from gelato.expression import glt_formatting
         fmt = settings["glt_formatting"]
         if fmt:
             expr = glt_formatting(expr, **settings)

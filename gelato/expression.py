@@ -27,11 +27,11 @@ from sympy.matrices.dense import MutableDenseMatrix
 from itertools import product
 import numpy as np
 import matplotlib.pyplot as plt
-from glt.printing.latex import latex_title_as_paragraph
-from glt.printing.latex import glt_latex_definitions
-from glt.printing.latex import glt_latex_names
-from glt.printing.latex import glt_latex
-from glt.printing.latex import print_glt_latex
+from gelato.printing.latex import latex_title_as_paragraph
+from gelato.printing.latex import glt_latex_definitions
+from gelato.printing.latex import glt_latex_names
+from gelato.printing.latex import glt_latex
+from gelato.printing.latex import print_glt_latex
 
 # TODO find a better solution.
 #      this code is duplicated in printing.latex

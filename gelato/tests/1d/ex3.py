@@ -65,8 +65,8 @@ def run(filename):
         # ...
 
         # ... compute and plot the glt symbol
-        from glt.expression import glt_symbol_from_weak_formulation
-        from glt.expression import glt_plot_eigenvalues
+        from gelato.expression import glt_symbol_from_weak_formulation
+        from gelato.expression import glt_plot_eigenvalues
 
         expr = glt_symbol_from_weak_formulation(form_a, \
                                                 verbose=True, evaluate=True, \
@@ -93,7 +93,7 @@ def run(filename):
         # ...
 
         # ... compute and plot the glt symbol
-        from glt.expression import glt_symbol_from_weak_formulation
+        from gelato.expression import glt_symbol_from_weak_formulation
 
         expr = glt_symbol_from_weak_formulation(form_a, \
                                                 verbose=True, evaluate=False, \
@@ -109,8 +109,8 @@ def run(filename):
         # ...
 
         # ...
-        from glt.printing.latex import glt_latex_definitions
-        from glt.codegen.latex import Latex
+        from gelato.printing.latex import glt_latex_definitions
+        from gelato.codegen.latex import Latex
 
         proof = Latex(definitions=glt_latex_definitions())
         # ...

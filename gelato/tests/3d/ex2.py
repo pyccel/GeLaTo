@@ -1,7 +1,7 @@
 # coding: utf-8
 #
 # Usage:
-#  python test_glt_1d.py
+#  python test_glt_3d.py
 #
 
 from vale import construct_model
@@ -11,8 +11,8 @@ import matplotlib.pyplot       as plt
 # ...
 def run(filename):
     # ...
-    from caid.cad_geometry import line
-    geometry = line()
+    from caid.cad_geometry import cube
+    geometry = cube()
 
     from clapp.spl.mapping import Mapping
     mapping = Mapping(geometry=geometry)
@@ -21,9 +21,9 @@ def run(filename):
     # ... creates discretization parameters
     from clapp.disco.parameters.bspline import BSpline
 
-    bspline_params = BSpline([256], [2], \
-                             bc_min=[0], \
-                             bc_max=[0])
+    bspline_params = BSpline([8,8,8], [2,2,2], \
+                             bc_min=[0,0,0], \
+                             bc_max=[0,0,0])
     # ...
 
     # ... create a context from discretization
@@ -39,8 +39,8 @@ def run(filename):
     # ...
 
     # ... accessing the pde declarations
-    V      = pde["V"]
-    form_a = pde["a"]
+    V           = pde["V"]
+    form_a      = pde["a"]
     # ...
 
     # ...
@@ -48,20 +48,25 @@ def run(filename):
     matrix      = form_a.matrix
     # ...
 
+    # ... define the constants
+    constants = {"alpha": 1., "beta": 0.5}
     # ...
+
+    # ...
+    assembler_a.set_constants(constants, verbose=False)
     assembler_a.assemble()
     # ...
 
     # ... compute and plot the glt symbol
-    from glt.expression import glt_symbol_from_weak_formulation
-    from glt.expression import glt_plot_eigenvalues
+    from gelato.expression import glt_symbol_from_weak_formulation
+    from gelato.expression import glt_plot_eigenvalues
 
     discretization = {"n_elements": bspline_params["N_ELEMENTS"], \
                       "degrees": bspline_params["DEGREES"]}
-
     expr = glt_symbol_from_weak_formulation(form_a, \
-                           verbose=False, evaluate=True, \
-                           discretization=discretization)
+                                            verbose=True, evaluate=True, \
+                                            discretization=discretization, \
+                                            user_constants=constants)
     print "GLT symbol : ", expr
     # ...
 
@@ -70,7 +75,7 @@ def run(filename):
     # ...
 
     # ...
-    filename_out = "1d_"+filename.split('/')[-1].split('.')[0] + ".png"
+    filename_out = "3d_"+filename.split('/')[-1].split('.')[0] + ".png"
     plt.legend(loc=2)
     plt.savefig(filename_out)
     # ...
@@ -98,8 +103,9 @@ import os
 cmd = "rm -rf input"
 os.system(cmd)
 
-#run(filename="inputs/poisson.vl")
-run(filename="inputs/poisson_block.vl")
+#run(filename="inputs/laplace.vl")
+run(filename="inputs/advection.vl")
+#run(filename="inputs/curlcurl_divdiv.vl")
 
 cmd = "rm -rf input"
 os.system(cmd)

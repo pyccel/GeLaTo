@@ -4,11 +4,11 @@
 import sys
 from setuptools import setup, find_packages
 
-NAME    = 'glt'
+NAME    = 'gelato'
 VERSION = '0.1'
 AUTHOR  = 'Ahmed Ratnani'
 EMAIL   = 'ahmed.ratnani@ipp.mpg.de'
-URL     = 'https://github.com/ratnania/glt'
+URL     = 'https://github.com/ratnania/GeLaTo'
 DESCR   = 'A Python library for Generalized Locally Toeplitz theory for Isogeometric Analysis.'
 KEYWORDS = ['math']
 LICENSE = "LICENSE"
