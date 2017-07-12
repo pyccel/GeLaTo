@@ -9,11 +9,10 @@ Real                            :: beta
 b1(u::V) := < f * u >_Omega
 b2(w::V) := < g * w >_Omega
 
+a11(v1::V, u1::V) := < beta * dx(u1) * dx(v1) + alpha * dy(u1) * dy(v1) >_Omega
+a12(v1::V, u2::V) := < beta * dy(u2) * dx(v1) - alpha * dx(u2) * dy(v1) >_Omega
+a21(v2::V, u1::V) := < beta * dx(u1) * dy(v2) - alpha * dy(u1) * dx(v2) >_Omega
+a22(v2::V, u2::V) := < beta * dy(u2) * dy(v2) + alpha * dx(u2) * dx(v2) >_Omega
+
 b((v1,v2)::V) := b1(v1) + b2(v2)
-
-a_11(v1::V, u1::V) := < beta * dx(u1) * dx(v1) + alpha * dy(u1) * dy(v1) >_Omega
-a_12(v1::V, u2::V) := < beta * dy(u2) * dx(v1) - alpha * dx(u2) * dy(v1) >_Omega
-a_21(v2::V, u1::V) := < beta * dx(u1) * dy(v2) - alpha * dy(u1) * dx(v2) >_Omega
-a_22(v2::V, u2::V) := < beta * dy(u2) * dy(v2) + alpha * dx(u2) * dx(v2) >_Omega
-
-a((v1,v2) :: V,(u1,u2) :: V) := a_11(v1,u1) + a_12(v1,u2) + a_21(v2,u1) + a_22(v2,u2)
+a((v1,v2) :: V,(u1,u2) :: V) := a11(v1,u1) + a12(v1,u2) + a21(v2,u1) + a22(v2,u2)
