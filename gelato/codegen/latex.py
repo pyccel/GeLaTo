@@ -89,13 +89,12 @@ class Latex(object):
             some input attributs.
         """
         if section == "prelude":
-            for key, txt in vertex.items():
+            for key, txt in list(vertex.items()):
                 self._prelude.append(assign(key, txt))
         elif section == "body":
             self._body += vertex
         else:
-            print ("> Wrong section name.")
-            raise()
+            raise ValueError("> Wrong section name.")
 
     def _str_prelude(self, mode='plain'):
         """

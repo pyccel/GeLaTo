@@ -116,7 +116,7 @@ def apply_mapping(expr, dim, instructions=None, **settings):
     # ... updates the latex expression
     if instructions is not None:
         sets = {}
-        for key, value in settings.items():
+        for key, value in list(settings.items()):
             sets[key] = value
         sets["mode"] = "equation*"
 
@@ -169,7 +169,7 @@ def apply_tensor(expr, dim, instructions=None, **settings):
     # ... updates the latex expression
     if instructions is not None:
         sets = {}
-        for key, value in settings.items():
+        for key, value in list(settings.items()):
             sets[key] = value
         sets["mode"] = "equation*"
 
@@ -246,7 +246,7 @@ def apply_factor(expr, dim, instructions=None, **settings):
 
         # ...
         sets = {}
-        for key, value in settings.items():
+        for key, value in list(settings.items()):
             if not(key == "glt_integrate"):
                 sets[key] = value
         sets["mode"] = "equation*"
@@ -310,7 +310,7 @@ def glt_update_user_functions(expr, user_functions):
         a dictionary containing the user defined functions
     """
     from clapp.vale.expressions.function import Function as CLAPP_Function
-    for f_name, f in user_functions.items():
+    for f_name, f in list(user_functions.items()):
         # ...
         if type(f) == CLAPP_Function:
             sympy_f = f.to_sympy()
@@ -336,7 +336,7 @@ def glt_update_user_constants(expr, user_constants):
     user_constants: dict
         a dictionary containing the user defined constants
     """
-    for f_name, f in user_constants.items():
+    for f_name, f in list(user_constants.items()):
         # ...
         if type(f) in [int, float, complex]:
             expr = expr.subs({Symbol(f_name): f})
@@ -389,13 +389,13 @@ def glt_symbol(expr, dim, n_deriv=1, \
     """
     # ...
     if verbose:
-        print "*** Input expression : ", expr
+        print(("*** Input expression : ", expr))
     # ...
 
     # ...
     if type(expr) == dict:
         d_expr = {}
-        for key, txt in expr.items():
+        for key, txt in list(expr.items()):
             # ... when using vale, we may get also a coefficient.
             if type(txt) == list:
                 txt = str(txt[0]) + " * (" + txt[1] + ")"
@@ -426,13 +426,13 @@ def glt_symbol(expr, dim, n_deriv=1, \
 
         # ...
         if user_constants is not None:
-            for c_name, c in user_constants.items():
+            for c_name, c in list(user_constants.items()):
                 ns[c_name] = Symbol(c_name)
         # ...
 
         # ...
         d = basis_symbols(dim,n_deriv)
-        for key, item in d.items():
+        for key, item in list(d.items()):
             ns[key] = item
         # ...
 
@@ -454,7 +454,7 @@ def glt_symbol(expr, dim, n_deriv=1, \
         instructions.append(glt_latex(expr, **settings))
         # ...
 
-        print ">>> weak formulation: ", expr
+        print((">>> weak formulation: ", expr))
     # ...
 
     # ...
@@ -462,7 +462,7 @@ def glt_symbol(expr, dim, n_deriv=1, \
                          instructions=instructions, \
                          **settings)
     if verbose:
-        print expr
+        print(expr)
     # ...
 
     # ...
@@ -470,7 +470,7 @@ def glt_symbol(expr, dim, n_deriv=1, \
                          instructions=instructions, \
                          **settings)
     if verbose:
-        print expr
+        print(expr)
     # ...
 
     # ...
@@ -478,7 +478,7 @@ def glt_symbol(expr, dim, n_deriv=1, \
                          instructions=instructions, \
                          **settings)
     if verbose:
-        print expr
+        print(expr)
     # ...
 
     # ...
@@ -584,8 +584,7 @@ def glt_lambdify(expr, dim=None, discretization=None):
         if discretization is not None:
             _dim = len(discretization["n_elements"])
         else:
-            print("> either dim or discretization must be provided.")
-            raise()
+            raise ValueError("> either dim or discretization must be provided.")
 
     args_x = ["x","y","z"]
     args_t = ["t1","t2","t3"]
@@ -644,7 +643,7 @@ def glt_approximate_eigenvalues(expr, discretization, mapping=None):
             eigen = expr.eigenvals()
 
             eigs = []
-            for ek, mult in eigen.items():
+            for ek, mult in list(eigen.items()):
                 f = glt_lambdify(ek, discretization=discretization)
                 t = f(x,t1)
                 eigs += mult * list(t)
@@ -674,7 +673,7 @@ def glt_approximate_eigenvalues(expr, discretization, mapping=None):
             eigen = expr.eigenvals()
 
             eigs = []
-            for ek, mult in eigen.items():
+            for ek, mult in list(eigen.items()):
                 f = glt_lambdify(ek, discretization=discretization)
                 t = f(x,y,t1,t2).ravel()
                 eigs += mult * list(t)
@@ -711,7 +710,7 @@ def glt_approximate_eigenvalues(expr, discretization, mapping=None):
             eigen = expr.eigenvals()
 
             eigs = []
-            for ek, mult in eigen.items():
+            for ek, mult in list(eigen.items()):
                 f = glt_lambdify(ek, discretization=discretization)
                 t = f(x,y,z,t1,t2,t3).ravel()
                 eigs += mult * list(t)
@@ -759,8 +758,7 @@ def glt_plot_eigenvalues(expr, discretization, \
         if type(matrix) == Matrix:
             M = matrix.get().todense()
         elif type(matrix) == dict:
-            print ("NOT YET IMPLEMENTED")
-            raise()
+            raise ValueError("NOT YET IMPLEMENTED")
         else:
             M = matrix.todense()
         # ...
@@ -842,7 +840,7 @@ class glt_symbol_m(Function):
 
         pp = 2*p + 1
         N = pp + 1
-        L = range(0, N + pp + 1)
+        L = list(range(0, N + pp + 1))
 
         b0 = bspline_basis(pp, L, 0, r)
         bsp = lambdify(r, b0)
@@ -890,7 +888,7 @@ class glt_symbol_s(Function):
 
         pp = 2*p + 1
         N = pp + 1
-        L = range(0, N + pp + 1)
+        L = list(range(0, N + pp + 1))
 
         b0    = bspline_basis(pp, L, 0, r)
         b0_r  = diff(b0, r)
@@ -940,7 +938,7 @@ class glt_symbol_a(Function):
 
         pp = 2*p + 1
         N = pp + 1
-        L = range(0, N + pp + 1)
+        L = list(range(0, N + pp + 1))
 
         b0   = bspline_basis(pp, L, 0, r)
         b0_r = diff(b0, r)
@@ -989,7 +987,7 @@ def dict_to_matrix(d, instructions=None, **settings):
     # ...
     n_rows = 1
     n_cols = 1
-    for key, values in d.items():
+    for key, values in list(d.items()):
         if key[0]+1 > n_rows:
             n_rows = key[0] + 1
         if key[1]+1 > n_cols:
@@ -1023,7 +1021,7 @@ def dict_to_matrix(d, instructions=None, **settings):
 
         # ...
         sets = {}
-        for key, value in settings.items():
+        for key, value in list(settings.items()):
             if not(key == "glt_integrate"):
                 sets[key] = value
 

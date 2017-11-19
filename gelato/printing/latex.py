@@ -155,7 +155,7 @@ def get_sympy_printer_settings(settings):
         dictionary for different settings
     """
     sets = {}
-    for key, value in settings.items():
+    for key, value in list(settings.items()):
         if key not in SETTINGS:
             sets[key] = value
     return sets
@@ -182,7 +182,7 @@ def glt_latex(expr, **settings):
 
         sets = settings.copy()
         sets["mode"] = "plain"
-        for key, txt in expr.items():
+        for key, txt in list(expr.items()):
             d_expr[key] = glt_latex(txt, **sets)
 
         return d_expr
@@ -222,6 +222,6 @@ def print_glt_latex(expr, **settings):
     settings: dict
         dictionary for different settings
     """
-    print(glt_latex(expr, **settings))
+    print((glt_latex(expr, **settings)))
 # ...
 
