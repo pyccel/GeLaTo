@@ -556,58 +556,6 @@ def glt_symbol(expr, dim,  n_deriv=1,
 # ...
 
 # ...
-def glt_symbol_from_weak_formulation(form, discretization, \
-                                     user_constants=None, \
-                                     verbose=False, evaluate=True, \
-                                     instructions=[], \
-                                     **settings):
-    """
-    creates a glt symbol from a weak formulation.
-
-    form: vale.BilinearForm
-        a weak formulation.
-
-    discretization: dict
-        a dictionary that contains the used discretization
-
-    user_constants: dict
-        a dictionary containing the user defined constants
-
-    verbose: bool
-        talk more
-
-    evaluate: bool
-        causes the evaluation of the atomic symbols, if true
-
-    instructions: list
-        a list to keep track of the applied instructions.
-
-    settings: dict
-        dictionary for different settings
-    """
-    # ... TODO sets n_deriv from bilinear form
-    n_deriv = 2
-    # ...
-
-    # ... gets the dimension
-    dim = form.assembler.trial_space.context.p_dim
-    # ...
-
-    # ... TODO user constants from form
-    # we consider form to be sympy expression for the moment
-    expr = glt_symbol(form.glt_expr, dim, n_deriv=n_deriv, \
-                      verbose=verbose, evaluate=evaluate, \
-                      discretization=discretization, \
-                      user_functions=form.functions, \
-                      user_constants=user_constants, \
-                      instructions=instructions, \
-                      **settings)
-    # ...
-
-    return expr
-# ...
-
-# ...
 def glt_lambdify(expr, dim=None, discretization=None):
     """
     it is supposed that glt_symbol has been called before.
@@ -1084,72 +1032,6 @@ class glt_symbol_a(Function):
 # ...
 
 # ...
-def dict_to_matrix(d, instructions=None, **settings):
-    """
-    converts a dictionary of expressions to a matrix
-
-    d: dict
-        dictionary of expressions
-
-    instructions: list
-        a list to keep track of the applied instructions.
-
-    settings: dict
-        dictionary for different settings
-    """
-    # ...
-    assert(type(d) == dict)
-    # ...
-
-    # ...
-    n_rows = 1
-    n_cols = 1
-    for key, values in list(d.items()):
-        if key[0]+1 > n_rows:
-            n_rows = key[0] + 1
-        if key[1]+1 > n_cols:
-            n_cols = key[1] + 1
-    # ...
-
-    # ...
-    expressions = []
-    for i_row in range(0, n_rows):
-        row_expr = []
-        for i_col in range(0, n_cols):
-            _expr = None
-            try:
-                _expr = d[i_row,i_col]
-            except:
-                _expr = S.Zero
-            row_expr.append(_expr)
-        expressions.append(row_expr)
-    # ...
-
-    # ...
-    expr = Matrix(expressions)
-    # ...
-
-    # ... updates the latex expression
-    if instructions is not None:
-        # ...
-        title  = "GLT symbol"
-        instructions.append(latex_title_as_paragraph(title))
-        # ...
-
-        # ...
-        sets = {}
-        for key, value in list(settings.items()):
-            if not(key == "glt_integrate"):
-                sets[key] = value
-
-        instructions.append(glt_latex(expr, **sets))
-        # ...
-    # ...
-
-    return expr
-# ...
-
-# ...
 def glt_symbol_laplace(discretization, \
                        verbose=False, evaluate=True, \
                        instructions=[], \
@@ -1172,28 +1054,7 @@ def glt_symbol_laplace(discretization, \
     settings: dict
         dictionary for different settings
     """
-    # ...
-    dim = len(discretization["n_elements"])
-    # ...
-
-    # ...
-    if dim == 1:
-        txt = "Ni_x * Nj_x"
-    elif dim == 2:
-        txt = "Ni_x * Nj_x + Ni_y * Nj_y"
-    elif dim == 3:
-        txt = "Ni_x * Nj_x + Ni_y * Nj_y + Ni_z * Nj_z"
-    # ...
-
-    # ...
-    expr = glt_symbol(txt, dim, \
-                      verbose=verbose, evaluate=evaluate, \
-                      discretization=discretization, \
-                      instructions=instructions, \
-                      **settings)
-    # ...
-
-    return expr
+    raise NotImplementedError('')
 # ...
 
 # ...
