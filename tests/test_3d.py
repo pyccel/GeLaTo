@@ -1,22 +1,18 @@
 # coding: utf-8
 
-# TODO: - raise error if the weak form is not linear/bilinear on the test/trial
-
-
 import numpy as np
 
 from sympy.core.containers import Tuple
 from sympy import symbols
 from sympy import Symbol
 from sympy import Lambda
+from sympy import IndexedBase
 
 from gelato.expression import glt_symbol
 from gelato.expression import gelatize
 from gelato.expression import normalize_weak_from
 from gelato.expression import initialize_weak_form
 from gelato.calculus   import (Dot, Cross, Grad, Curl, Rot, Div)
-
-from pyccel.ast.core import IndexedVariable
 
 
 DIM = 3
@@ -55,8 +51,8 @@ def test_3d_1():
 def test_3d_2():
     x,y,z = symbols('x y z')
 
-    u = IndexedVariable('u')
-    v = IndexedVariable('v')
+    u = IndexedBase('u')
+    v = IndexedBase('v')
 
 
     a = Lambda((x,y,z,v,u), Div(u) * Div(v) + 0.2 * Dot(u, v))
@@ -89,8 +85,8 @@ def test_3d_2():
 def test_3d_3():
     x,y,z = symbols('x y z')
 
-    u = IndexedVariable('u')
-    v = IndexedVariable('v')
+    u = IndexedBase('u')
+    v = IndexedBase('v')
 
     a = Lambda((x,y,z,v,u), Dot(Curl(u), Curl(v)) + 0.2 * Dot(u, v))
     print '> input       := {0}'.format(a)
@@ -122,8 +118,8 @@ def test_3d_3():
 def test_3d_4a():
     x,y,z = symbols('x y z')
 
-    u = IndexedVariable('u')
-    v = IndexedVariable('v')
+    u = IndexedBase('u')
+    v = IndexedBase('v')
 
     b = Tuple(1.0, 0., 0.)
 
@@ -158,10 +154,10 @@ def test_3d_4b():
     """Alfven operator."""
     x,y,z = symbols('x y z')
 
-    u = IndexedVariable('u')
-    v = IndexedVariable('v')
+    u = IndexedBase('u')
+    v = IndexedBase('v')
 
-    b = IndexedVariable('b')
+    b = IndexedBase('b')
 
     c0,c1,c2 = symbols('c0 c1 c2')
 

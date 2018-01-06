@@ -10,8 +10,6 @@ from sympy import Lambda
 from gelato.calculus import (dx, dy, dz)
 from gelato.calculus import LinearOperator
 
-from pyccel.ast.core import IndexedVariable
-
 
 # ...
 def test_0():

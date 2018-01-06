@@ -1,9 +1,5 @@
 # coding: utf-8
 
-# TODO: - raise error if the weak form is not linear/bilinear on the test/trial
-
-from pyccel.symbolic.gelato import glt_symbol
-
 import numpy as np
 
 from sympy.core.sympify import sympify
@@ -43,9 +39,7 @@ from sympy import S
 from sympy.core.compatibility import is_sequence
 from sympy import Basic
 from sympy import Function
-
-from pyccel.ast.core import IndexedVariable
-from pyccel.ast.core import IndexedElement
+from sympy import Indexed
 
 
 # ...
@@ -76,9 +70,9 @@ class LinearOperator(Function):
     def __getitem__(self, indices, **kw_args):
         if is_sequence(indices):
             # Special case needed because M[*my_tuple] is a syntax error.
-            return IndexedElement(self, *indices, **kw_args)
+            return Indexed(self, *indices, **kw_args)
         else:
-            return IndexedElement(self, indices, **kw_args)
+            return Indexed(self, indices, **kw_args)
 
     @classmethod
     def eval(cls, *_args):
@@ -323,9 +317,9 @@ class Cross_3d(CrossBasic):
     def __getitem__(self, indices, **kw_args):
         if is_sequence(indices):
             # Special case needed because M[*my_tuple] is a syntax error.
-            return IndexedElement(self, *indices, **kw_args)
+            return Indexed(self, *indices, **kw_args)
         else:
-            return IndexedElement(self, indices, **kw_args)
+            return Indexed(self, indices, **kw_args)
 
     @classmethod
     def eval(cls, *_args):
@@ -371,9 +365,9 @@ class GradBasic(Function):
     def __getitem__(self, indices, **kw_args):
         if is_sequence(indices):
             # Special case needed because M[*my_tuple] is a syntax error.
-            return IndexedElement(self, *indices, **kw_args)
+            return Indexed(self, *indices, **kw_args)
         else:
-            return IndexedElement(self, indices, **kw_args)
+            return Indexed(self, indices, **kw_args)
 
 class Grad_1d(GradBasic):
     """
@@ -462,9 +456,9 @@ class CurlBasic(Function):
     def __getitem__(self, indices, **kw_args):
         if is_sequence(indices):
             # Special case needed because M[*my_tuple] is a syntax error.
-            return IndexedElement(self, *indices, **kw_args)
+            return Indexed(self, *indices, **kw_args)
         else:
-            return IndexedElement(self, indices, **kw_args)
+            return Indexed(self, indices, **kw_args)
 
 class Curl_2d(CurlBasic):
     """
@@ -536,9 +530,9 @@ class Rot_2d(Function):
     def __getitem__(self, indices, **kw_args):
         if is_sequence(indices):
             # Special case needed because M[*my_tuple] is a syntax error.
-            return IndexedElement(self, *indices, **kw_args)
+            return Indexed(self, *indices, **kw_args)
         else:
-            return IndexedElement(self, indices, **kw_args)
+            return Indexed(self, indices, **kw_args)
 
     @classmethod
     def eval(cls, *_args):
@@ -580,9 +574,9 @@ class DivBasic(Function):
     def __getitem__(self, indices, **kw_args):
         if is_sequence(indices):
             # Special case needed because M[*my_tuple] is a syntax error.
-            return IndexedElement(self, *indices, **kw_args)
+            return Indexed(self, *indices, **kw_args)
         else:
-            return IndexedElement(self, indices, **kw_args)
+            return Indexed(self, indices, **kw_args)
 
 class Div_1d(DivBasic):
     """
@@ -665,9 +659,9 @@ class GenericFunction(Function):
     def __getitem__(self, indices, **kw_args):
         if is_sequence(indices):
             # Special case needed because M[*my_tuple] is a syntax error.
-            return IndexedElement(self, *indices, **kw_args)
+            return Indexed(self, *indices, **kw_args)
         else:
-            return IndexedElement(self, indices, **kw_args)
+            return Indexed(self, indices, **kw_args)
 
 class Dot(GenericFunction):
     pass

@@ -31,6 +31,8 @@ from sympy import Mul, Add
 from sympy import Tuple
 from sympy import postorder_traversal
 from sympy import preorder_traversal
+from sympy import Indexed
+from sympy import IndexedBase
 
 from itertools import product
 
@@ -39,9 +41,11 @@ from gelato.calculus import (Dot_1d, Grad_1d, Div_1d)
 from gelato.calculus import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
 from gelato.calculus import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
 
-from pyccel.ast.core import IndexedVariable
-from pyccel.ast.core import IndexedElement
-from pyccel.ast.core import Variable
+try:
+    from pyccel.ast.core import Variable
+    ENABLE_PYCCEL = True
+except:
+    ENABLE_PYCCEL = False
 
 
 # TODO find a better solution.
@@ -199,8 +203,12 @@ def initialize_weak_form(f, dim):
     # ...
     def _find_atom(expr, atom):
         """."""
-        if not(isinstance(atom, (Symbol, IndexedVariable, Variable))):
-            raise TypeError('Wrong type, given {0}'.format(type(atom)))
+        if ENABLE_PYCCEL:
+            if not(isinstance(atom, (Symbol, IndexedBase, Variable))):
+                raise TypeError('Wrong type, given {0}'.format(type(atom)))
+        else:
+            if not(isinstance(atom, (Symbol, IndexedBase))):
+                raise TypeError('Wrong type, given {0}'.format(type(atom)))
 
         if isinstance(expr, (list, tuple, Tuple)):
             ls = [_find_atom(i, atom) for i in expr]
@@ -215,11 +223,12 @@ def initialize_weak_form(f, dim):
         if isinstance(expr, Function):
             return _find_atom(expr.args, atom)
 
-        if isinstance(expr, IndexedElement):
+        if isinstance(expr, Indexed):
             return (str(expr.base) == str(atom))
 
-        if isinstance(expr, Variable):
-            return (str(expr) == str(atom))
+        if ENABLE_PYCCEL:
+            if isinstance(expr, Variable):
+                return (str(expr) == str(atom))
 
         if isinstance(expr, Symbol):
             return (str(expr) == str(atom))
@@ -230,8 +239,12 @@ def initialize_weak_form(f, dim):
     # ...
     def _is_vector(expr, atom):
         """."""
-        if not(isinstance(atom, (Symbol, IndexedVariable, Variable))):
-            raise TypeError('Wrong type, given {0}'.format(type(atom)))
+        if ENABLE_PYCCEL:
+            if not(isinstance(atom, (Symbol, IndexedBase, Variable))):
+                raise TypeError('Wrong type, given {0}'.format(type(atom)))
+        else:
+            if not(isinstance(atom, (Symbol, IndexedBase))):
+                raise TypeError('Wrong type, given {0}'.format(type(atom)))
 
         if isinstance(expr, (list, tuple, Tuple)):
             ls = [_is_vector(i, atom) for i in expr]
@@ -246,7 +259,7 @@ def initialize_weak_form(f, dim):
         if isinstance(expr, Function):
             return _is_vector(expr.args, atom)
 
-        if isinstance(expr, IndexedElement):
+        if isinstance(expr, Indexed):
             return True
 
         return False
@@ -285,7 +298,7 @@ def initialize_weak_form(f, dim):
             if _is_vector(expr, u):
                 found_vector = True
                 for i in range(0, dim):
-                    uofi = IndexedVariable(str(u))[i]
+                    uofi = IndexedBase(str(u))[i]
                     ui = Symbol('{0}{1}'.format(u, i+1))
                     expr = expr.subs(uofi, ui)
                     args += [ui]
@@ -366,7 +379,7 @@ def normalize_weak_from(f):
             if a in tests:
                 expr = expr.subs({i: Symbol('Ni_{0}'.format(coordinate))})
 
-            if isinstance(a, IndexedElement) and a.base in tests:
+            if isinstance(a, Indexed) and a.base in tests:
                 expr = expr.subs({i: Symbol('Ni_{0}'.format(coordinate))})
             # ...
 
@@ -374,7 +387,7 @@ def normalize_weak_from(f):
             if a in trials:
                 expr = expr.subs({i: Symbol('Nj_{0}'.format(coordinate))})
 
-            if isinstance(a, IndexedElement) and a.base in trials:
+            if isinstance(a, Indexed) and a.base in trials:
                 expr = expr.subs({i: Symbol('Nj_{0}'.format(coordinate))})
             # ...
     # ...

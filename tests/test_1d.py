@@ -1,8 +1,5 @@
 # coding: utf-8
 
-# TODO: - raise error if the weak form is not linear/bilinear on the test/trial
-
-
 import numpy as np
 
 from sympy.core.containers import Tuple
@@ -16,8 +13,6 @@ from gelato.expression import normalize_weak_from
 from gelato.expression import initialize_weak_form
 from gelato.calculus   import (Dot, Cross, Grad, Curl, Rot, Div)
 from gelato.calculus   import LinearOperator
-
-from pyccel.ast.core import IndexedVariable
 
 
 DIM = 1
