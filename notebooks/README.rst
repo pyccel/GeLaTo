@@ -23,13 +23,3 @@ Converting notebooks to rst
 run::
 
   jupyter nbconvert --to=rst --execute getting_started_1.ipynb
-
-.. |build-status| image:: https://travis-ci.org/ratnania/GeLaTo.svg?branch=master
-    :alt: build status
-    :scale: 100%
-    :target: https://travis-ci.org/ratnania/GeLaTo
-
-.. |docs| image:: https://readthedocs.org/projects/gelato/badge/?version=latest
-    :target: http://gelato.readthedocs.io/en/latest/?badge=latest
-    :scale: 100%
-    :alt: Documentation Status
