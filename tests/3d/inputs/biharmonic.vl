@@ -1,7 +1,0 @@
-Domain(dim=3,kind='structured') :: Omega
-Space(domain=Omega,kind='h1')   :: V
-Field(space=V)                  :: phi 
-Function(x,y,z)                 :: f 
-
-b(v::V) := < f * v >_Omega 
-a(v::V, u::V) := < dxx(v) * dxx(u) + dyy(v) * dyy(u) + dzz(v) * dzz(u) >_Omega

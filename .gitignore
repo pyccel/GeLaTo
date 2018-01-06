@@ -5,6 +5,7 @@
 *build*
 *egg*
 *dist*
+.cache
 doc/README.rst
 doc/tutorials/*
 
