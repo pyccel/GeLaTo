@@ -49,4 +49,4 @@ run::
 .. |docs| image:: https://readthedocs.org/projects/GeLaTo/badge/?version=latest
     :alt: Documentation Status
     :scale: 100%
-    :target: http://GeLaTo.readthedocs.io/
+    :target: http://gelato.readthedocs.io/
