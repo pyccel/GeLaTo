@@ -10,10 +10,6 @@ Installation is done using::
 
   sudo python setup.py install
 
-If you are a member of the **CLAPP** framework, you may need to add the **CLAPP_DIR** as a *prefix*::
-
-  sudo python setup.py install --prefix=$CLAPP_DIR
-
 Dependencies
 ^^^^^^^^^^^^
 
