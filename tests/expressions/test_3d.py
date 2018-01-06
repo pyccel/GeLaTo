@@ -8,7 +8,6 @@ from sympy import Symbol
 from sympy import Lambda
 from sympy import IndexedBase
 
-from gelato.expression import glt_symbol
 from gelato.expression import gelatize
 from gelato.expression import normalize_weak_from
 from gelato.expression import initialize_weak_form
@@ -36,14 +35,6 @@ def test_3d_1():
     expr = normalize_weak_from(expr)
     print '> normal form := {0}'.format(expr)
 
-    # ... create a glt symbol from a string without evaluation
-    #     a discretization is defined as a dictionary
-    discretization = {"n_elements": [16, 16, 16], "degrees": [3, 3, 3]}
-
-    expr = glt_symbol(expr, dim=DIM, discretization=discretization, evaluate=False)
-    print '> glt symbol  := {0}'.format(expr)
-    # ...
-
     print('')
 # ...
 
@@ -70,14 +61,6 @@ def test_3d_2():
     expr = normalize_weak_from(expr)
     print '> normal form := {0}'.format(expr)
 
-    # ... create a glt symbol from a string without evaluation
-    #     a discretization is defined as a dictionary
-    discretization = {"n_elements": [16, 16, 16], "degrees": [3, 3, 3]}
-
-    expr = glt_symbol(expr, dim=DIM, discretization=discretization, evaluate=False)
-    print '> glt symbol  := {0}'.format(expr)
-    # ...
-
     print('')
 # ...
 
@@ -102,14 +85,6 @@ def test_3d_3():
 
     expr = normalize_weak_from(expr)
     print '> normal form := {0}'.format(expr)
-
-    # ... create a glt symbol from a string without evaluation
-    #     a discretization is defined as a dictionary
-    discretization = {"n_elements": [16, 16, 16], "degrees": [3, 3, 3]}
-
-    expr = glt_symbol(expr, dim=DIM, discretization=discretization, evaluate=False)
-    print '> glt symbol  := {0}'.format(expr)
-    # ...
 
     print('')
 # ...
@@ -137,14 +112,6 @@ def test_3d_4a():
 
     expr = normalize_weak_from(expr)
     print '> normal form := {0}'.format(expr)
-
-    # ... create a glt symbol from a string without evaluation
-    #     a discretization is defined as a dictionary
-    discretization = {"n_elements": [16, 16, 16], "degrees": [3, 3, 3]}
-
-    expr = glt_symbol(expr, dim=DIM, discretization=discretization, evaluate=False)
-    print '> glt symbol  := {0}'.format(expr)
-    # ...
 
     print('')
 # ...
@@ -178,14 +145,6 @@ def test_3d_4b():
 #
 #    expr = normalize_weak_from(expr)
 #    print '> normal form := {0}'.format(expr)
-#
-#    # ... create a glt symbol from a string without evaluation
-#    #     a discretization is defined as a dictionary
-#    discretization = {"n_elements": [16, 16, 16], "degrees": [3, 3, 3]}
-#
-#    expr = glt_symbol(expr, dim=DIM, discretization=discretization, evaluate=False)
-#    print '> glt symbol  := {0}'.format(expr)
-#    # ...
 
     print('')
 # ...

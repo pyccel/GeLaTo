@@ -41,6 +41,15 @@ from sympy import Basic
 from sympy import Function
 from sympy import Indexed
 
+#try:
+#    from pyccel.ast.core import IndexedElement as Indexed
+#
+#    ENABLE_PYCCEL = True
+#except:
+#    from sympy import Indexed
+#
+#    ENABLE_PYCCEL = False
+
 
 # ...
 class LinearOperator(Function):
