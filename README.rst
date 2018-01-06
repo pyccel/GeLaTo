@@ -1,3 +1,8 @@
+Welcome to Pyccel
+=================
+
+|build-status| |docs|
+
 Introduction
 ============
 
@@ -35,3 +40,8 @@ Converting notebooks to rst
 run::
 
   jupyter nbconvert --to=rst --execute getting_started_1.ipynb
+
+.. |build-status| image:: https://travis-ci.org/ratnania/GeLaTo.svg?branch=master
+    :alt: build status
+    :scale: 100%
+    :target: https://travis-ci.org/ratnania/GeLaTo
