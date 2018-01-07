@@ -72,6 +72,11 @@ _basis_registery = ['Ni',
 
 
 # ...
+def _is_valid_op(expr):
+    return
+# ...
+
+# ...
 def gelatize(expr, dim):
     # ... in the case of a Lambda expression
     args = None
@@ -80,21 +85,8 @@ def gelatize(expr, dim):
         expr = expr.expr
     # ...
 
-    # ...
-    def _is_valid_op(expr):
-        # TODO improve this
-        try:
-            op_name  = str(type(expr).__name__)
-        except:
-            op_name = str(expr)
-        op_names = [str(a) for a in _generic_ops]
-
-        return isinstance(a, _generic_ops) or (op_name in op_names)
-    # ...
-
     # ... we first need to find the ordered list of generic operators
-    ops = [a for a in preorder_traversal(expr) if _is_valid_op(a)]
-#    print '> ops = ', ops
+    ops = [a for a in preorder_traversal(expr) if isinstance(a, _generic_ops)]
     # ...
 
     # ...

@@ -1,13 +1,13 @@
 # coding: utf-8
 
 # ... import symbolic tools
-glt_function = load('pyccel.symbolic.gelato', 'glt_function', True, 3)
-dx           = load('pyccel.symbolic.gelato', 'dx', False, 1)
-dy           = load('pyccel.symbolic.gelato', 'dy', False, 1)
+glt_function = load('gelato.glt', 'glt_function', True, 3)
+Grad         = load('gelato.calculus', 'Grad', False, 1)
+Dot          = load('gelato.calculus', 'Dot', False, 1)
 # ...
 
 # ... weak formulation
-a  = lambda x,y,u,v: dx(u) * dx(v) + dy(u) * dy(v)
+a  = lambda x,y,u,v: Dot(Grad(u), Grad(v)) + u * v
 # ...
 
 # ... computing the glt symbol

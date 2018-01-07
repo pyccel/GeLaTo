@@ -2,13 +2,11 @@
 
 # ... import symbolic tools
 glt_function = load('gelato.glt', 'glt_function', True, 3)
-Grad         = load('gelato.calculus', 'Grad', False, 1)
-Dot          = load('gelato.calculus', 'Dot', False, 1)
 dx           = load('gelato.calculus', 'dx', False, 1)
 # ...
 
 # ... weak formulation
-a  = lambda x,u,v: Dot(Grad(u), Grad(v)) + u * v
+a  = lambda x,u,v: dx(u) * dx(v) + u * v
 # ...
 
 # ... computing the glt symbol

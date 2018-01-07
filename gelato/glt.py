@@ -36,7 +36,6 @@ from sympy import IndexedBase
 
 from itertools import product
 
-from gelato.calculus import _generic_ops, _partial_derivatives
 from gelato.calculus import (Dot_1d, Grad_1d, Div_1d)
 from gelato.calculus import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
 from gelato.calculus import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
