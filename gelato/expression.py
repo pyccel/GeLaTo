@@ -80,8 +80,21 @@ def gelatize(expr, dim):
         expr = expr.expr
     # ...
 
+    # ...
+    def _is_valid_op(expr):
+        # TODO improve this
+        try:
+            op_name  = str(type(expr).__name__)
+        except:
+            op_name = str(expr)
+        op_names = [str(a) for a in _generic_ops]
+
+        return isinstance(a, _generic_ops) or (op_name in op_names)
+    # ...
+
     # ... we first need to find the ordered list of generic operators
-    ops = [a for a in preorder_traversal(expr) if isinstance(a, _generic_ops)]
+    ops = [a for a in preorder_traversal(expr) if _is_valid_op(a)]
+#    print '> ops = ', ops
     # ...
 
     # ...
@@ -432,45 +445,9 @@ class weak_formulation(Function):
         dim = _args[1]
         # ...
 
-        # ...
-        f, info = initialize_weak_form(f, dim)
-
-        coords = info['coords']
-        tests  = info['tests']
-        trials = info['trials']
-
-        test_names  = [str(i) for i in tests]
-        trial_names = [str(i) for i in trials]
-        coord_names = [str(i) for i in coords]
-        # ...
-
-        # ...
-        expr = normalize_weak_from(f)
-
-        if isinstance(expr, Matrix):
-            expressions = []
-            nr = expr.shape[0]
-            nc = expr.shape[1]
-            for ir in range(0, nr):
-                for ic in range(0, nc):
-                    expressions += [expr[ir,ic]]
-            expr = Tuple(*expressions)
-
-            if len(expr) == 1:
-                expr = expr[0]
-        # ...
-
-        # ... TODO improve
-        free_symbols = [str(i) for i in expr.free_symbols]
-        free_symbols.sort()
-
-        args  = _coord_registery[:dim]
-        args += [i for i in free_symbols if i in _basis_registery]
-
-        args = [Symbol(i) for i in args]
-        # ...
-
-        expr = Lambda(args, expr)
+        # ... TODO is_block
+        expr = construct_weak_form(f, dim=dim, is_block=False, verbose=False)
+        # ...
 
         return expr
 # ...

@@ -416,7 +416,7 @@ def glt_symbol(expr, dim,  n_deriv=1,
     # ...
 
     # ...
-    expr = construct_weak_form(expr, dim=dim, is_block=is_block)
+    expr = construct_weak_form(expr, dim=dim, is_block=is_block, verbose=verbose)
     # ...
 
     # ...
@@ -854,32 +854,10 @@ class glt_function(Function):
             p = [p]
         discretization = {"n_elements": n, "degrees": p}
 
-        f, info = initialize_weak_form(f, dim)
-
-        coords = info['coords']
-        tests  = info['tests']
-        trials = info['trials']
-
-        test_names  = [str(i) for i in tests]
-        trial_names = [str(i) for i in trials]
-        coord_names = [str(i) for i in coords]
-
-        F = glt_symbol(f, dim=dim, discretization=discretization, evaluate=True)
-
-        # glt_symbol may return a matrix of lambdas
-        if isinstance(F, Matrix):
-            expressions = []
-            for i in range(0, F.shape[0]):
-                row = []
-                for j in range(0, F.shape[1]):
-                    row += [F[i,j].expr]
-                expressions += [row]
-            args = list(coords)
-            args += [a for a in F[i,j].variables if not(str(a) in coord_names)]
-            F = Lambda(args, Matrix(expressions))
-
-#        print(F)
-#        import sys; sys.exit(1)
+        F = glt_symbol(f, dim=dim,
+                       discretization=discretization,
+                       evaluate=True,
+                       verbose=False)
 
         return F
 # ...
