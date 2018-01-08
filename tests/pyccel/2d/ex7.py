@@ -1,7 +1,6 @@
 # coding: utf-8
 
-# TODO: - why must we put 'g1, g2 = 0'? => problem with local_vars/stmt in syntax?
-#       - improve how we pass arguments to weak_form
+# TODO: - improve how we pass arguments to weak_form
 
 # ... import symbolic tools
 weak_formulation = load('pyccel.symbolic.gelato', 'weak_formulation', True, 2)
@@ -14,45 +13,22 @@ eps = 0.1
 bracket = lambda u,v: dy(u)*dx(v) - dx(u)*dy(v)
 a       = lambda x,y,u,v: (1.0 + eps*x)*dx(u) * dx(v) + bracket(u,v)
 
-wf = weak_formulation(a, 2)
-
+wf        = weak_formulation(a, 2)
 weak_form = lambdify(wf)
 # ...
 
-#$ header function kernel(int, int, double [:], double [:], double [:], double [:], double [:,:], double [:,:], double [:,:], double [:,:]) results (double)
-def kernel(p1, p2, u, v, wu, wv, bi1, bi2, bj1, bj2):
-    contrib = 0.0
+# ... to be improved
+Ni_x = 0.2
+Ni_y = 0.2
+Nj_x = -0.2
+Nj_y = -0.1
 
-    val  = 0.0
+y = weak_form(0.1, 0.1, Ni_x, Ni_y, Nj_x, Nj_y)
+# ...
 
-    x    = 0.0
-    y    = 0.0
-
-    Ni   = 0.0
-    Ni_x = 0.0
-    Ni_y = 0.0
-    Nj   = 0.0
-    Nj_x = 0.0
-    Nj_y = 0.0
-
-    g1 = 0
-    g2 = 0
-
-    for g1 in range(0, p1+1):
-        for g2 in range(0, p2+1):
-
-            x = u[g1]
-            y = v[g2]
-
-            Ni   = bi1[0,g1] * bi2[0,g2]
-            Ni_x = bi1[1,g1] * bi2[0,g2]
-            Ni_y = bi1[0,g1] * bi2[1,g2]
-
-            Nj   = bj1[0,g1] * bj2[0,g2]
-            Nj_x = bj1[1,g1] * bj2[0,g2]
-            Nj_y = bj1[0,g1] * bj2[1,g2]
-
-            val = weak_form(x, y, Ni_x, Ni_y, Nj_x, Nj_y)
-            contrib = contrib + val * wu[g1] * wv[g2]
-
-    return contrib
+# ... a Lambda expression can be printed
+print(' a             := ', a)
+print('weak-form      := ', wf)
+print('eval weak-form := ', y)
+print('')
+# ...
