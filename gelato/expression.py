@@ -439,7 +439,33 @@ class weak_formulation(Function):
 
         # ... TODO is_block
         expr = construct_weak_form(f, dim=dim, is_block=False, verbose=False)
-        # ...
+        # ...
+
+        # ...
+        if isinstance(expr, Matrix):
+            expressions = []
+            nr = expr.shape[0]
+            nc = expr.shape[1]
+            for ir in range(0, nr):
+                for ic in range(0, nc):
+                    expressions += [expr[ir,ic]]
+            expr = Tuple(*expressions)
+
+            if len(expr) == 1:
+                expr = expr[0]
+        # ...
+
+        # ... TODO improve
+        free_symbols = [str(i) for i in expr.free_symbols]
+        free_symbols.sort()
+
+        args  = _coord_registery[:dim]
+        args += [i for i in free_symbols if i in _basis_registery]
+
+        args = [Symbol(i) for i in args]
+        # ...
+
+        expr = Lambda(args, expr)
 
         return expr
 # ...

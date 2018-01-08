@@ -46,7 +46,7 @@ def test_1d():
 # ...
 def test_2d():
     print('============== testing 2d ================')
-    ignored = []
+    ignored = ['ex5b.py', 'ex6.py', 'ex7.py', 'ex8.py', 'ex9.py']
 
     base_dir = os.getcwd()
 
