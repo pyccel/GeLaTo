@@ -11,6 +11,7 @@ from gelato.expression import gelatize
 from gelato.expression import normalize_weak_from
 from gelato.calculus   import (Dot, Cross, Grad, Curl, Rot, Div)
 from gelato.calculus   import LinearOperator
+from gelato.calculus   import Constant
 
 
 DIM = 1
@@ -34,7 +35,30 @@ def test_1d_1():
     print('')
 # ...
 
+# ...
+def test_1d_2():
+    x,y = symbols('x y')
+
+    u = Symbol('u')
+    v = Symbol('v')
+
+#    b = Function('b')
+    b = Constant('b')
+
+    a = Lambda((x,y,v,u), Dot(Grad(b*u), Grad(v)) + u*v)
+    print '> input       := {0}'.format(a)
+
+    expr = gelatize(a, dim=DIM)
+    print '> gelatized   := {0}'.format(expr)
+
+    expr = normalize_weak_from(expr)
+    print '> normal form := {0}'.format(expr)
+
+    print('')
+# ...
+
 # .....................................................
 if __name__ == '__main__':
 
     test_1d_1()
+    test_1d_2()

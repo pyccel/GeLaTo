@@ -51,6 +51,16 @@ from sympy import Indexed
 #    ENABLE_PYCCEL = False
 
 
+#if ENABLE_PYCCEL:
+#    _coeffs_registery += (Variable,)
+
+# ...
+class Constant(Symbol):
+    pass
+# ...
+
+_coeffs_registery = (Integer, Float, Constant)
+
 # ...
 class LinearOperator(Function):
     """
@@ -90,8 +100,6 @@ class LinearOperator(Function):
         if not _args:
             return
 
-        _coeffs_registery = (Integer, Float)
-
         expr = _args[0]
         if isinstance(expr, Add):
             args = expr.args
@@ -129,8 +137,6 @@ class DifferentialOperator(LinearOperator):
     @classmethod
     def eval(cls, *_args):
         """."""
-
-        _coeffs_registery = (Integer, Float)
 
         expr = _args[0]
         if isinstance(expr, Add):

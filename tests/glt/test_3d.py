@@ -10,6 +10,7 @@ from sympy import IndexedBase
 
 from gelato.glt import glt_symbol
 from gelato.calculus   import (Dot, Cross, Grad, Curl, Rot, Div)
+from gelato.calculus   import Constant
 
 
 DIM = 3
@@ -101,33 +102,36 @@ def test_3d_4a():
     print('')
 # ...
 
-## ... TODO fix it
-#def test_3d_4b():
-#    """Alfven operator."""
-#    x,y,z = symbols('x y z')
-#
-#    u = IndexedBase('u')
-#    v = IndexedBase('v')
-#
-#    b = IndexedBase('b')
-#
-#    c0,c1,c2 = symbols('c0 c1 c2')
-#
-#    a = Lambda((x,y,z,v,u), (  c0 * Dot(u, v)
-#                             - c1 * Div(u) * Div(v)
-#                             + c2 *Dot(Curl(Cross(b,u)), Curl(Cross(b,v)))))
-#    print '> input       := {0}'.format(a)
-#
-#    # ... create a glt symbol from a string without evaluation
-#    #     a discretization is defined as a dictionary
-#    discretization = {"n_elements": [16, 16, 16], "degrees": [3, 3, 3]}
-#
-#    expr = glt_symbol(a, dim=DIM, discretization=discretization, evaluate=False, is_block=True)
-#    print '> glt symbol  := {0}'.format(expr)
-#    # ...
-#
-#    print('')
-## ...
+# ...
+def test_3d_4b():
+    """Alfven operator."""
+    x,y,z = symbols('x y z')
+
+    u = IndexedBase('u')
+    v = IndexedBase('v')
+
+    bx = Constant('bx')
+    by = Constant('by')
+    bz = Constant('bz')
+    b = Tuple(bx, by, bz)
+
+    c0,c1,c2 = symbols('c0 c1 c2')
+
+    a = Lambda((x,y,z,v,u), (  c0 * Dot(u, v)
+                             - c1 * Div(u) * Div(v)
+                             + c2 *Dot(Curl(Cross(b,u)), Curl(Cross(b,v)))))
+    print '> input       := {0}'.format(a)
+
+    # ... create a glt symbol from a string without evaluation
+    #     a discretization is defined as a dictionary
+    discretization = {"n_elements": [16, 16, 16], "degrees": [3, 3, 3]}
+
+    expr = glt_symbol(a, dim=DIM, discretization=discretization, evaluate=False, is_block=True)
+    print '> glt symbol  := {0}'.format(expr)
+    # ...
+
+    print('')
+# ...
 
 # .....................................................
 if __name__ == '__main__':
@@ -135,4 +139,4 @@ if __name__ == '__main__':
     test_3d_2()
     test_3d_3()
     test_3d_4a()
-#    test_3d_4b()
+    test_3d_4b()

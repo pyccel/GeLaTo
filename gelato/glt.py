@@ -478,6 +478,7 @@ def glt_symbol(expr, dim,  n_deriv=1,
 
         # ...
         expr = sympify(str(expr), locals=ns)
+        expr = expr.expand()
         # ...
 
         # ... remove _0 for a nice printing

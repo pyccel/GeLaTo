@@ -12,6 +12,7 @@ from gelato.expression import gelatize
 from gelato.expression import normalize_weak_from
 from gelato.expression import initialize_weak_form
 from gelato.calculus   import (Dot, Cross, Grad, Curl, Rot, Div)
+from gelato.calculus   import Constant
 
 
 DIM = 3
@@ -124,7 +125,10 @@ def test_3d_4b():
     u = IndexedBase('u')
     v = IndexedBase('v')
 
-    b = IndexedBase('b')
+    bx = Constant('bx')
+    by = Constant('by')
+    bz = Constant('bz')
+    b = Tuple(bx, by, bz)
 
     c0,c1,c2 = symbols('c0 c1 c2')
 
@@ -136,15 +140,14 @@ def test_3d_4b():
     expr = gelatize(a, dim=DIM)
     print '> gelatized   := {0}'.format(expr)
 
-    # TODO: fix, not working
-#    expr, info = initialize_weak_form(expr, dim=DIM)
-#    print '> temp form   :='
-#    # for a nice printing, we print the dictionary entries one by one
-#    for key, value in expr.items():
-#        print '\t\t', key, '\t', value
-#
-#    expr = normalize_weak_from(expr)
-#    print '> normal form := {0}'.format(expr)
+    expr, info = initialize_weak_form(expr, dim=DIM)
+    print '> temp form   :='
+    # for a nice printing, we print the dictionary entries one by one
+    for key, value in expr.items():
+        print '\t\t', key, '\t', value
+
+    expr = normalize_weak_from(expr)
+    print '> normal form := {0}'.format(expr)
 
     print('')
 # ...
