@@ -33,12 +33,14 @@ from sympy import postorder_traversal
 from sympy import preorder_traversal
 from sympy import Indexed
 from sympy import IndexedBase
+from sympy import Lambda
 
 from itertools import product
 
 from gelato.calculus import (Dot_1d, Grad_1d, Div_1d)
 from gelato.calculus import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
 from gelato.calculus import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
+from gelato.calculus import Constant
 from gelato.expression import construct_weak_form
 
 try:
@@ -325,56 +327,9 @@ def glt_update_atoms(expr, discretization):
 # ...
 
 # ...
-def glt_update_user_functions(expr, user_functions):
-    """
-    updates the glt symbol with user defined functions
-
-    expr:
-        a sympy expression
-
-    user_functions: dict
-        a dictionary containing the user defined functions
-    """
-    from clapp.vale.expressions.function import Function as CLAPP_Function
-    for f_name, f in list(user_functions.items()):
-        # ...
-        if type(f) == CLAPP_Function:
-            sympy_f = f.to_sympy()
-        else:
-            sympy_f = implemented_function(Function(f_name), f)
-        # ...
-
-        # ...
-        expr = expr.subs({Symbol(f_name): sympy_f})
-        # ...
-
-    return expr
-# ...
-
-# ...
-def glt_update_user_constants(expr, user_constants):
-    """
-    updates the glt symbol with user defined constants
-
-    expr:
-        a sympy expression
-
-    user_constants: dict
-        a dictionary containing the user defined constants
-    """
-    for f_name, f in list(user_constants.items()):
-        # ...
-        if type(f) in [int, float, complex]:
-            expr = expr.subs({Symbol(f_name): f})
-        # ...
-
-    return expr
-# ...
-
-# ...
 def glt_symbol(expr, dim,  n_deriv=1,
                verbose=False, evaluate=True, is_block=False, discretization=None,
-               user_functions=None, user_constants=None, instructions=[], **settings):
+               instructions=[], **settings):
     """
     computes the glt symbol of a weak formulation given as a sympy expression.
 
@@ -393,14 +348,11 @@ def glt_symbol(expr, dim,  n_deriv=1,
     evaluate: bool
         causes the evaluation of the atomic symbols, if true
 
+    is_block: bool
+        treat a block prolbem if True. (this must be removed lated)
+
     discretization: dict
         a dictionary that contains the used discretization
-
-    user_functions: dict
-        a dictionary containing the user defined functions
-
-    user_constants: dict
-        a dictionary containing the user defined constants
 
     instructions: list
         a list to keep track of the applied instructions.
@@ -443,8 +395,6 @@ def glt_symbol(expr, dim,  n_deriv=1,
                                      verbose=verbose, \
                                      evaluate=evaluate, \
                                      discretization=discretization, \
-                                     user_functions=user_functions, \
-                                     user_constants=user_constants, \
                                      instructions=instructions, \
                                      **settings)
             # ...
@@ -460,12 +410,6 @@ def glt_symbol(expr, dim,  n_deriv=1,
         # ...
 
         # ...
-        if user_constants is not None:
-            for c_name, c in list(user_constants.items()):
-                ns[c_name] = Symbol(c_name)
-        # ...
-
-        # ...
         d = basis_symbols(dim,n_deriv)
         for key, item in list(d.items()):
             ns[key] = item
@@ -477,14 +421,8 @@ def glt_symbol(expr, dim,  n_deriv=1,
         # ...
 
         # ...
-        expr = sympify(str(expr), locals=ns)
+        expr = sympify(expr, locals=ns)
         expr = expr.expand()
-        # ...
-
-        # ... remove _0 for a nice printing
-        #     TODO remove
-        expr = expr.subs({Symbol("Ni_0"): Symbol("Ni")})
-        expr = expr.subs({Symbol("Nj_0"): Symbol("Nj")})
         # ...
     # ...
 
@@ -537,54 +475,25 @@ def glt_symbol(expr, dim,  n_deriv=1,
     expr = glt_update_atoms(expr, discretization)
     # ...
 
-    # ...
-    if (not user_functions) and (not user_constants):
-        return expr
-    # ...
-
-    # ...
-    if user_constants:
-        expr = glt_update_user_constants(expr, user_constants)
-    # ...
-
-    # ...
-    if user_functions:
-        expr = glt_update_user_functions(expr, user_functions)
-    # ...
-
     return expr
 # ...
 
 # ...
-def glt_lambdify(expr, dim=None, discretization=None):
+def glt_lambdify(expr):
     """
     it is supposed that glt_symbol has been called before.
 
     expr: sympy.Expression
         a sympy expression or a text
-
-    dim: int
-        dimension of the logical/physical domain.
-
-    discretization: dict
-        a dictionary that contains the used discretization
     """
-    _dim = dim
-    if dim is None:
-        if discretization is not None:
-            _dim = len(discretization["n_elements"])
-        else:
-            raise ValueError("> either dim or discretization must be provided.")
+    if not isinstance(expr, Lambda):
+        raise TypeError('Expecting a Lambda expression')
 
-    args_x = ["x","y","z"]
-    args_t = ["t1","t2","t3"]
-    args_xt = args_x[:_dim] + args_t[:_dim]
-    args = [Symbol(x) for x in args_xt]
-    return lambdify(args, expr, "numpy")
+    return lambdify(expr.variables, expr.expr, "numpy")
 # ...
 
 # ...
-def glt_approximate_eigenvalues(expr, discretization, mapping=None):
+def glt_approximate_eigenvalues(expr, discretization, mapping=None, is_block=False):
     """
     approximates the eigenvalues using a uniform sampling
 
@@ -596,17 +505,21 @@ def glt_approximate_eigenvalues(expr, discretization, mapping=None):
 
     mapping: clapp.spl.mapping.Mapping
         a mapping object (geometric transformation)
+
+    is_block: bool
+        treat a block prolbem if True. (this must be removed lated)
     """
     # ...
-    is_block = False
+    if not isinstance(expr, Lambda):
+        raise TypeError('Expecting a Lambda expression')
     # ...
 
     # ... lambdify the symbol.
-    #     The block case will be done later.
-    if type(expr) == MutableDenseMatrix:
-        is_block = True
-    else:
-        f = glt_lambdify(expr, discretization=discretization)
+    f = glt_lambdify(expr)
+    # ...
+
+    # ...
+    expr = expr.expr
     # ...
 
     # ...
@@ -634,7 +547,7 @@ def glt_approximate_eigenvalues(expr, discretization, mapping=None):
 
             eigs = []
             for ek, mult in list(eigen.items()):
-                f = glt_lambdify(ek, discretization=discretization)
+                f = glt_lambdify(ek)
                 t = f(x,t1)
                 eigs += mult * list(t)
 
@@ -664,7 +577,7 @@ def glt_approximate_eigenvalues(expr, discretization, mapping=None):
 
             eigs = []
             for ek, mult in list(eigen.items()):
-                f = glt_lambdify(ek, discretization=discretization)
+                f = glt_lambdify(ek)
                 t = f(x,y,t1,t2).ravel()
                 eigs += mult * list(t)
 
@@ -701,7 +614,7 @@ def glt_approximate_eigenvalues(expr, discretization, mapping=None):
 
             eigs = []
             for ek, mult in list(eigen.items()):
-                f = glt_lambdify(ek, discretization=discretization)
+                f = glt_lambdify(ek)
                 t = f(x,y,z,t1,t2,t3).ravel()
                 eigs += mult * list(t)
 
