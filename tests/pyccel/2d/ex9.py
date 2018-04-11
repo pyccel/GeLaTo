@@ -26,8 +26,8 @@ wf = weak_formulation(a, 2)
 # ...
 
 # ... a Lambda expression can be printed
-print(' a             := ', a)
-print('weak-form      := ', wf)
+print((' a             := ', a))
+print(('weak-form      := ', wf))
 #print('eval weak-form := ', y)
 print('')
 # ...

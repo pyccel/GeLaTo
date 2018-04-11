@@ -22,8 +22,8 @@ y = g(0.5, 0.5, 0.1, 0.5, 0.1, 0.3)
 # ...
 
 # ... a Lambda expression can be printed
-print(' a          := ', a)
-print(' glt symbol := ', ga)
+print((' a          := ', a))
+print((' glt symbol := ', ga))
 print('')
-print(' symbol (0.5, 0.5, 0.5, 0.1, 0.1, 0.3) = ', y)
+print((' symbol (0.5, 0.5, 0.5, 0.1, 0.1, 0.3) = ', y))
 # ...

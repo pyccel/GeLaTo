@@ -18,8 +18,8 @@ weak_form = lambdify(wf)
 # ...
 
 # ... a Lambda expression can be printed
-print(' a          := ', a)
-print('weak-form   := ', wf)
+print((' a          := ', a))
+print(('weak-form   := ', wf))
 print('')
 # ...
 

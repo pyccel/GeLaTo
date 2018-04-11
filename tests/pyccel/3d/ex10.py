@@ -18,9 +18,9 @@ a1  = lambda x,y,z,v,u: Dot(Grad(u), Grad(v))
 ga1 = glt_function(a1, [4, 4, 4], [2, 2, 2])
 wa1 = weak_formulation(a1, 3)
 
-print(' a1            := ', a1)
-print(' glt symbol a1 := ', ga1)
-print('wa1            := ', wa1)
+print((' a1            := ', a1))
+print((' glt symbol a1 := ', ga1))
+print(('wa1            := ', wa1))
 print('')
 # ...
 
@@ -30,9 +30,9 @@ a2  = lambda x,y,z,v,u: Div(u) * Div(v) + 0.2 * Dot(u, v)
 ga2 = glt_function(a2, [4, 4, 4], [2, 2, 2])
 wa2 = weak_formulation(a2, 3)
 
-print(' a2            := ', a2)
-print(' glt symbol a2 := ', ga2)
-print('wa2            := ', wa2)
+print((' a2            := ', a2))
+print((' glt symbol a2 := ', ga2))
+print(('wa2            := ', wa2))
 print('')
 # ...
 
@@ -42,8 +42,8 @@ a3  = lambda x,y,z,v,u: Dot(Curl(u), Curl(v)) + 0.2 * Dot(u, v)
 ga3 = glt_function(a3, [4, 4, 4], [2, 2, 2])
 wa3 = weak_formulation(a3, 3)
 
-print(' a3            := ', a3)
-print(' glt symbol a3 := ', ga3)
-print('wa3            := ', wa3)
+print((' a3            := ', a3))
+print((' glt symbol a3 := ', ga3))
+print(('wa3            := ', wa3))
 print('')
 # ...

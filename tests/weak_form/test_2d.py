@@ -23,11 +23,11 @@ def test_2d_1():
     v = Symbol('v')
 
     a = Lambda((x,y,v,u), Dot(Grad(u), Grad(v)) + u*v)
-    print '> input       := {0}'.format(a)
+    print('> input       := {0}'.format(a))
 
     # ...
     expr = construct_weak_form(a, dim=DIM)
-    print '> weak form := {0}'.format(expr)
+    print('> weak form := {0}'.format(expr))
     # ...
 
     print('')
@@ -41,11 +41,11 @@ def test_2d_2():
     v = IndexedBase('v')
 
     a = Lambda((x,y,v,u), Rot(u) * Rot(v) + Div(u) * Div(v) + 0.2 * Dot(u, v))
-    print '> input       := {0}'.format(a)
+    print('> input       := {0}'.format(a))
 
     # ...
     expr = construct_weak_form(a, dim=DIM, is_block=True, verbose=True)
-    print '> weak form := {0}'.format(expr)
+    print('> weak form := {0}'.format(expr))
     # ...
 
     print('')
@@ -59,11 +59,11 @@ def test_2d_3():
     v = Symbol('v')
 
     a = Lambda((x,y,v,u), Cross(Curl(u), Curl(v)) + 0.2 * u * v)
-    print '> input       := {0}'.format(a)
+    print('> input       := {0}'.format(a))
 
     # ...
     expr = construct_weak_form(a, dim=DIM, is_block=True)
-    print '> weak form := {0}'.format(expr)
+    print('> weak form := {0}'.format(expr))
     # ...
 
     print('')
@@ -81,11 +81,11 @@ def test_2d_4():
     b = Tuple(bx, by)
 
     a = Lambda((x,y,v,u), 0.2 * u * v + Dot(b, Grad(v)) * u)
-    print '> input       := {0}'.format(a)
+    print('> input       := {0}'.format(a))
 
     # ...
     expr = construct_weak_form(a, dim=DIM, is_block=False)
-    print '> weak form := {0}'.format(expr)
+    print('> weak form := {0}'.format(expr))
     # ...
 
     print('')

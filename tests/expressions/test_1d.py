@@ -24,13 +24,13 @@ def test_1d_1():
     v = Symbol('v')
 
     a = Lambda((x,y,v,u), Dot(Grad(u), Grad(v)) + u*v)
-    print '> input       := {0}'.format(a)
+    print('> input       := {0}'.format(a))
 
     expr = gelatize(a, dim=DIM)
-    print '> gelatized   := {0}'.format(expr)
+    print('> gelatized   := {0}'.format(expr))
 
     expr = normalize_weak_from(expr)
-    print '> normal form := {0}'.format(expr)
+    print('> normal form := {0}'.format(expr))
 
     print('')
 # ...
@@ -46,13 +46,13 @@ def test_1d_2():
     b = Constant('b')
 
     a = Lambda((x,y,v,u), Dot(Grad(b*u), Grad(v)) + u*v)
-    print '> input       := {0}'.format(a)
+    print('> input       := {0}'.format(a))
 
     expr = gelatize(a, dim=DIM)
-    print '> gelatized   := {0}'.format(expr)
+    print('> gelatized   := {0}'.format(expr))
 
     expr = normalize_weak_from(expr)
-    print '> normal form := {0}'.format(expr)
+    print('> normal form := {0}'.format(expr))
 
     print('')
 # ...

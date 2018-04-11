@@ -39,7 +39,7 @@ def test_1d():
         f = os.path.basename(f_name)
 
         pyccel(files=[f_name])
-        print('> testing {0}: done'.format(str(f)))
+        print(('> testing {0}: done'.format(str(f))))
     # ...
 # ...
 
@@ -74,7 +74,7 @@ def test_2d():
         f = os.path.basename(f_name)
 
         pyccel(files=[f_name])
-        print('> testing {0}: done'.format(str(f)))
+        print(('> testing {0}: done'.format(str(f))))
     # ...
 # ...
 
@@ -109,7 +109,7 @@ def test_3d():
         f = os.path.basename(f_name)
 
         pyccel(files=[f_name])
-        print('> testing {0}: done'.format(str(f)))
+        print(('> testing {0}: done'.format(str(f))))
     # ...
 # ...
 

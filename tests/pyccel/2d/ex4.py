@@ -21,7 +21,7 @@ g = lambdify(ga)
 y = g(0.5, 0.5, 0.1, 0.3)
 # ...
 
-print(' a          := ', a)
-print(' glt symbol := ', ga)
+print((' a          := ', a))
+print((' glt symbol := ', ga))
 print('')
-print(' symbol (0.5, 0.5, 0.1, 0.3) = ', y)
+print((' symbol (0.5, 0.5, 0.1, 0.3) = ', y))

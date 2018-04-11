@@ -25,13 +25,13 @@ def test_2d_1():
     v = Symbol('v')
 
     a = Lambda((x,y,v,u), Dot(Grad(u), Grad(v)) + u*v)
-    print '> input       := {0}'.format(a)
+    print('> input       := {0}'.format(a))
 
     expr = gelatize(a, dim=DIM)
-    print '> gelatized   := {0}'.format(expr)
+    print('> gelatized   := {0}'.format(expr))
 
     expr = normalize_weak_from(expr)
-    print '> normal form := {0}'.format(expr)
+    print('> normal form := {0}'.format(expr))
 
     print('')
 # ...
@@ -44,19 +44,19 @@ def test_2d_2():
     v = IndexedBase('v')
 
     a = Lambda((x,y,v,u), Rot(u) * Rot(v) + Div(u) * Div(v) + 0.2 * Dot(u, v))
-    print '> input       := {0}'.format(a)
+    print('> input       := {0}'.format(a))
 
     expr = gelatize(a, dim=DIM)
-    print '> gelatized   := {0}'.format(expr)
+    print('> gelatized   := {0}'.format(expr))
 
     expr, info = initialize_weak_form(expr, dim=DIM)
-    print '> temp form   :='
+    print('> temp form   :=')
     # for a nice printing, we print the dictionary entries one by one
-    for key, value in expr.items():
-        print '\t\t', key, '\t', value
+    for key, value in list(expr.items()):
+        print('\t\t', key, '\t', value)
 
     expr = normalize_weak_from(expr)
-    print '> normal form := {0}'.format(expr)
+    print('> normal form := {0}'.format(expr))
 
     print('')
 # ...
@@ -69,16 +69,16 @@ def test_2d_3():
     v = Symbol('v')
 
     a = Lambda((x,y,v,u), Cross(Curl(u), Curl(v)) + 0.2 * u * v)
-    print '> input       := {0}'.format(a)
+    print('> input       := {0}'.format(a))
 
     expr = gelatize(a, dim=DIM)
-    print '> gelatized   := {0}'.format(expr)
+    print('> gelatized   := {0}'.format(expr))
 
     expr, info = initialize_weak_form(expr, dim=DIM)
-    print '> temp form   := {0}'.format(expr)
+    print('> temp form   := {0}'.format(expr))
 
     expr = normalize_weak_from(expr)
-    print '> normal form := {0}'.format(expr)
+    print('> normal form := {0}'.format(expr))
 
     print('')
 # ...
@@ -95,16 +95,16 @@ def test_2d_4():
     b = Tuple(bx, by)
 
     a = Lambda((x,y,v,u), 0.2 * u * v + Dot(b, Grad(v)) * u)
-    print '> input       := {0}'.format(a)
+    print('> input       := {0}'.format(a))
 
     expr = gelatize(a, dim=DIM)
-    print '> gelatized   := {0}'.format(expr)
+    print('> gelatized   := {0}'.format(expr))
 
     expr, info = initialize_weak_form(expr, dim=DIM)
-    print '> temp form   := {0}'.format(expr)
+    print('> temp form   := {0}'.format(expr))
 
     expr = normalize_weak_from(expr)
-    print '> normal form := {0}'.format(expr)
+    print('> normal form := {0}'.format(expr))
 
     print('')
 # ...

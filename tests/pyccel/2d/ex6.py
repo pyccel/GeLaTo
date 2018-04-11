@@ -24,8 +24,8 @@ g  = lambdify(ga)
 y = g (0.2, 0.2, 1.1, 3.1)
 # ...
 
-print(' a          := ', a)
-print(' wf         := ', wf)
-print(' glt symbol := ', ga)
+print((' a          := ', a))
+print((' wf         := ', wf))
+print((' glt symbol := ', ga))
 print('')
-print(' symbol (0.2, 0.2, 1.1, 3.1) = ', y)
+print((' symbol (0.2, 0.2, 1.1, 3.1) = ', y))

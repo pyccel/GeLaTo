@@ -17,36 +17,36 @@ def test_0():
 
     # ...
     expr = x+y
-    print '> expr := {0}'.format(expr)
+    print('> expr := {0}'.format(expr))
 
     expr = LinearOperator(expr)
-    print '> gelatized := {0}'.format(expr)
+    print('> gelatized := {0}'.format(expr))
     print('')
     # ...
 
     # ...
     expr = 2*x+y
-    print '> expr := {0}'.format(expr)
+    print('> expr := {0}'.format(expr))
 
     expr = LinearOperator(expr)
-    print '> gelatized := {0}'.format(expr)
+    print('> gelatized := {0}'.format(expr))
     print('')
     # ...
 
     # ...
     expr = a*x+y
-    print '> expr := {0}'.format(expr)
+    print('> expr := {0}'.format(expr))
 
     expr = LinearOperator(expr)
-    print '> gelatized := {0}'.format(expr)
+    print('> gelatized := {0}'.format(expr))
     # ...
 
     # ...
     expr = 2*a*x+y
-    print '> expr := {0}'.format(expr)
+    print('> expr := {0}'.format(expr))
 
     expr = LinearOperator(expr)
-    print '> gelatized := {0}'.format(expr)
+    print('> gelatized := {0}'.format(expr))
     # ...
 # ...
 
@@ -56,29 +56,29 @@ def test_1():
 
     # ...
     expr = u+v
-    print '> expr := {0}'.format(expr)
+    print('> expr := {0}'.format(expr))
 
     expr = dx(expr)
-    print '> gelatized := {0}'.format(expr)
+    print('> gelatized := {0}'.format(expr))
     print('')
     # ...
 
     # ...
     expr = 2*u*v
-    print '> expr := {0}'.format(expr)
+    print('> expr := {0}'.format(expr))
 
     expr = dx(expr)
-    print '> gelatized := {0}'.format(expr)
+    print('> gelatized := {0}'.format(expr))
     print('')
     # ...
 
     # ... dx should not operate on u^2,
     #     since we consider only linearized weak formulations
     expr = u*u
-    print '> expr := {0}'.format(expr)
+    print('> expr := {0}'.format(expr))
 
     expr = dx(expr)
-    print '> gelatized := {0}'.format(expr)
+    print('> gelatized := {0}'.format(expr))
     print('')
     # ...
 # ...

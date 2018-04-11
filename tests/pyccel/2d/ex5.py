@@ -27,8 +27,8 @@ y = weak_form(0.1, 0.1, Ni, Ni_x, Ni_y, Nj, Nj_x, Nj_y)
 # ...
 
 # ... a Lambda expression can be printed
-print(' a             := ', a)
-print('weak-form      := ', wf)
-print('eval weak-form := ', y)
+print((' a             := ', a))
+print(('weak-form      := ', wf))
+print(('eval weak-form := ', y))
 print('')
 # ...
