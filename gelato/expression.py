@@ -182,7 +182,7 @@ def initialize_weak_form(f, dim):
 
     n = (n_args - dim) / 2
 
-    args   = tuple(args)
+    args   = tuple([a for a in args])
     coords = Tuple(*args[:dim])
     tests  = Tuple(*args[dim:dim+n])
     trials = Tuple(*args[dim+n:])
@@ -360,7 +360,7 @@ def normalize_weak_from(f):
 
     n = (n_args - dim) / 2
 
-    args   = tuple(args)
+    args   = tuple([a for a in args])
     coords = Tuple(*args[:dim])
     tests  = Tuple(*args[dim:dim+n])
     trials = Tuple(*args[dim+n:])
