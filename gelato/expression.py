@@ -480,7 +480,7 @@ def construct_weak_form(expr, dim, verbose=False, is_block=False):
     expr = gelatize(expr, dim=dim)
 
     if verbose:
-        print '> gelatized   := {0}'.format(expr)
+        print ('> gelatized   := {0}'.format(expr))
     # ...
 
     # ...
@@ -489,17 +489,17 @@ def construct_weak_form(expr, dim, verbose=False, is_block=False):
 
         if verbose:
             if isinstance(expr, dict):
-                print '> temp form   :='
+                print ('> temp form   :=')
                 # for a nice printing, we print the dictionary entries one by one
                 for key, value in expr.items():
-                    print '\t\t', key, '\t', value
+                    print ('\t\t', key, '\t', value)
     # ...
 
     # ...
     expr = normalize_weak_from(expr)
 
     if verbose:
-        print '> normal form := {0}'.format(expr)
+        print ('> normal form := {0}'.format(expr))
     # ...
 
     return expr
