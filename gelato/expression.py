@@ -180,7 +180,7 @@ def initialize_weak_form(f, dim):
     if (n_args - dim) % 2 == 1:
         raise ValueError('Wrong number of arguments')
 
-    n = (n_args - dim) / 2
+    n = (n_args - dim) // 2
 
     args   = tuple([a for a in args])
     coords = Tuple(*args[:dim])
@@ -309,7 +309,7 @@ def initialize_weak_form(f, dim):
             d_expr[k], _infos = initialize_weak_form(d_expr[k], dim)
 
     if len(d_expr) == 1:
-        key = d_expr.keys()[0]
+        key = list(d_expr.keys())[0]
         d_expr = d_expr[key]
 
     info = {}
@@ -358,9 +358,8 @@ def normalize_weak_from(f):
     if (n_args - dim) % 2 == 1:
         raise ValueError('Wrong number of arguments')
 
-    n = (n_args - dim) / 2
+    n = (n_args - dim) // 2
 
-    args   = tuple([a for a in args])
     coords = Tuple(*args[:dim])
     tests  = Tuple(*args[dim:dim+n])
     trials = Tuple(*args[dim+n:])
