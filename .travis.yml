@@ -28,4 +28,6 @@ install:
 
 # command to run tests
 script:
-  - python tests/run_tests.py
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.4 || $TRAVIS_PYTHON_VERSION == 3.5 ]]; then py.test tests/expressions ;else pytest tests/expressions; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.4 || $TRAVIS_PYTHON_VERSION == 3.5 ]]; then py.test tests/glt ;else pytest tests/glt; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.4 || $TRAVIS_PYTHON_VERSION == 3.5 ]]; then py.test tests/weak_form ;else pytest tests/weak_form; fi
