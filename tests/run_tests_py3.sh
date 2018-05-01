@@ -11,7 +11,7 @@ python3 tests/weak_form/test_1d.py
 python3 tests/weak_form/test_2d.py
 python3 tests/weak_form/test_3d.py
 
-python3 tests/fem/test_1d.py
-python3 tests/fem/test_2d.py
-python3 tests/fem/test_3d.py
+cd tests/fem/; python3 test_1d.py; cd ../.. 
+cd tests/fem/; python3 test_2d.py; cd ../..
+cd tests/fem/; python3 test_3d.py; cd ../..
 

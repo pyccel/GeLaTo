@@ -2,6 +2,8 @@
 *.pyo
 .ipynb_checkpoints/
 *.bak
+*.so
+*.f90
 
 *build*
 *egg*

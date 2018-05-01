@@ -47,11 +47,13 @@ def test_2d_1():
     # ...
 
     # ...
-    kernel = compile_kernel('kernel', expr, V)
-    M = assemble_matrix(V, kernel).tocsr()
+    kernel_py  = compile_kernel('kernel_1', expr, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_1', expr, V, backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py).tocsr()
+    M_f90 = assemble_matrix(V, kernel_f90).tocsr()
     # ...
 
-    print(M.shape)
 # ...
 
 # ...
@@ -85,13 +87,19 @@ def test_2d_2():
     # ...
 
     # ...
-    kernel = compile_kernel('kernel', expr, V,
-                            d_constants={'nu': 0.1},
-                            d_args={'alpha': 'double'})
-    M = assemble_matrix(V, kernel, args={'alpha': 2.0}).tocsr()
+    kernel_py  = compile_kernel('kernel_2', expr, V,
+                                d_constants={'nu': 0.1},
+                                d_args={'alpha': 'double'},
+                                backend='python')
+    kernel_f90 = compile_kernel('kernel_2', expr, V,
+                                d_constants={'nu': 0.1},
+                                d_args={'alpha': 'double'},
+                                backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py, args={'alpha': 2.0}).tocsr()
+    M_f90 = assemble_matrix(V, kernel_f90, args={'alpha': 2.0}).tocsr()
     # ...
 
-    print(M.shape)
 # ...
 
 # .....................................................

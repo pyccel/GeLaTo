@@ -3,6 +3,9 @@
 # TODO: - allow for giving a name for the trial/test basis
 #       - Ni/Nj should be Ni_0/Nj_O
 
+# .............................................
+#               1D case
+# .............................................
 template_1d = """
 def {__KERNEL_NAME__}(p1, k1, basis, w, mat {__ARGS__}):
     mat[:,:] = 0.
@@ -23,6 +26,12 @@ def {__KERNEL_NAME__}(p1, k1, basis, w, mat {__ARGS__}):
             mat[il_1, p1 + jl_1 - il_1] = v
 """
 
+template_header_1d = '#$ header procedure {__KERNEL_NAME__}(int, int, double [:,:,:], double [:], double [:,:] {__TYPES__})'
+# .............................................
+
+# .............................................
+#               2D case
+# .............................................
 template_2d = """
 def {__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, w1, w2, mat {__ARGS__}):
     mat[:,:,:,:] = 0.
@@ -48,6 +57,12 @@ def {__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, w1, w2, mat {__ARGS__}):
                     mat[il_1, il_2, p1 + jl_1 - il_1, p2 + jl_2 - il_2] = v
 """
 
+template_header_2d = '#$ header procedure {__KERNEL_NAME__}(int, int, int, int, double [:,:,:], double [:,:,:], double [:], double [:], double [:,:,:,:] {__TYPES__})'
+# .............................................
+
+# .............................................
+#               3D case
+# .............................................
 template_3d = """
 def {__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, w1, w2, w3, mat {__ARGS__}):
     mat[:,:,:,:,:,:] = 0.
@@ -77,3 +92,6 @@ def {__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, w1, w2, w3, mat {__
                                         v += ({__WEAK_FORM__}) * wvol
                             mat[il_1, il_2, il_3, p1 + jl_1 - il_1, p2 + jl_2 - il_2, p3 + jl_3 - il_3] = v
 """
+
+template_header_3d = '#$ header procedure {__KERNEL_NAME__}(int, int, int, int, int, int, double [:,:,:], double [:,:,:], double [:,:,:], double [:], double [:], double [:], double [:,:,:,:,:,:] {__TYPES__})'
+# .............................................
