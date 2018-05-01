@@ -14,7 +14,7 @@ from collections import OrderedDict
 
 def compile_kernel(name, expr, V,
                    namespace=globals(),
-                   verbose=True,
+                   verbose=False,
                    d_constants={},
                    d_args={},
                    backend='python'):

@@ -327,8 +327,13 @@ def glt_update_atoms(expr, discretization):
 # ...
 
 # ...
-def glt_symbol(expr, dim,  n_deriv=1,
-               verbose=False, evaluate=True, is_block=False, discretization=None,
+def glt_symbol(expr,
+               n_deriv=1,
+               space=None,
+               verbose=False,
+               evaluate=True,
+               is_block=False,
+               discretization=None,
                instructions=[], **settings):
     """
     computes the glt symbol of a weak formulation given as a sympy expression.
@@ -336,8 +341,8 @@ def glt_symbol(expr, dim,  n_deriv=1,
     expr: sympy.Expression
         a sympy expression or a text
 
-    dim: int
-        dimension of the logical/physical domain.
+    space: spl.fem.SplineSpace, spl.fem.TensorSpace
+        a Finite elements space from spl. Default: None
 
     n_deriv: int
         maximum derivatives that appear in the weak formulation.
@@ -366,6 +371,25 @@ def glt_symbol(expr, dim,  n_deriv=1,
         raise TypeError('Expecting a Lambda expression')
     # ...
 
+    # ...
+    if not( discretization is None ):
+        dim = len(discretization['n_elements'])
+
+    elif not( space is None ):
+        dim = space.pdim
+
+        n_elements = space.ncells
+        if not( isinstance(n_elements, (list, tuple))): n_elements = [n_elements]
+
+        degrees = space.degree
+        if not( isinstance(degrees, (list, tuple))): degrees = [degrees]
+
+        discretization = {'n_elements': n_elements, 'degrees': degrees}
+
+    else:
+        raise ValueError('discretization (dict) or fem space must be given')
+    # ...
+
     # ...
     expr = construct_weak_form(expr, dim=dim, is_block=is_block, verbose=verbose)
     # ...
@@ -390,12 +414,12 @@ def glt_symbol(expr, dim,  n_deriv=1,
             # ...
 
             # ...
-            d_expr[key] = glt_symbol(txt, dim, \
-                                     n_deriv=n_deriv, \
-                                     verbose=verbose, \
-                                     evaluate=evaluate, \
-                                     discretization=discretization, \
-                                     instructions=instructions, \
+            d_expr[key] = glt_symbol(txt,
+                                     n_deriv=n_deriv,
+                                     verbose=verbose,
+                                     evaluate=evaluate,
+                                     discretization=discretization,
+                                     instructions=instructions,
                                      **settings)
             # ...
 
@@ -410,7 +434,7 @@ def glt_symbol(expr, dim,  n_deriv=1,
         # ...
 
         # ...
-        d = basis_symbols(dim,n_deriv)
+        d = basis_symbols(dim, n_deriv)
         for key, item in list(d.items()):
             ns[key] = item
         # ...
@@ -492,13 +516,20 @@ def glt_lambdify(expr):
     return lambdify(expr.variables, expr.expr, "numpy")
 # ...
 
-# ...
-def glt_approximate_eigenvalues(expr, discretization, mapping=None, is_block=False):
+# ... TODO: use pyccel rather than lambdify
+def glt_approximate_eigenvalues(expr,
+                                space=None,
+                                discretization=None,
+                                mapping=None,
+                                is_block=False):
     """
     approximates the eigenvalues using a uniform sampling
 
     expr: sympy.Expression
         a sympy expression or a text
+
+    space: spl.fem.SplineSpace, spl.fem.TensorSpace
+        a Finite elements space from spl. Default: None
 
     discretization: dict
         a dictionary that contains the used discretization
@@ -512,6 +543,25 @@ def glt_approximate_eigenvalues(expr, discretization, mapping=None, is_block=Fal
     # ...
     if not isinstance(expr, Lambda):
         raise TypeError('Expecting a Lambda expression')
+    # ...
+
+    # ...
+    if not( discretization is None ):
+        dim = len(discretization['n_elements'])
+
+    elif not( space is None ):
+        dim = space.pdim
+
+        n_elements = space.ncells
+        if not( isinstance(n_elements, (list, tuple))): n_elements = [n_elements]
+
+        degrees = space.degree
+        if not( isinstance(degrees, (list, tuple))): degrees = [degrees]
+
+        discretization = {'n_elements': n_elements, 'degrees': degrees}
+
+    else:
+        raise ValueError('discretization (dict) or fem space must be given')
     # ...
 
     # ... lambdify the symbol.
@@ -624,7 +674,7 @@ def glt_approximate_eigenvalues(expr, discretization, mapping=None, is_block=Fal
     # ...
 # ...
 
-# ...
+# ... TODO to be removed, once we have notebooks with complex symbols
 def glt_plot_eigenvalues(expr, discretization, \
                          mapping=None, \
                          matrix=None, \

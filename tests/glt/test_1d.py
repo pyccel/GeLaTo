@@ -12,8 +12,6 @@ from gelato.calculus   import (Dot, Cross, Grad, Curl, Rot, Div)
 from gelato.calculus   import Constant
 
 
-DIM = 1
-
 # ...
 def test_1d_1():
     x,y = symbols('x y')
@@ -28,7 +26,7 @@ def test_1d_1():
     #     a discretization is defined as a dictionary
     discretization = {"n_elements": [16], "degrees": [3]}
 
-    expr = glt_symbol(a, dim=DIM, discretization=discretization, evaluate=False)
+    expr = glt_symbol(a, discretization=discretization, evaluate=False)
     print('> glt symbol  := {0}'.format(expr))
     # ...
 
@@ -52,7 +50,7 @@ def test_1d_2():
     #     a discretization is defined as a dictionary
     discretization = {"n_elements": [16], "degrees": [3]}
 
-    expr = glt_symbol(a, dim=DIM, discretization=discretization, evaluate=False)
+    expr = glt_symbol(a, discretization=discretization, evaluate=False)
     print('> glt symbol  := {0}'.format(expr))
     # ...
 
