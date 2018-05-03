@@ -601,7 +601,6 @@ def glt_approximate_eigenvalues(expr,
     # ...
 
     # ...
-    variables = expr.variables
     expr = expr.expr
     # ...
 
@@ -638,7 +637,25 @@ def glt_approximate_eigenvalues(expr,
                 return np.asarray(eigs) + 0.j
 
             else:
-                raise NotImplementedError('TODO')
+                # sample the lambdified matrix symbol
+                F = f(x,t1)
+
+                # TODO must be converted to Fortran (using pyccel?)
+                n,m = expr.shape
+                W = []
+                for i in range(0, nx):
+                    for j in range(0,ny):
+
+                        w, v = eig(F[:,i,j])
+                        wr = w.real
+
+                        # TODO treat the case of complex eigenvalues
+
+                        W += list(wr)
+
+                W = np.asarray(W)
+
+                return W
 
         else:
             return f(x,t1)
@@ -673,7 +690,25 @@ def glt_approximate_eigenvalues(expr,
                 return np.asarray(eigs) + 0.j
 
             else:
-                raise NotImplementedError('TODO')
+                # sample the lambdified matrix symbol
+                F = f(x,y,t1,t2)
+
+                # TODO must be converted to Fortran (using pyccel?)
+                n,m = expr.shape
+                W = []
+                for i in range(0, nx):
+                    for j in range(0,ny):
+
+                        w, v = eig(F[:,:,i,j])
+                        wr = w.real
+
+                        # TODO treat the case of complex eigenvalues
+
+                        W += list(wr)
+
+                W = np.asarray(W)
+
+                return W
 
         else:
             rr = f(x,y,t1,t2)
@@ -716,15 +751,10 @@ def glt_approximate_eigenvalues(expr,
                 return np.asarray(eigs) + 0.j
 
             else:
-                # create a Lambda expression
-                L = Lambda(variables, expr)
-
-                # lambdify it
-                f = glt_lambdify(L)
-
-                # sample it
+                # sample the lambdified matrix symbol
                 F = f(x,y,z,t1,t2,t3)
 
+                # TODO must be converted to Fortran (using pyccel?)
                 n,m = expr.shape
                 W = []
                 for i in range(0, nx):
