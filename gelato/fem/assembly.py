@@ -52,7 +52,7 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
     # ... build matrices
     # TODO this is only for the parallel case
 #    for ie1 in range(s1, e1+1-p1):
-    for ie1 in range(0, V.ncells[0]):
+    for ie1 in range(0, V.ncells):
         i_span_1 = spans_1[ie1]
 
         bs = basis_1[:, :, :, ie1]

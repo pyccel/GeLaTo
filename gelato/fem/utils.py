@@ -123,6 +123,28 @@ def compile_kernel(name, expr, V,
 
             # ... identation
             tab = ' '*4
+            # ...
+
+            # ... - initializing element matrices
+            #     - define arguments
+            lines = []
+            mat_args = []
+            slices = ','.join(':' for i in range(0, 2*dim))
+            for i in range(0, n_components):
+                for j in range(0, n_components):
+                    mat = 'mat_{i}{j}'.format(i=i,j=j)
+                    mat_args.append(mat)
+
+                    line = '{mat}[{slices}] = 0.0'.format(mat=mat,slices=slices)
+                    line = tab + line
+
+                    lines.append(line)
+
+            mat_args_str = ', '.join(mat for mat in mat_args)
+            mat_init_str = '\n'.join(line for line in lines)
+            # ...
+
+            # ... update identation
             for i in range(0, 2*dim):
                 tab += ' '*4
 
@@ -160,7 +182,15 @@ def compile_kernel(name, expr, V,
             # ...
 
             # ... assign accumulated values to element matrix
-            e_pattern = 'mat[{i}, {j}, il_1, il_2, p1 + jl_1 - il_1, p2 + jl_2 - il_2] = v_{i}{j}'
+            if dim == 1:
+                e_pattern = 'mat_{i}{j}[il_1, p1 + jl_1 - il_1] = v_{i}{j}'
+            elif dim == 2:
+                e_pattern = 'mat_{i}{j}[il_1, il_2, p1 + jl_1 - il_1, p2 + jl_2 - il_2] = v_{i}{j}'
+            elif dim ==3:
+                e_pattern = 'mat_{i}{j}[il_1, il_2, il_3, p1 + jl_1 - il_1, p2 + jl_2 - il_2, p3 + jl_3 - il_3] = v_{i}{j}'
+            else:
+                raise NotImplementedError('only 1d, 2d and 3d are available')
+
             tab = tab_base
             lines = []
             for i in range(0, n_components):
@@ -174,13 +204,12 @@ def compile_kernel(name, expr, V,
             # ...
 
             code = template.format(__KERNEL_NAME__=name,
+                                   __MAT_ARGS__=mat_args_str,
+                                   __MAT_INIT__=mat_init_str,
                                    __ACCUM_INIT__=accum_init_str,
                                    __ACCUM__=accum_str,
                                    __ACCUM_ASSIGN__=accum_assign_str,
                                    __ARGS__=args)
-
-            print(code)
-            import sys; sys.exit(0)
 
         else:
             raise NotImplementedError('We only treat the case of a block space, for '
@@ -210,9 +239,39 @@ def compile_kernel(name, expr, V,
                                                                           pattern=pattern))
             except:
                 raise ValueError('Could not find the corresponding template')
+            # ...
 
-            header = template.format(__KERNEL_NAME__=name,
-                                     __TYPES__=dtypes)
+            # ...
+            if isinstance(V, VectorFemSpace):
+                if V.is_block:
+                    # ... declare element matrices dtypes
+                    mat_types = []
+                    for i in range(0, n_components):
+                        for j in range(0, n_components):
+                            if dim == 1:
+                                mat_types.append('double [:,:]')
+                            elif dim == 2:
+                                mat_types.append('double [:,:,:,:]')
+                            elif dim ==3:
+                                mat_types.append('double [:,:,:,:,:,:]')
+                            else:
+                                raise NotImplementedError('only 1d, 2d and 3d are available')
+
+                    mat_types_str = ', '.join(mat for mat in mat_types)
+                    # ...
+
+                    header = template.format(__KERNEL_NAME__=name,
+                                             __MAT_TYPES__=mat_types_str,
+                                             __TYPES__=dtypes)
+
+                else:
+                    raise NotImplementedError('We only treat the case of a block space, for '
+                                              'which all components have are identical.')
+
+            else:
+                header = template.format(__KERNEL_NAME__=name,
+                                         __TYPES__=dtypes)
+
             # ...
 
             # compile the kernel

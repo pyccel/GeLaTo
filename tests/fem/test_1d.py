@@ -19,6 +19,8 @@ from gelato.fem.utils    import compile_kernel
 from spl.fem.splines import SplineSpace
 from spl.fem.tensor  import TensorSpace
 
+from utils import assert_identical_coo
+
 # ...
 def test_1d_1():
     # ... define the weak formulation
@@ -46,9 +48,11 @@ def test_1d_1():
     kernel_py  = compile_kernel('kernel_1', expr, V, backend='python')
     kernel_f90 = compile_kernel('kernel_1', expr, V, backend='fortran')
 
-    M_py  = assemble_matrix(V, kernel_py).tocsr()
-    M_f90 = assemble_matrix(V, kernel_f90).tocsr()
+    M_py  = assemble_matrix(V, kernel_py).tocoo()
+    M_f90 = assemble_matrix(V, kernel_f90).tocoo()
     # ...
+
+    assert_identical_coo(M_py, M_f90)
 
 # ...
 
@@ -88,9 +92,11 @@ def test_1d_2():
                                 d_args={'alpha': 'double'},
                                 backend='fortran')
 
-    M_py  = assemble_matrix(V, kernel_py, args={'alpha': 2.0}).tocsr()
-    M_f90 = assemble_matrix(V, kernel_f90, args={'alpha': 2.0}).tocsr()
+    M_py  = assemble_matrix(V, kernel_py, args={'alpha': 2.0}).tocoo()
+    M_f90 = assemble_matrix(V, kernel_f90, args={'alpha': 2.0}).tocoo()
     # ...
+
+    assert_identical_coo(M_py, M_f90)
 
 # ...
 

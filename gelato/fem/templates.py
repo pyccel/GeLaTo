@@ -100,8 +100,8 @@ template_header_3d_scalar = '#$ header procedure {__KERNEL_NAME__}(int, int, int
 #               1D case - block
 # .............................................
 template_1d_block = """
-def {__KERNEL_NAME__}(p1, k1, basis, w, mat {__ARGS__}):
-    mat[:,:,:,:] = 0.
+def {__KERNEL_NAME__}(p1, k1, basis, w, {__MAT_ARGS__} {__ARGS__}):
+{__MAT_INIT__}
     for il_1 in range(0, p1+1):
         for jl_1 in range(0, p1+1):
 
@@ -119,15 +119,15 @@ def {__KERNEL_NAME__}(p1, k1, basis, w, mat {__ARGS__}):
 {__ACCUM_ASSIGN__}
 """
 
-template_header_1d_block = '#$ header procedure {__KERNEL_NAME__}(int, int, double [:,:,:], double [:], double [:,:,:,:] {__TYPES__})'
+template_header_1d_block = '#$ header procedure {__KERNEL_NAME__}(int, int, double [:,:,:], double [:], {__MAT_TYPES__} {__TYPES__})'
 # .............................................
 
 # .............................................
 #               2D case - block vector
 # .............................................
 template_2d_block = """
-def {__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, w1, w2, mat {__ARGS__}):
-    mat[:,:,:,:,:,:] = 0.
+def {__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, w1, w2, {__MAT_ARGS__} {__ARGS__}):
+{__MAT_INIT__}
     for il_1 in range(0, p1+1):
         for jl_1 in range(0, p1+1):
             for il_2 in range(0, p2+1):
@@ -150,15 +150,15 @@ def {__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, w1, w2, mat {__ARGS__}):
 {__ACCUM_ASSIGN__}
 """
 
-template_header_2d_block = '#$ header procedure {__KERNEL_NAME__}(int, int, int, int, double [:,:,:], double [:,:,:], double [:], double [:], double [:,:,:,:,:,:] {__TYPES__})'
+template_header_2d_block = '#$ header procedure {__KERNEL_NAME__}(int, int, int, int, double [:,:,:], double [:,:,:], double [:], double [:], {__MAT_TYPES__} {__TYPES__})'
 # .............................................
 
 # .............................................
 #               3D case - block
 # .............................................
 template_3d_block = """
-def {__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, w1, w2, w3, mat {__ARGS__}):
-    mat[:,:,:,:,:,:,:,:] = 0.
+def {__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, w1, w2, w3, {__MAT_ARGS__} {__ARGS__}):
+{__MAT_INIT__}
     for il_1 in range(0, p1+1):
         for jl_1 in range(0, p1+1):
             for il_2 in range(0, p2+1):
@@ -186,6 +186,6 @@ def {__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, w1, w2, w3, mat {__
 {__ACCUM_ASSIGN__}
 """
 
-template_header_3d_block = '#$ header procedure {__KERNEL_NAME__}(int, int, int, int, int, int, double [:,:,:], double [:,:,:], double [:,:,:], double [:], double [:], double [:], double [:,:,:,:,:,:,:,:] {__TYPES__})'
+template_header_3d_block = '#$ header procedure {__KERNEL_NAME__}(int, int, int, int, int, int, double [:,:,:], double [:,:,:], double [:,:,:], double [:], double [:], double [:], {__MAT_TYPES__} {__TYPES__})'
 # .............................................
 
