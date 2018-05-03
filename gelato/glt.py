@@ -341,7 +341,7 @@ def glt_symbol(expr,
     expr: sympy.Expression
         a sympy expression or a text
 
-    space: spl.fem.SplineSpace, spl.fem.TensorSpace
+    space: spl.fem.SplineSpace, spl.fem.TensorSpace, spl.fem.VectorFemSpace
         a Finite elements space from spl. Default: None
 
     n_deriv: int
@@ -354,7 +354,9 @@ def glt_symbol(expr,
         causes the evaluation of the atomic symbols, if true
 
     is_block: bool
-        treat a block prolbem if True. (this must be removed lated)
+        treat a block prolbem if True. Must be supplied only when using
+        discretization. Otherwise, the fem space should be consistent with the
+        weak formulation.
 
     discretization: dict
         a dictionary that contains the used discretization
@@ -385,6 +387,16 @@ def glt_symbol(expr,
         if not( isinstance(degrees, (list, tuple))): degrees = [degrees]
 
         discretization = {'n_elements': n_elements, 'degrees': degrees}
+
+        from spl.fem.vector  import VectorFemSpace
+        is_block = isinstance(space, VectorFemSpace)
+
+        if is_block:
+            # TODO make sure all degrees are the same?
+            #      or remove discretization and use only the space
+            discretization['degrees'] = degrees[0]
+
+        # TODO check that the weak form is consistent with the space (both are blocks)
 
     else:
         raise ValueError('discretization (dict) or fem space must be given')
@@ -538,7 +550,9 @@ def glt_approximate_eigenvalues(expr,
         a mapping object (geometric transformation)
 
     is_block: bool
-        treat a block prolbem if True. (this must be removed lated)
+        treat a block prolbem if True. Must be supplied only when using
+        discretization. Otherwise, the fem space should be consistent with the
+        weak formulation.
     """
     # ...
     if not isinstance(expr, Lambda):
@@ -559,6 +573,16 @@ def glt_approximate_eigenvalues(expr,
         if not( isinstance(degrees, (list, tuple))): degrees = [degrees]
 
         discretization = {'n_elements': n_elements, 'degrees': degrees}
+
+        from spl.fem.vector  import VectorFemSpace
+        is_block = isinstance(space, VectorFemSpace)
+
+        if is_block:
+            # TODO make sure all degrees are the same?
+            #      or remove discretization and use only the space
+            discretization['degrees'] = degrees[0]
+
+        # TODO check that the weak form is consistent with the space (both are blocks)
 
     else:
         raise ValueError('discretization (dict) or fem space must be given')
@@ -606,8 +630,8 @@ def glt_approximate_eigenvalues(expr,
             return f(x,t1)
     elif dim == 2:
         # TODO boundary condition
-        nx = n[0] + degrees[0] - 2
-        ny = n[1] + degrees[1] - 2
+        nx = n[0] + degrees[0] #- 2
+        ny = n[1] + degrees[1] #- 2
 
         t1 = np.linspace(-np.pi,np.pi, nx)
         t2 = np.linspace(-np.pi,np.pi, ny)
