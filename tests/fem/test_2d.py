@@ -54,8 +54,8 @@ def test_2d_1():
     kernel_py  = compile_kernel('kernel_1', expr, V, backend='python')
     kernel_f90 = compile_kernel('kernel_1', expr, V, backend='fortran')
 
-    M_py  = assemble_matrix(V, kernel_py).tocoo()
-    M_f90 = assemble_matrix(V, kernel_f90).tocoo()
+    M_py  = assemble_matrix(V, kernel_py)
+    M_f90 = assemble_matrix(V, kernel_f90)
     # ...
 
     assert_identical_coo(M_py, M_f90)
@@ -102,8 +102,8 @@ def test_2d_2():
                                 d_args={'alpha': 'double'},
                                 backend='fortran')
 
-    M_py  = assemble_matrix(V, kernel_py, args={'alpha': 2.0}).tocoo()
-    M_f90 = assemble_matrix(V, kernel_f90, args={'alpha': 2.0}).tocoo()
+    M_py  = assemble_matrix(V, kernel_py, args={'alpha': 2.0})
+    M_f90 = assemble_matrix(V, kernel_f90, args={'alpha': 2.0})
     # ...
 
     assert_identical_coo(M_py, M_f90)
@@ -142,11 +142,11 @@ def test_2d_3():
     kernel_py  = compile_kernel('kernel_3', a, V, backend='python')
     kernel_f90 = compile_kernel('kernel_3', a, V, backend='fortran')
 
-#    M_py  = assemble_matrix(V, kernel_py).tocoo()
-#    M_f90 = assemble_matrix(V, kernel_f90).tocoo()
-#    # ...
+    M_py  = assemble_matrix(V, kernel_py)
+    M_f90 = assemble_matrix(V, kernel_f90)
+    # ...
 
-#    assert_identical_coo(M_py, M_f90)
+    assert_identical_coo(M_py, M_f90)
 
 # ...
 
