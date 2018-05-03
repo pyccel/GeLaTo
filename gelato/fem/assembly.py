@@ -22,6 +22,37 @@ def assemble_matrix(V, kernel, args=None, M=None):
 
 def assemble_matrix_1d(V, kernel, args=None, M=None):
 
+    from spl.fem.vector  import VectorFemSpace
+
+    # ...
+    is_block = False
+    if isinstance(V, VectorFemSpace):
+        if not( V.is_block ):
+            raise NotImplementedError('Expecting a scalar or vector space.')
+
+        is_block = True
+    # ...
+
+    # ... data structure if not given
+    if M is None:
+        from spl.linalg.stencil import StencilVector, StencilMatrix
+
+        # scalar case
+        if not is_block:
+            M = StencilMatrix(V.vector_space, V.vector_space)
+        else:
+            n_components = len(V.spaces)
+
+            V = V.spaces[0]
+
+            M = []
+            for i in range(0, n_components):
+                line = []
+                for j in range(0, n_components):
+                    line.append(StencilMatrix(V.vector_space, V.vector_space))
+                M.append(line)
+    # ...
+
     # ... sizes
     [s1] = V.vector_space.starts
     [e1] = V.vector_space.ends
@@ -33,21 +64,25 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
     weights_1 = V.weights
     # ...
 
-    # ... data structure if not given
-    if M is None:
-        from spl.linalg.stencil import StencilVector, StencilMatrix
-
-        M = StencilMatrix(V.vector_space, V.vector_space)
-    # ...
-
     # ... element matrix
-    mat = zeros((p1+1,2*p1+1), order='F')
+    if not is_block:
+        mat = zeros((p1+1,2*p1+1), order='F')
+    else:
+        mats = []
+        for i in range(0, n_components):
+            line = []
+            for j in range(0, n_components):
+                line.append(zeros((p1+1,2*p1+1), order='F'))
+            mats.append(line)
     # ...
 
     if args is None:
         _kernel = kernel
     else:
-        _kernel = lambda p1, k1, bs, w, mat: kernel(p1, k1, bs, w, mat, *args)
+        if not is_block:
+            _kernel = lambda p1, k1, bs, w, mat: kernel(p1, k1, bs, w, mat, *args)
+        else:
+            raise NotImplementedError('TODO for block case')
 
     # ... build matrices
     # TODO this is only for the parallel case
@@ -57,9 +92,28 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
 
         bs = basis_1[:, :, :, ie1]
         w = weights_1[:, ie1]
-        _kernel(p1, k1, bs, w, mat)
+
+        if not is_block:
+            _kernel(p1, k1, bs, w, mat)
+        else:
+            _mats = []
+            for i in range(0, n_components):
+                for j in range(0, n_components):
+                    _mats.append(mats[i][j])
+
+            _kernel(p1, k1, bs, w, *_mats)
+
         s1 = i_span_1 - p1 - 1
-        M._data[s1:s1+p1+1,:] += mat[:,:]
+
+        if not is_block:
+            M._data[s1:s1+p1+1,:] += mat[:,:]
+        else:
+            for i in range(0, n_components):
+                for j in range(0, n_components):
+                    _mat = mats[i][j]
+                    _M = M[i][j]
+
+            _M._data[s1:s1+p1+1,:] += _mat[:,:]
     # ...
 
     return M
