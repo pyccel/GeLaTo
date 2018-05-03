@@ -37,6 +37,8 @@ from sympy import Lambda
 
 from itertools import product
 
+from scipy.linalg import eig
+
 from gelato.calculus import (Dot_1d, Grad_1d, Div_1d)
 from gelato.calculus import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
 from gelato.calculus import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
@@ -533,7 +535,8 @@ def glt_approximate_eigenvalues(expr,
                                 space=None,
                                 discretization=None,
                                 mapping=None,
-                                is_block=False):
+                                is_block=False,
+                                symbolic_eigen=False):
     """
     approximates the eigenvalues using a uniform sampling
 
@@ -553,6 +556,11 @@ def glt_approximate_eigenvalues(expr,
         treat a block prolbem if True. Must be supplied only when using
         discretization. Otherwise, the fem space should be consistent with the
         weak formulation.
+
+    symbolic_eigen: bool
+        in the case of a block expression, we can first compute the (symbolic) eigenvalues
+        of the symbol then sample it, or doing the sampling then compute the
+        numerical eigenvalues.
     """
     # ...
     if not isinstance(expr, Lambda):
@@ -593,6 +601,7 @@ def glt_approximate_eigenvalues(expr,
     # ...
 
     # ...
+    variables = expr.variables
     expr = expr.expr
     # ...
 
@@ -606,7 +615,7 @@ def glt_approximate_eigenvalues(expr,
     # ...
     if dim == 1:
         # TODO boundary condition
-        nx = n[0] + degrees[0] - 2
+        nx = n[0] + degrees[0] #- 2
 
         t1 = np.linspace(-np.pi,np.pi, nx)
 
@@ -617,15 +626,20 @@ def glt_approximate_eigenvalues(expr,
             x = u
 
         if is_block:
-            eigen = expr.eigenvals()
+            if symbolic_eigen:
+                eigen = expr.eigenvals()
 
-            eigs = []
-            for ek, mult in list(eigen.items()):
-                f = glt_lambdify(ek)
-                t = f(x,t1)
-                eigs += mult * list(t)
+                eigs = []
+                for ek, mult in list(eigen.items()):
+                    f = glt_lambdify(ek)
+                    t = f(x,t1)
+                    eigs += mult * list(t)
 
-            return np.asarray(eigs) + 0.j
+                return np.asarray(eigs) + 0.j
+
+            else:
+                raise NotImplementedError('TODO')
+
         else:
             return f(x,t1)
     elif dim == 2:
@@ -647,23 +661,29 @@ def glt_approximate_eigenvalues(expr,
         t1,t2 = np.meshgrid(t1,t2)
 
         if is_block:
-            eigen = expr.eigenvals()
+            if symbolic_eigen:
+                eigen = expr.eigenvals()
 
-            eigs = []
-            for ek, mult in list(eigen.items()):
-                f = glt_lambdify(ek)
-                t = f(x,y,t1,t2).ravel()
-                eigs += mult * list(t)
+                eigs = []
+                for ek, mult in list(eigen.items()):
+                    f = glt_lambdify(ek)
+                    t = f(x,y,t1,t2).ravel()
+                    eigs += mult * list(t)
 
-            return np.asarray(eigs) + 0.j
+                return np.asarray(eigs) + 0.j
+
+            else:
+                raise NotImplementedError('TODO')
+
         else:
             rr = f(x,y,t1,t2)
             return f(x,y,t1,t2).ravel()
+
     elif dim == 3:
         # TODO boundary condition
-        nx = n[0] + degrees[0] - 2
-        ny = n[1] + degrees[1] - 2
-        nz = n[2] + degrees[2] - 2
+        nx = n[0] + degrees[0] #- 2
+        ny = n[1] + degrees[1] #- 2
+        nz = n[2] + degrees[2] #- 2
 
         t1 = np.linspace(-np.pi,np.pi, nx)
         t2 = np.linspace(-np.pi,np.pi, ny)
@@ -684,15 +704,44 @@ def glt_approximate_eigenvalues(expr,
         t1,t2,t3 = np.meshgrid(t2,t1,t3)
 
         if is_block:
-            eigen = expr.eigenvals()
+            if symbolic_eigen:
+                eigen = expr.eigenvals()
 
-            eigs = []
-            for ek, mult in list(eigen.items()):
-                f = glt_lambdify(ek)
-                t = f(x,y,z,t1,t2,t3).ravel()
-                eigs += mult * list(t)
+                eigs = []
+                for ek, mult in list(eigen.items()):
+                    f = glt_lambdify(ek)
+                    t = f(x,y,z,t1,t2,t3).ravel()
+                    eigs += mult * list(t)
 
-            return np.asarray(eigs) + 0.j
+                return np.asarray(eigs) + 0.j
+
+            else:
+                # create a Lambda expression
+                L = Lambda(variables, expr)
+
+                # lambdify it
+                f = glt_lambdify(L)
+
+                # sample it
+                F = f(x,y,z,t1,t2,t3)
+
+                n,m = expr.shape
+                W = []
+                for i in range(0, nx):
+                    for j in range(0,ny):
+                        for k in range(0,nz):
+
+                            w, v = eig(F[:,:,i,j,k])
+                            wr = w.real
+
+                            # TODO treat the case of complex eigenvalues
+
+                            W += list(wr)
+
+                W = np.asarray(W)
+
+                return W
+
         else:
             return f(x,y,z,t1,t2,t3).ravel()
     # ...
