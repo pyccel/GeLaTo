@@ -11,13 +11,14 @@ from sympy import Symbol
 from sympy import Lambda
 
 from gelato.expression   import construct_weak_form
-from gelato.calculus     import (Dot, Cross, Grad, Curl, Rot, Div)
+from gelato.calculus     import (Dot, Cross, Grad, Curl, Rot, Div, dx)
 from gelato.calculus     import Constant
 from gelato.fem.assembly import assemble_matrix
 from gelato.fem.utils    import compile_kernel
 
 from spl.fem.splines import SplineSpace
 from spl.fem.tensor  import TensorSpace
+from spl.fem.vector  import VectorFemSpace
 
 from utils import assert_identical_coo
 
@@ -100,9 +101,49 @@ def test_1d_2():
 
 # ...
 
+# ...
+def test_1d_3():
+    # ... define the weak formulation
+    x = Symbol('x')
+
+    u0, u1 = symbols('u0 u1')
+    v0, v1 = symbols('v0 v1')
+
+    a = Lambda((x,v0,v1,u0,u1), dx(u0)*dx(v0) + dx(u1)*v0 + u0*dx(v1) + u1*v1)
+    # ...
+
+    # ...  create a finite element space
+    p  = 3
+    ne = 64
+
+    print('> Grid   :: {ne}'.format(ne=ne))
+    print('> Degree :: {p}'.format(p=p))
+
+    grid = linspace(0., 1., ne+1)
+
+    V = SplineSpace(p, grid=grid)
+    # ...
+
+    # ... Vector fem space
+    V = VectorFemSpace(V, V)
+    # ...
+
+    # ...
+    kernel_py  = compile_kernel('kernel_3', a, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_3', a, V, backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py)
+    M_f90 = assemble_matrix(V, kernel_f90)
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
+
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
 
     test_1d_1()
     test_1d_2()
+    test_1d_3()
