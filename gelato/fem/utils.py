@@ -2,12 +2,18 @@
 
 # TODO: - allow for giving a name for the trial/test basis
 #       - Ni/Nj should be Ni_0/Nj_O
+#       - define templates as proper python functions
+#       - use redbaron to modify the template
 
 from gelato.expression import construct_weak_form
 from gelato.calculus   import (Dot, Cross, Grad, Curl, Rot, Div)
-from gelato.fem.templates import template_1d, template_header_1d
-from gelato.fem.templates import template_2d, template_header_2d
-from gelato.fem.templates import template_3d, template_header_3d
+from gelato.fem.templates import template_1d_scalar, template_header_1d_scalar
+from gelato.fem.templates import template_2d_scalar, template_header_2d_scalar
+from gelato.fem.templates import template_3d_scalar, template_header_3d_scalar
+
+from gelato.fem.templates import template_1d_block, template_header_1d_block
+from gelato.fem.templates import template_2d_block, template_header_2d_block
+from gelato.fem.templates import template_3d_block, template_header_3d_block
 
 from numbers import Number
 from collections import OrderedDict
@@ -20,6 +26,8 @@ def compile_kernel(name, expr, V,
                    backend='python'):
     """returns a kernel from a Lambda expression on a Finite Elements space."""
 
+    from spl.fem.vector  import VectorFemSpace
+
     # ... parametric dimension
     dim = V.pdim
     # ...
@@ -30,7 +38,8 @@ def compile_kernel(name, expr, V,
     # ...
 
     # ...
-    expr = construct_weak_form(expr, dim=dim)
+    expr = construct_weak_form(expr, dim=dim,
+                               is_block=isinstance(V, VectorFemSpace))
     if verbose:
         print('> weak form := {0}'.format(expr))
     # ...
@@ -82,14 +91,106 @@ def compile_kernel(name, expr, V,
     # ...
 
     # ...
-    try:
-        template = eval('template_{}d'.format(dim))
-    except:
-        raise ValueError('Could not find the corresponding template')
+    if isinstance(V, VectorFemSpace) and not( V.is_block ):
+        raise NotImplementedError('We only treat the case of a block space, for '
+                                  'which all components have are identical.')
+    # ...
 
-    code = template.format(__KERNEL_NAME__=name,
-                           __WEAK_FORM__=expr,
-                           __ARGS__=args)
+    # ...
+    pattern = 'scalar'
+    if isinstance(V, VectorFemSpace):
+        if V.is_block:
+            pattern = 'block'
+
+        else:
+            raise NotImplementedError('We only treat the case of a block space, for '
+                                      'which all components have are identical.')
+
+    # ...
+
+    # ...
+    template_str = 'template_{dim}d_{pattern}'.format(dim=dim, pattern=pattern)
+    try:
+        template = eval(template_str)
+    except:
+        raise ValueError('Could not find the corresponding template {}'.format(template_str))
+    # ...
+
+    # ...
+    if isinstance(V, VectorFemSpace):
+        if V.is_block:
+            n_components = len(V.spaces)
+
+            # ... identation
+            tab = ' '*4
+            for i in range(0, 2*dim):
+                tab += ' '*4
+
+            tab_base = tab
+            # ...
+
+            # ... initializing accumulation variables
+            lines = []
+            for i in range(0, n_components):
+                for j in range(0, n_components):
+                    line = 'v_{i}{j} = 0.0'.format(i=i,j=j)
+                    line = tab + line
+
+                    lines.append(line)
+
+            accum_init_str = '\n'.join(line for line in lines)
+            # ...
+
+            # .. update indentation
+            for i in range(0, dim):
+                tab += ' '*4
+            # ...
+
+            # ... accumulation contributions
+            lines = []
+            for i in range(0, n_components):
+                for j in range(0, n_components):
+                    line = 'v_{i}{j} += ({__WEAK_FORM__}) * wvol'
+                    line = line.format(i=i, j=j, __WEAK_FORM__=expr[i,j])
+                    line = tab + line
+
+                    lines.append(line)
+
+            accum_str = '\n'.join(line for line in lines)
+            # ...
+
+            # ... assign accumulated values to element matrix
+            e_pattern = 'mat[{i}, {j}, il_1, il_2, p1 + jl_1 - il_1, p2 + jl_2 - il_2] = v_{i}{j}'
+            tab = tab_base
+            lines = []
+            for i in range(0, n_components):
+                for j in range(0, n_components):
+                    line = e_pattern.format(i=i,j=j)
+                    line = tab + line
+
+                    lines.append(line)
+
+            accum_assign_str = '\n'.join(line for line in lines)
+            # ...
+
+            code = template.format(__KERNEL_NAME__=name,
+                                   __ACCUM_INIT__=accum_init_str,
+                                   __ACCUM__=accum_str,
+                                   __ACCUM_ASSIGN__=accum_assign_str,
+                                   __ARGS__=args)
+
+            print(code)
+            import sys; sys.exit(0)
+
+        else:
+            raise NotImplementedError('We only treat the case of a block space, for '
+                                      'which all components have are identical.')
+
+    else:
+        code = template.format(__KERNEL_NAME__=name,
+                               __WEAK_FORM__=expr,
+                               __ARGS__=args)
+
     # ...
 
     # ... always execute it to check if it is python valid
@@ -105,7 +206,8 @@ def compile_kernel(name, expr, V,
 
             #  ... define a header to specify the arguments types for kernel
             try:
-                template = eval('template_header_{}d'.format(dim))
+                template = eval('template_header_{dim}d_{pattern}'.format(dim=dim,
+                                                                          pattern=pattern))
             except:
                 raise ValueError('Could not find the corresponding template')
 

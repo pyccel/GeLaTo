@@ -9,6 +9,7 @@ from sympy.core.containers import Tuple
 from sympy import symbols
 from sympy import Symbol
 from sympy import Lambda
+from sympy import IndexedBase
 
 from gelato.expression   import construct_weak_form
 from gelato.calculus     import (Dot, Cross, Grad, Curl, Rot, Div)
@@ -18,6 +19,7 @@ from gelato.fem.utils    import compile_kernel
 
 from spl.fem.splines import SplineSpace
 from spl.fem.tensor  import TensorSpace
+from spl.fem.vector  import VectorFemSpace
 
 # ...
 def test_3d_1():
@@ -108,9 +110,48 @@ def test_3d_2():
 
 # ...
 
+# ...
+def test_3d_3():
+    x,y,z = symbols('x y z')
+
+    u = IndexedBase('u')
+    v = IndexedBase('v')
+
+    a = Lambda((x,y,z,v,u), Dot(Curl(u), Curl(v)) + 0.2 * Dot(u, v))
+
+    # ...  create a finite element space
+    p1  = 2 ; p2  = 2 ; p3  = 2
+    ne1 = 2 ; ne2 = 2 ; ne3 = 2
+
+    grid_1 = linspace(0., 1., ne1+1)
+    grid_2 = linspace(0., 1., ne2+1)
+    grid_3 = linspace(0., 1., ne3+1)
+
+    V1 = SplineSpace(p1, grid=grid_1)
+    V2 = SplineSpace(p2, grid=grid_2)
+    V3 = SplineSpace(p3, grid=grid_3)
+
+    W = TensorSpace(V1, V2, V3)
+    # ...
+
+    # ... vector space
+    V = VectorFemSpace(W, W, W)
+    # ...
+
+    # ...
+    kernel_py  = compile_kernel('kernel_3', a, V, backend='python')
+#    kernel_f90 = compile_kernel('kernel_3', a, V, backend='fortran')
+#
+#    M_py  = assemble_matrix(V, kernel_py).tocsr()
+#    M_f90 = assemble_matrix(V, kernel_f90).tocsr()
+    # ...
+
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
 
-    test_3d_1()
-    test_3d_2()
+#    test_3d_1()
+#    test_3d_2()
+    test_3d_3()
