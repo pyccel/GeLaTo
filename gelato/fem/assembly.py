@@ -50,7 +50,9 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
         _kernel = lambda p1, k1, bs, w, mat: kernel(p1, k1, bs, w, mat, *args)
 
     # ... build matrices
-    for ie1 in range(s1, e1+1-p1):
+    # TODO this is only for the parallel case
+#    for ie1 in range(s1, e1+1-p1):
+    for ie1 in range(0, V.ncells[0]):
         i_span_1 = spans_1[ie1]
 
         bs = basis_1[:, :, :, ie1]
@@ -96,8 +98,11 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
         _kernel = lambda p1, p2, k1, k2, bs1, bs2, w1, w2, mat: kernel(p1, p2, k1, k2, bs1, bs2, w1, w2, mat, *args)
 
     # ... build matrices
-    for ie1 in range(s1, e1+1-p1):
-        for ie2 in range(s2, e2+1-p2):
+    # TODO this is only for the parallel case
+#    for ie1 in range(s1, e1+1-p1):
+#        for ie2 in range(s2, e2+1-p2):
+    for ie1 in range(0, V.ncells[0]):
+        for ie2 in range(0, V.ncells[1]):
             i_span_1 = spans_1[ie1]
             i_span_2 = spans_2[ie2]
 
@@ -148,9 +153,13 @@ def assemble_matrix_3d(V, kernel, args=None, M=None):
         _kernel = lambda p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, w1, w2, w3, mat: kernel(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, w1, w2, w3, mat, *args)
 
     # ... build matrices
-    for ie1 in range(s1, e1+1-p1):
-        for ie2 in range(s2, e2+1-p2):
-            for ie3 in range(s3, e3+1-p3):
+    # TODO this is only for the parallel case
+#    for ie1 in range(s1, e1+1-p1):
+#        for ie2 in range(s2, e2+1-p2):
+#            for ie3 in range(s3, e3+1-p3):
+    for ie1 in range(0, V.ncells[0]):
+        for ie2 in range(0, V.ncells[1]):
+            for ie3 in range(0, V.ncells[2]):
                 i_span_1 = spans_1[ie1]
                 i_span_2 = spans_2[ie2]
                 i_span_3 = spans_3[ie3]
