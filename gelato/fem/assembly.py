@@ -76,14 +76,6 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
             mats.append(line)
     # ...
 
-    if args is None:
-        _kernel = kernel
-    else:
-        if not is_block:
-            _kernel = lambda p1, k1, bs, w, mat: kernel(p1, k1, bs, w, mat, *args)
-        else:
-            raise NotImplementedError('TODO for block case')
-
     # ... build matrices
     # TODO this is only for the parallel case
 #    for ie1 in range(s1, e1+1-p1):
@@ -94,14 +86,23 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
         w = weights_1[:, ie1]
 
         if not is_block:
-            _kernel(p1, k1, bs, w, mat)
+            if args is None:
+                kernel(p1, k1, bs, w, mat)
+
+            else:
+                kernel(p1, k1, bs, w, mat, *args)
+
         else:
             _mats = []
             for i in range(0, n_components):
                 for j in range(0, n_components):
                     _mats.append(mats[i][j])
 
-            _kernel(p1, k1, bs, w, *_mats)
+            if args is None:
+                kernel(p1, k1, bs, w, *_mats)
+
+            else:
+                kernel(p1, k1, bs, w, *_mats, *args)
 
         s1 = i_span_1 - p1 - 1
 
@@ -178,14 +179,6 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
             mats.append(line)
     # ...
 
-    if args is None:
-        _kernel = kernel
-    else:
-        if not is_block:
-            _kernel = lambda p1, p2, k1, k2, bs1, bs2, w1, w2, mat: kernel(p1, p2, k1, k2, bs1, bs2, w1, w2, mat, *args)
-        else:
-            raise NotImplementedError('TODO for block case')
-
     # ... build matrices
     # TODO this is only for the parallel case
 #    for ie1 in range(s1, e1+1-p1):
@@ -201,14 +194,39 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
             w2 = weights_2[:, ie2]
 
             if not is_block:
-                _kernel(p1, p2, k1, k2, bs1, bs2, w1, w2, mat)
+                if args is None:
+                    kernel(p1, p2,
+                           k1, k2,
+                           bs1, bs2,
+                           w1, w2,
+                           mat)
+
+                else:
+                    kernel(p1, p2,
+                           k1, k2,
+                           bs1, bs2,
+                           w1, w2,
+                           mat, *args)
+
             else:
                 _mats = []
                 for i in range(0, n_components):
                     for j in range(0, n_components):
                         _mats.append(mats[i][j])
 
-                _kernel(p1, p2, k1, k2, bs1, bs2, w1, w2, *_mats)
+                if args is None:
+                    kernel(p1, p2,
+                           k1, k2,
+                           bs1, bs2,
+                           w1, w2,
+                           *_mats)
+
+                else:
+                    kernel(p1, p2,
+                           k1, k2,
+                           bs1, bs2,
+                           w1, w2,
+                           *_mats, *args)
 
             s1 = i_span_1 - p1 - 1
             s2 = i_span_2 - p2 - 1
@@ -286,14 +304,6 @@ def assemble_matrix_3d(V, kernel, args=None, M=None):
             mats.append(line)
     # ...
 
-    if args is None:
-        _kernel = kernel
-    else:
-        if not is_block:
-            _kernel = lambda p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, w1, w2, w3, mat: kernel(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, w1, w2, w3, mat, *args)
-        else:
-            raise NotImplementedError('TODO for block case')
-
     # ... build matrices
     # TODO this is only for the parallel case
 #    for ie1 in range(s1, e1+1-p1):
@@ -314,14 +324,38 @@ def assemble_matrix_3d(V, kernel, args=None, M=None):
                 w3 = weights_3[:, ie3]
 
                 if not is_block:
-                    _kernel(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, w1, w2, w3, mat)
+                    if args is None:
+                        kernel(p1, p2, p3,
+                               k1, k2, k3,
+                               bs1, bs2, bs3,
+                               w1, w2, w3,
+                               mat)
+
+                    else:
+                        kernel(p1, p2, p3,
+                               k1, k2, k3,
+                               bs1, bs2, bs3,
+                               w1, w2, w3,
+                               mat, *args)
+
                 else:
                     _mats = []
                     for i in range(0, n_components):
                         for j in range(0, n_components):
                             _mats.append(mats[i][j])
 
-                    _kernel(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, w1, w2, w3, *_mats)
+                    if args is None:
+                        kernel(p1, p2, p3,
+                               k1, k2, k3,
+                               bs1, bs2, bs3,
+                               w1, w2, w3,
+                               *_mats)
+                    else:
+                        kernel(p1, p2, p3,
+                               k1, k2, k3,
+                               bs1, bs2, bs3,
+                               w1, w2, w3,
+                               *_mats, *args)
 
                 s1 = i_span_1 - p1 - 1
                 s2 = i_span_2 - p2 - 1
