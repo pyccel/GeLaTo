@@ -62,6 +62,7 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
     spans_1 = V.spans
     basis_1 = V.basis
     weights_1 = V.weights
+    points_1 = V.points
     # ...
 
     # ... element matrix
@@ -84,13 +85,14 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
 
         bs = basis_1[:, :, :, ie1]
         w = weights_1[:, ie1]
+        u = points_1[:, ie1]
 
         if not is_block:
             if args is None:
-                kernel(p1, k1, bs, w, mat)
+                kernel(p1, k1, bs, u, w, mat)
 
             else:
-                kernel(p1, k1, bs, w, mat, *args)
+                kernel(p1, k1, bs, u, w, mat, *args)
 
         else:
             _mats = []
@@ -99,10 +101,10 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
                     _mats.append(mats[i][j])
 
             if args is None:
-                kernel(p1, k1, bs, w, *_mats)
+                kernel(p1, k1, bs, u, w, *_mats)
 
             else:
-                kernel(p1, k1, bs, w, *_mats, *args)
+                kernel(p1, k1, bs, u, w, *_mats, *args)
 
         s1 = i_span_1 - p1 - 1
 

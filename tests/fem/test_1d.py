@@ -9,6 +9,7 @@ from sympy.core.containers import Tuple
 from sympy import symbols
 from sympy import Symbol
 from sympy import Lambda
+from sympy import Function
 
 from gelato.expression   import construct_weak_form
 from gelato.calculus     import (Dot, Cross, Grad, Curl, Rot, Div, dx)
@@ -30,7 +31,7 @@ def test_1d_1():
     u = Symbol('u')
     v = Symbol('v')
 
-    expr = Lambda((x,v,u), Dot(Grad(u), Grad(v)) + u*v)
+    a = Lambda((x,v,u), Dot(Grad(u), Grad(v)) + u*v)
     # ...
 
     # ...  create a finite element space
@@ -46,8 +47,8 @@ def test_1d_1():
     # ...
 
     # ...
-    kernel_py  = compile_kernel('kernel_1', expr, V, backend='python')
-    kernel_f90 = compile_kernel('kernel_1', expr, V, backend='fortran')
+    kernel_py  = compile_kernel('kernel_1', a, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_1', a, V, backend='fortran')
 
     M_py  = assemble_matrix(V, kernel_py)
     M_f90 = assemble_matrix(V, kernel_f90)
@@ -68,7 +69,7 @@ def test_1d_2():
     alpha = Symbol('alpha')
     nu = Symbol('nu')
 
-    expr = Lambda((x,v,u), alpha * Dot(Grad(u), Grad(v)) + nu*u*v)
+    a = Lambda((x,v,u), alpha * Dot(Grad(u), Grad(v)) + nu*u*v)
     # ...
 
     # ...  create a finite element space
@@ -84,11 +85,11 @@ def test_1d_2():
     # ...
 
     # ...
-    kernel_py  = compile_kernel('kernel_2', expr, V,
+    kernel_py  = compile_kernel('kernel_2', a, V,
                                 d_constants={'nu': 0.1},
                                 d_args={'alpha': 'double'},
                                 backend='python')
-    kernel_f90 = compile_kernel('kernel_2', expr, V,
+    kernel_f90 = compile_kernel('kernel_2', a, V,
                                 d_constants={'nu': 0.1},
                                 d_args={'alpha': 'double'},
                                 backend='fortran')
@@ -140,10 +141,63 @@ def test_1d_3():
 
 # ...
 
+# ...
+def test_1d_4():
+    x = Symbol('x')
+
+    u = Symbol('u')
+    v = Symbol('v')
+
+    b = Function('b')
+
+    a = Lambda((x,v,u), Dot(Grad(u), Grad(v)) + b(x)*u*v)
+    print('> input     := {0}'.format(a))
+
+    # ...  create a finite element space
+    p  = 3
+    ne = 64
+
+    print('> Grid   :: {ne}'.format(ne=ne))
+    print('> Degree :: {p}'.format(p=p))
+
+    grid = linspace(0., 1., ne+1)
+
+    V = SplineSpace(p, grid=grid)
+    # ...
+
+    # ...
+    def b(s):
+        r = s*(1.-s)
+        return r
+
+    header_b = '#$ header function b(double) results(double)'
+
+    kernel_py  = compile_kernel('kernel_4', a, V,
+                                d_functions={'b': (b, header_b)},
+                                verbose=True,
+                                backend='python')
+
+    kernel_f90 = compile_kernel('kernel_4', a, V,
+                                d_functions={'b': (b, header_b)},
+                                verbose=True,
+                                backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py)
+    M_f90 = assemble_matrix(V, kernel_f90)
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
+    # ...
+
+
+    print('')
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
 
-    test_1d_1()
-    test_1d_2()
-    test_1d_3()
+#    test_1d_1()
+#    test_1d_2()
+#    test_1d_3()
+    test_1d_4()

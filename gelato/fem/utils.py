@@ -23,6 +23,7 @@ def compile_kernel(name, expr, V,
                    verbose=False,
                    d_constants={},
                    d_args={},
+                   d_functions={},
                    backend='python'):
     """returns a kernel from a Lambda expression on a Finite Elements space."""
 
@@ -88,6 +89,13 @@ def compile_kernel(name, expr, V,
         #      to make sure the final code will compile
         #      the remaining free symbols must be the trial/test basis functions,
         #      and the coordinates
+    # ...
+
+    # ...
+    if d_functions:
+        for k, (f,h) in list(d_functions.items()):
+            if not callable(f):
+                raise TypeError('Expecting a callable function')
     # ...
 
     # ...
@@ -223,62 +231,65 @@ def compile_kernel(name, expr, V,
     # ...
 
     # ... always execute it to check if it is python valid
+    # TODO add local namespace
+    for k,v in list(d_functions.items()):
+        namespace[k] = v[0]
     exec(code, namespace)
     kernel = namespace[name]
     # ...
 
     # ...
     if backend == 'fortran':
+#        try:
+        # import epyccel function
+        from pyccel.epyccel import epyccel
+
+        #  ... define a header to specify the arguments types for kernel
         try:
-            # import epyccel function
-            from pyccel.epyccel import epyccel
+            template = eval('template_header_{dim}d_{pattern}'.format(dim=dim,
+                                                                      pattern=pattern))
+        except:
+            raise ValueError('Could not find the corresponding template')
+        # ...
 
-            #  ... define a header to specify the arguments types for kernel
-            try:
-                template = eval('template_header_{dim}d_{pattern}'.format(dim=dim,
-                                                                          pattern=pattern))
-            except:
-                raise ValueError('Could not find the corresponding template')
-            # ...
+        # ...
+        if isinstance(V, VectorFemSpace):
+            if V.is_block:
+                # ... declare element matrices dtypes
+                mat_types = []
+                for i in range(0, n_components):
+                    for j in range(0, n_components):
+                        if dim == 1:
+                            mat_types.append('double [:,:]')
+                        elif dim == 2:
+                            mat_types.append('double [:,:,:,:]')
+                        elif dim ==3:
+                            mat_types.append('double [:,:,:,:,:,:]')
+                        else:
+                            raise NotImplementedError('only 1d, 2d and 3d are available')
 
-            # ...
-            if isinstance(V, VectorFemSpace):
-                if V.is_block:
-                    # ... declare element matrices dtypes
-                    mat_types = []
-                    for i in range(0, n_components):
-                        for j in range(0, n_components):
-                            if dim == 1:
-                                mat_types.append('double [:,:]')
-                            elif dim == 2:
-                                mat_types.append('double [:,:,:,:]')
-                            elif dim ==3:
-                                mat_types.append('double [:,:,:,:,:,:]')
-                            else:
-                                raise NotImplementedError('only 1d, 2d and 3d are available')
+                mat_types_str = ', '.join(mat for mat in mat_types)
+                # ...
 
-                    mat_types_str = ', '.join(mat for mat in mat_types)
-                    # ...
-
-                    header = template.format(__KERNEL_NAME__=name,
-                                             __MAT_TYPES__=mat_types_str,
-                                             __TYPES__=dtypes)
-
-                else:
-                    raise NotImplementedError('We only treat the case of a block space, for '
-                                              'which all components have are identical.')
-
-            else:
                 header = template.format(__KERNEL_NAME__=name,
+                                         __MAT_TYPES__=mat_types_str,
                                          __TYPES__=dtypes)
 
-            # ...
+            else:
+                raise NotImplementedError('We only treat the case of a block space, for '
+                                          'which all components have are identical.')
 
-            # compile the kernel
-            kernel = epyccel(code, header, name=name)
-        except:
-            print('> COULD NOT CONVERT KERNEL TO FORTRAN')
-            print('  THE PYTHON BACKEND WILL BE USED')
+        else:
+            header = template.format(__KERNEL_NAME__=name,
+                                     __TYPES__=dtypes)
+
+        # ...
+
+        # compile the kernel
+        kernel = epyccel(code, header, name=name, d_functions=d_functions)
+#        except:
+#            print('> COULD NOT CONVERT KERNEL TO FORTRAN')
+#            print('  THE PYTHON BACKEND WILL BE USED')
     # ...
 
     return kernel

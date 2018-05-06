@@ -7,7 +7,7 @@
 #               1D case - scalar
 # .............................................
 template_1d_scalar = """
-def {__KERNEL_NAME__}(p1, k1, basis, w, mat {__ARGS__}):
+def {__KERNEL_NAME__}(p1, k1, basis, u, w, mat {__ARGS__}):
     mat[:,:] = 0.
     for il_1 in range(0, p1+1):
         for jl_1 in range(0, p1+1):
@@ -20,13 +20,14 @@ def {__KERNEL_NAME__}(p1, k1, basis, w, mat {__ARGS__}):
                 Nj = basis[jl_1, 0, g1]
                 Nj_x = basis[jl_1, 1, g1]
 
+                x    = u[g1]
                 wvol = w[g1]
 
                 v += ({__WEAK_FORM__}) * wvol
             mat[il_1, p1 + jl_1 - il_1] = v
 """
 
-template_header_1d_scalar = '#$ header procedure {__KERNEL_NAME__}(int, int, double [:,:,:], double [:], double [:,:] {__TYPES__})'
+template_header_1d_scalar = '#$ header procedure {__KERNEL_NAME__}(int, int, double [:,:,:], double [:], double [:], double [:,:] {__TYPES__})'
 # .............................................
 
 # .............................................
