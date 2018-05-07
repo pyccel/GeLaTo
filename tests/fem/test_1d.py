@@ -166,11 +166,10 @@ def test_1d_4():
     # ...
 
     # ...
-    def b(s):
-        r = s*(1.-s)
-        return r
-
     header_b = '#$ header function b(double) results(double)'
+    def b(s):
+        r = 1.+ s*(1.-s)
+        return r
 
     kernel_py  = compile_kernel('kernel_4', a, V,
                                 d_functions={'b': (b, header_b)},
@@ -197,7 +196,7 @@ def test_1d_4():
 # .....................................................
 if __name__ == '__main__':
 
-#    test_1d_1()
-#    test_1d_2()
-#    test_1d_3()
+    test_1d_1()
+    test_1d_2()
+    test_1d_3()
     test_1d_4()

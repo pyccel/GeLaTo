@@ -9,6 +9,7 @@ from sympy.core.containers import Tuple
 from sympy import symbols
 from sympy import Symbol
 from sympy import Lambda
+from sympy import Function
 from sympy import IndexedBase
 
 from gelato.expression   import construct_weak_form
@@ -31,7 +32,7 @@ def test_2d_1():
     u = Symbol('u')
     v = Symbol('v')
 
-    expr = Lambda((x,y,v,u), Dot(Grad(u), Grad(v)) + u*v)
+    a = Lambda((x,y,v,u), Dot(Grad(u), Grad(v)) + u*v)
     # ...
 
     # ...  create a finite element space
@@ -51,8 +52,8 @@ def test_2d_1():
     # ...
 
     # ...
-    kernel_py  = compile_kernel('kernel_1', expr, V, backend='python')
-    kernel_f90 = compile_kernel('kernel_1', expr, V, backend='fortran')
+    kernel_py  = compile_kernel('kernel_1', a, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_1', a, V, backend='fortran')
 
     M_py  = assemble_matrix(V, kernel_py)
     M_f90 = assemble_matrix(V, kernel_f90)
@@ -73,7 +74,7 @@ def test_2d_2():
     alpha = Symbol('alpha')
     nu = Symbol('nu')
 
-    expr = Lambda((x,v,u), alpha * Dot(Grad(u), Grad(v)) + nu*u*v)
+    a = Lambda((x,v,u), alpha * Dot(Grad(u), Grad(v)) + nu*u*v)
     # ...
 
     # ...  create a finite element space
@@ -93,11 +94,11 @@ def test_2d_2():
     # ...
 
     # ...
-    kernel_py  = compile_kernel('kernel_2', expr, V,
+    kernel_py  = compile_kernel('kernel_2', a, V,
                                 d_constants={'nu': 0.1},
                                 d_args={'alpha': 'double'},
                                 backend='python')
-    kernel_f90 = compile_kernel('kernel_2', expr, V,
+    kernel_f90 = compile_kernel('kernel_2', a, V,
                                 d_constants={'nu': 0.1},
                                 d_args={'alpha': 'double'},
                                 backend='fortran')
@@ -125,6 +126,9 @@ def test_2d_3():
     p1  = 2 ; p2  = 2
     ne1 = 8 ; ne2 = 8
 
+    print('> Grid   :: [{ne1},{ne2}]'.format(ne1=ne1, ne2=ne2))
+    print('> Degree :: [{p1},{p2}]'.format(p1=p1, p2=p2))
+
     grid_1 = linspace(0., 1., ne1+1)
     grid_2 = linspace(0., 1., ne2+1)
 
@@ -150,6 +154,59 @@ def test_2d_3():
 
 # ...
 
+# ...
+def test_2d_4():
+    # ... define the weak formulation
+    x,y = symbols('x y')
+
+    u = Symbol('u')
+    v = Symbol('v')
+
+    b = Function('b')
+
+    a = Lambda((x,y,v,u), Dot(Grad(u), Grad(v)) + b(x,y)*u*v)
+    # ...
+
+    # ...  create a finite element space
+    p1  = 2 ; p2  = 2
+    ne1 = 8 ; ne2 = 8
+
+    print('> Grid   :: [{ne1},{ne2}]'.format(ne1=ne1, ne2=ne2))
+    print('> Degree :: [{p1},{p2}]'.format(p1=p1, p2=p2))
+
+    grid_1 = linspace(0., 1., ne1+1)
+    grid_2 = linspace(0., 1., ne2+1)
+
+    V1 = SplineSpace(p1, grid=grid_1)
+    V2 = SplineSpace(p2, grid=grid_2)
+
+    V = TensorSpace(V1, V2)
+    # ...
+
+    # ...
+    header_b = '#$ header function b(double, double) results(double)'
+    def b(x,y):
+        r = 1.+ x*(1.-x) + y*(1.-y)
+        return r
+
+    kernel_py  = compile_kernel('kernel_4', a, V,
+                                d_functions={'b': (b, header_b)},
+                                verbose=True,
+                                backend='python')
+
+    kernel_f90 = compile_kernel('kernel_4', a, V,
+                                d_functions={'b': (b, header_b)},
+                                verbose=True,
+                                backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py)
+    M_f90 = assemble_matrix(V, kernel_f90)
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
+
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
@@ -157,3 +214,4 @@ if __name__ == '__main__':
     test_2d_1()
     test_2d_2()
     test_2d_3()
+    test_2d_4()
