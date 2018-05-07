@@ -194,12 +194,15 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
             bs2 = basis_2[:, :, :, ie2]
             w1 = weights_1[:, ie1]
             w2 = weights_2[:, ie2]
+            u1 = points_1[:, ie1]
+            u2 = points_2[:, ie2]
 
             if not is_block:
                 if args is None:
                     kernel(p1, p2,
                            k1, k2,
                            bs1, bs2,
+                           u1, u2,
                            w1, w2,
                            mat)
 
@@ -207,6 +210,7 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
                     kernel(p1, p2,
                            k1, k2,
                            bs1, bs2,
+                           u1, u2,
                            w1, w2,
                            mat, *args)
 
@@ -220,6 +224,7 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
                     kernel(p1, p2,
                            k1, k2,
                            bs1, bs2,
+                           u1, u2,
                            w1, w2,
                            *_mats)
 
@@ -227,6 +232,7 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
                     kernel(p1, p2,
                            k1, k2,
                            bs1, bs2,
+                           u1, u2,
                            w1, w2,
                            *_mats, *args)
 
@@ -324,12 +330,16 @@ def assemble_matrix_3d(V, kernel, args=None, M=None):
                 w1 = weights_1[:, ie1]
                 w2 = weights_2[:, ie2]
                 w3 = weights_3[:, ie3]
+                u1 = points_1[:, ie1]
+                u2 = points_2[:, ie2]
+                u3 = points_3[:, ie3]
 
                 if not is_block:
                     if args is None:
                         kernel(p1, p2, p3,
                                k1, k2, k3,
                                bs1, bs2, bs3,
+                               u1, u2, u3,
                                w1, w2, w3,
                                mat)
 
@@ -337,6 +347,7 @@ def assemble_matrix_3d(V, kernel, args=None, M=None):
                         kernel(p1, p2, p3,
                                k1, k2, k3,
                                bs1, bs2, bs3,
+                               u1, u2, u3,
                                w1, w2, w3,
                                mat, *args)
 
@@ -350,12 +361,14 @@ def assemble_matrix_3d(V, kernel, args=None, M=None):
                         kernel(p1, p2, p3,
                                k1, k2, k3,
                                bs1, bs2, bs3,
+                               u1, u2, u3,
                                w1, w2, w3,
                                *_mats)
                     else:
                         kernel(p1, p2, p3,
                                k1, k2, k3,
                                bs1, bs2, bs3,
+                               u1, u2, u3,
                                w1, w2, w3,
                                *_mats, *args)
 
