@@ -362,6 +362,9 @@ def compile_symbol(name, expr, V,
 
         expr = expr.subs(_d)
 
+#    print(expr)
+#    import sys; sys.exit(0)
+
     args = ''
     dtypes = ''
     if d_args:

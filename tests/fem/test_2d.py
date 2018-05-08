@@ -14,6 +14,7 @@ from sympy import IndexedBase
 
 from gelato.expression   import construct_weak_form
 from gelato.calculus     import (Dot, Cross, Grad, Curl, Rot, Div, dx, dy)
+from gelato.calculus     import Constant
 from gelato.fem.assembly import assemble_matrix
 from gelato.fem.utils    import compile_kernel
 
@@ -70,8 +71,8 @@ def test_2d_2():
     u = Symbol('u')
     v = Symbol('v')
 
-    alpha = Symbol('alpha')
-    nu = Symbol('nu')
+    alpha = Constant('alpha')
+    nu = Constant('nu')
 
     a = Lambda((x,v,u), alpha * Dot(Grad(u), Grad(v)) + nu*u*v)
     # ...
