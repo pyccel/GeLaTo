@@ -8,6 +8,7 @@
 from gelato.expression import construct_weak_form
 from gelato.glt import glt_symbol
 from gelato.calculus   import (Dot, Cross, Grad, Curl, Rot, Div)
+from gelato.calculus   import Constant
 from gelato.fem.templates import template_1d_scalar, template_header_1d_scalar
 from gelato.fem.templates import template_2d_scalar, template_header_2d_scalar
 from gelato.fem.templates import template_3d_scalar, template_header_3d_scalar
@@ -15,9 +16,10 @@ from gelato.fem.templates import template_3d_scalar, template_header_3d_scalar
 from gelato.fem.templates import template_1d_block, template_header_1d_block
 from gelato.fem.templates import template_2d_block, template_header_2d_block
 from gelato.fem.templates import template_3d_block, template_header_3d_block
-from gelato.fem.templates import template_symbol_scalar
-from gelato.fem.templates import template_symbol_header_1d_scalar
-from gelato.fem.templates import template_symbol_header_2d_scalar
+
+from gelato.fem.templates import symbol_1d_scalar, symbol_header_1d_scalar
+from gelato.fem.templates import symbol_2d_scalar, symbol_header_2d_scalar
+from gelato.fem.templates import symbol_3d_scalar, symbol_header_3d_scalar
 
 from numbers import Number
 from collections import OrderedDict
@@ -59,7 +61,14 @@ def compile_kernel(name, expr, V,
                 raise TypeError('Expecting a Python Numeric object')
 
         # update the weak formulation using the given arguments
-        expr = expr.subs(d_constants)
+        _d = {}
+        for k,v in list(d_constants.items()):
+            if isinstance(k, str):
+                _d[Constant(k)] = v
+            else:
+                _d[k] = v
+
+        expr = expr.subs(_d)
 
     args = ''
     dtypes = ''
@@ -343,8 +352,15 @@ def compile_symbol(name, expr, V,
             if not isinstance(a, Number):
                 raise TypeError('Expecting a Python Numeric object')
 
-        # update the weak formulation using the given arguments
-        expr = expr.subs(d_constants)
+        # update the glt symbol using the given arguments
+        _d = {}
+        for k,v in list(d_constants.items()):
+            if isinstance(k, str):
+                _d[Constant(k)] = v
+            else:
+                _d[k] = v
+
+        expr = expr.subs(_d)
 
     args = ''
     dtypes = ''
@@ -399,7 +415,7 @@ def compile_symbol(name, expr, V,
     # ...
 
     # ...
-    template_str = 'template_symbol_{pattern}'.format(pattern=pattern)
+    template_str = 'symbol_{dim}d_{pattern}'.format(dim=dim, pattern=pattern)
     try:
         template = eval(template_str)
     except:
@@ -412,7 +428,6 @@ def compile_symbol(name, expr, V,
 
     else:
         code = template.format(__SYMBOL_NAME__=name,
-                               __SYMBOL_ARGS__=', '.join('{}'.format(i) for i in expr.variables),
                                __SYMBOL_EXPR__=expr.expr,
                                __ARGS__=args)
     # ...
@@ -434,6 +449,8 @@ def compile_symbol(name, expr, V,
             for k,v in list(c.functions.items()):
                 namespace[k] = v[0]
     # ...
+#    print(code)
+#    import sys; sys.exit(0)
 
     # ...
     exec(code, namespace)
@@ -447,11 +464,11 @@ def compile_symbol(name, expr, V,
         from pyccel.epyccel import epyccel
 
         #  ... define a header to specify the arguments types for kernel
+        template_str = 'symbol_header_{dim}d_{pattern}'.format(dim=dim, pattern=pattern)
         try:
-            template = eval('template_symbol_header_{dim}d_{pattern}'.format(dim=dim,
-                                                                      pattern=pattern))
+            template = eval(template_str)
         except:
-            raise ValueError('Could not find the corresponding template')
+            raise ValueError('Could not find the corresponding template {}'.format(template_str))
         # ...
 
         # ...

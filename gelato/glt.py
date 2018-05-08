@@ -42,7 +42,6 @@ from scipy.linalg import eig
 from gelato.calculus import (Dot_1d, Grad_1d, Div_1d)
 from gelato.calculus import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
 from gelato.calculus import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
-from gelato.calculus import Constant
 from gelato.expression import construct_weak_form
 
 try:
@@ -333,7 +332,7 @@ def glt_symbol(expr,
                n_deriv=1,
                space=None,
                verbose=False,
-               evaluate=True,
+               evaluate=False,
                is_block=False,
                discretization=None,
                instructions=[], **settings):

@@ -4,7 +4,7 @@
 #       - Ni/Nj should be Ni_0/Nj_O
 
 # .............................................
-#               1D case - scalar
+#          KERNEL     1D case - scalar
 # .............................................
 template_1d_scalar = """
 def {__KERNEL_NAME__}(p1, k1, basis, u, w, mat {__ARGS__}):
@@ -31,7 +31,7 @@ template_header_1d_scalar = '#$ header procedure {__KERNEL_NAME__}(int, int, dou
 # .............................................
 
 # .............................................
-#               2D case - scalar
+#          KERNEL     2D case - scalar
 # .............................................
 template_2d_scalar = """
 def {__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, u1, u2, w1, w2, mat {__ARGS__}):
@@ -64,7 +64,7 @@ template_header_2d_scalar = '#$ header procedure {__KERNEL_NAME__}(int, int, int
 # .............................................
 
 # .............................................
-#               3D case - scalar
+#          KERNEL     3D case - scalar
 # .............................................
 template_3d_scalar = """
 def {__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, u1, u2, u3, w1, w2, w3, mat {__ARGS__}):
@@ -103,7 +103,7 @@ template_header_3d_scalar = '#$ header procedure {__KERNEL_NAME__}(int, int, int
 # .............................................
 
 # .............................................
-#               1D case - block
+#          KERNEL     2D case - block
 # .............................................
 template_1d_block = """
 def {__KERNEL_NAME__}(p1, k1, basis, u, w, {__MAT_ARGS__} {__ARGS__}):
@@ -130,7 +130,7 @@ template_header_1d_block = '#$ header procedure {__KERNEL_NAME__}(int, int, doub
 # .............................................
 
 # .............................................
-#               2D case - block vector
+#          KERNEL     2D case - block
 # .............................................
 template_2d_block = """
 def {__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, u1, u2, w1, w2, {__MAT_ARGS__} {__ARGS__}):
@@ -163,7 +163,7 @@ template_header_2d_block = '#$ header procedure {__KERNEL_NAME__}(int, int, int,
 # .............................................
 
 # .............................................
-#               3D case - block
+#          KERNEL     3D case - block
 # .............................................
 template_3d_block = """
 def {__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, u1, u2, u3, w1, w2, w3, {__MAT_ARGS__} {__ARGS__}):
@@ -202,9 +202,29 @@ template_header_3d_block = '#$ header procedure {__KERNEL_NAME__}(int, int, int,
 # .............................................
 
 # .............................................
-#          GLT symbol - scalar case
+#          SYMBOL     1D case - scalar
 # .............................................
-template_symbol_scalar ="""
+symbol_1d_scalar ="""
+def {__SYMBOL_NAME__}(arr_x, arr_t1, symbol {__ARGS__}):
+    from numpy import sin
+    from numpy import cos
+
+    n1 = len(arr_x)
+    symbol[:] = 0.
+    for i1 in range(0, n1):
+        x = arr_x[i1]
+        t1 = arr_t1[i1]
+
+        symbol[i1] = {__SYMBOL_EXPR__}
+"""
+
+symbol_header_1d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:] {__TYPES__})'
+# .............................................
+
+# .............................................
+#          SYMBOL     2D case - scalar
+# .............................................
+symbol_2d_scalar ="""
 def {__SYMBOL_NAME__}({__SYMBOL_ARGS__}, expr {__ARGS__}):
     from numpy import sin
     from numpy import cos
@@ -213,7 +233,20 @@ def {__SYMBOL_NAME__}({__SYMBOL_ARGS__}, expr {__ARGS__}):
     return expr
 """
 
-template_symbol_header_1d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double, double, double {__TYPES__})'
-template_symbol_header_2d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double, double, double, double, double {__TYPES__})'
+symbol_header_2d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double, double, double, double, double {__TYPES__})'
 # .............................................
 
+# .............................................
+#          SYMBOL     3D case - scalar
+# .............................................
+symbol_3d_scalar ="""
+def {__SYMBOL_NAME__}({__SYMBOL_ARGS__}, expr {__ARGS__}):
+    from numpy import sin
+    from numpy import cos
+
+    expr = {__SYMBOL_EXPR__}
+    return expr
+"""
+
+symbol_header_3d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double, double, double, double, double {__TYPES__})'
+# .............................................

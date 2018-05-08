@@ -14,7 +14,6 @@ from sympy import IndexedBase
 
 from gelato.expression   import construct_weak_form
 from gelato.calculus     import (Dot, Cross, Grad, Curl, Rot, Div)
-from gelato.calculus     import Constant
 from gelato.fem.assembly import assemble_matrix
 from gelato.fem.utils    import compile_kernel
 
