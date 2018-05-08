@@ -201,3 +201,19 @@ def {__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, u1, u2, u3, w1, w2,
 template_header_3d_block = '#$ header procedure {__KERNEL_NAME__}(int, int, int, int, int, int, double [:,:,:], double [:,:,:], double [:,:,:], double [:], double [:], double [:], double [:], double [:], double [:], {__MAT_TYPES__} {__TYPES__})'
 # .............................................
 
+# .............................................
+#          GLT symbol - scalar case
+# .............................................
+template_symbol_scalar ="""
+def {__SYMBOL_NAME__}({__SYMBOL_ARGS__}, expr {__ARGS__}):
+    from numpy import sin
+    from numpy import cos
+
+    expr = {__SYMBOL_EXPR__}
+    return expr
+"""
+
+template_symbol_header_1d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double, double, double {__TYPES__})'
+template_symbol_header_2d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double, double, double, double, double {__TYPES__})'
+# .............................................
+

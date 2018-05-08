@@ -192,22 +192,34 @@ def test_3d_4():
     V = TensorSpace(V1, V2, V3)
     # ...
 
-    # ...
-    header_b = '#$ header function b(double, double, double) results(double)'
+    # ... user defined function
     def b(x,y,z):
         r = 1.+ x*(1.-x) + y*(1.-y) + z*(1.-z)
         return r
+    # ...
 
+    # ... create an interactive pyccel context
+    from pyccel.epyccel import ContextPyccel
+
+    context = ContextPyccel(name='context_4')
+    context.insert_function(b, ['double', 'double', 'double'], kind='function', results=['double'])
+
+    context.compile()
+    # ...
+
+    # ...
     kernel_py  = compile_kernel('kernel_4', a, V,
-                                d_functions={'b': (b, header_b)},
+                                context=context,
                                 verbose=True,
                                 backend='python')
 
     kernel_f90 = compile_kernel('kernel_4', a, V,
-                                d_functions={'b': (b, header_b)},
+                                context=context,
                                 verbose=True,
                                 backend='fortran')
+    # ...
 
+    # ...
     M_py  = assemble_matrix(V, kernel_py)
     M_f90 = assemble_matrix(V, kernel_f90)
     # ...

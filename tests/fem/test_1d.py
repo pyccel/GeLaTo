@@ -165,29 +165,39 @@ def test_1d_4():
     V = SplineSpace(p, grid=grid)
     # ...
 
-    # ...
-    header_b = '#$ header function b(double) results(double)'
+    # ... user defined function
     def b(s):
         r = 1.+ s*(1.-s)
         return r
+    # ...
 
+    # ... create an interactive pyccel context
+    from pyccel.epyccel import ContextPyccel
+
+    context = ContextPyccel(name='context_4')
+    context.insert_function(b, ['double'], kind='function', results=['double'])
+
+    context.compile()
+    # ...
+
+    # ...
     kernel_py  = compile_kernel('kernel_4', a, V,
-                                d_functions={'b': (b, header_b)},
+                                context=context,
                                 verbose=True,
                                 backend='python')
 
     kernel_f90 = compile_kernel('kernel_4', a, V,
-                                d_functions={'b': (b, header_b)},
+                                context=context,
                                 verbose=True,
                                 backend='fortran')
+    # ...
 
+    # ...
     M_py  = assemble_matrix(V, kernel_py)
     M_f90 = assemble_matrix(V, kernel_f90)
     # ...
 
     assert_identical_coo(M_py, M_f90)
-    # ...
-
 
     print('')
 # ...

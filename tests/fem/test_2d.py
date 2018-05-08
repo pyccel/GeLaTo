@@ -183,22 +183,34 @@ def test_2d_4():
     V = TensorSpace(V1, V2)
     # ...
 
-    # ...
-    header_b = '#$ header function b(double, double) results(double)'
+    # ... user defined function
     def b(x,y):
         r = 1.+ x*(1.-x) + y*(1.-y)
         return r
+    # ...
 
+    # ... create an interactive pyccel context
+    from pyccel.epyccel import ContextPyccel
+
+    context = ContextPyccel(name='context_4')
+    context.insert_function(b, ['double', 'double'], kind='function', results=['double'])
+
+    context.compile()
+    # ...
+
+    # ...
     kernel_py  = compile_kernel('kernel_4', a, V,
-                                d_functions={'b': (b, header_b)},
+                                context=context,
                                 verbose=True,
                                 backend='python')
 
     kernel_f90 = compile_kernel('kernel_4', a, V,
-                                d_functions={'b': (b, header_b)},
+                                context=context,
                                 verbose=True,
                                 backend='fortran')
+    # ...
 
+    # ...
     M_py  = assemble_matrix(V, kernel_py)
     M_f90 = assemble_matrix(V, kernel_f90)
     # ...
@@ -238,8 +250,7 @@ def test_2d_5():
     V = TensorSpace(V1, V2)
     # ...
 
-    # ...
-    header_b0 = '#$ header function b0(double, double) results(double)'
+    # ... user defined function
     def b0(x,y):
         from numpy import sin
         from scipy import pi
@@ -247,26 +258,37 @@ def test_2d_5():
         r = 1.1659397624413860850012270020670 * (1.0 + 0.1 * sin(2*pi*y))
         return r
 
-    header_b1 = '#$ header function b1(double, double) results(double)'
     def b1(x,y):
         from numpy import sin
         from scipy import pi
 
         r = 1.0 * (1.0 + 0.1 * sin(2*pi*y))
         return r
+    # ...
 
+    # ... create an interactive pyccel context
+    from pyccel.epyccel import ContextPyccel
+
+    context = ContextPyccel(name='context_4')
+    context.insert_function(b0, ['double', 'double'], kind='function', results=['double'])
+    context.insert_function(b1, ['double', 'double'], kind='function', results=['double'])
+
+    context.compile()
+    # ...
+
+    # ...
     kernel_py  = compile_kernel('kernel_5', a, V,
-                                d_functions={'b0': (b0, header_b0),
-                                             'b1': (b1, header_b1)},
+                                context=context,
                                 verbose=True,
                                 backend='python')
 
     kernel_f90 = compile_kernel('kernel_5', a, V,
-                                d_functions={'b0': (b0, header_b0),
-                                             'b1': (b1, header_b1)},
+                                context=context,
                                 verbose=True,
                                 backend='fortran')
+    # ...
 
+    # ...
     M_py  = assemble_matrix(V, kernel_py)
     M_f90 = assemble_matrix(V, kernel_f90)
     # ...
