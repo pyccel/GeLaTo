@@ -1,8 +1,5 @@
 # coding: utf-8
 
-# TODO - python version of symbols
-#      - block example (test_3)
-
 import numpy as np
 from numpy import linspace, zeros, pi
 
@@ -24,7 +21,7 @@ from spl.fem.vector  import VectorFemSpace
 
 
 # ...
-def test_1d_1():
+def test_1d_scalar_1():
     x = Symbol('x')
 
     u = Symbol('u')
@@ -51,7 +48,7 @@ def test_1d_1():
     # ...
 
     # ...
-    symbol_f90 = compile_symbol('symbol_1', a, V, backend='fortran')
+    symbol_f90 = compile_symbol('symbol_scalar_1', a, V, backend='fortran')
     # ...
 
     # ... example of symbol evaluation
@@ -65,7 +62,7 @@ def test_1d_1():
 # ...
 
 # ...
-def test_1d_2():
+def test_1d_scalar_2():
     x = Symbol('x')
 
     u = Symbol('u')
@@ -94,7 +91,7 @@ def test_1d_2():
     # ...
 
     # ...
-    symbol_f90 = compile_symbol('symbol_2', a, V,
+    symbol_f90 = compile_symbol('symbol_scalar_2', a, V,
                                 d_constants={'b': 0.1},
                                 backend='fortran')
     # ...
@@ -110,51 +107,7 @@ def test_1d_2():
 # ...
 
 # ...
-def test_1d_3():
-    x = Symbol('x')
-
-    u0, u1 = symbols('u0 u1')
-    v0, v1 = symbols('v0 v1')
-
-    a = Lambda((x,v0,v1,u0,u1), dx(u0)*dx(v0) + dx(u1)*v0 + u0*dx(v1) + u1*v1)
-    print('> input       := {0}'.format(a))
-
-    # ...  create a finite element space
-    p  = 3
-    ne = 64
-
-    print('> Grid   :: {ne}'.format(ne=ne))
-    print('> Degree :: {p}'.format(p=p))
-
-    grid = linspace(0., 1., ne+1)
-
-    V1 = SplineSpace(p, grid=grid)
-    V2 = SplineSpace(p, grid=grid)
-
-    V = VectorFemSpace(V1, V2)
-    # ...
-
-    # ... create a glt symbol from a string without evaluation
-    expr = glt_symbol(a, space=V)
-    print('> glt symbol  := {0}'.format(expr))
-    # ...
-
-    # ...
-    symbol_f90 = compile_symbol('symbol_3', a, V, backend='fortran')
-    # ...
-
-    # ... example of symbol evaluation
-    t1 = linspace(-pi,pi, ne+1)
-    x1 = linspace(0.,1., ne+1)
-    e = zeros((2,2,ne+1))
-    symbol_f90(x1, t1, e)
-    # ...
-
-    print('')
-# ...
-
-# ...
-def test_1d_4():
+def test_1d_scalar_3():
     x = Symbol('x')
 
     u = Symbol('u')
@@ -191,14 +144,14 @@ def test_1d_4():
     # ... create an interactive pyccel context
     from pyccel.epyccel import ContextPyccel
 
-    context = ContextPyccel(name='context_4')
+    context = ContextPyccel(name='context_scalar_3')
     context.insert_function(b, ['double'], kind='function', results=['double'])
 
     context.compile()
     # ...
 
     # ...
-    symbol_f90 = compile_symbol('symbol_4', a, V,
+    symbol_f90 = compile_symbol('symbol_scalar_3', a, V,
                                 context=context,
                                 backend='fortran')
     # ...
@@ -213,10 +166,54 @@ def test_1d_4():
     print('')
 # ...
 
+# ... TODO
+def test_1d_block_1():
+    x = Symbol('x')
+
+    u0, u1 = symbols('u0 u1')
+    v0, v1 = symbols('v0 v1')
+
+    a = Lambda((x,v0,v1,u0,u1), dx(u0)*dx(v0) + dx(u1)*v0 + u0*dx(v1) + u1*v1)
+    print('> input       := {0}'.format(a))
+
+    # ...  create a finite element space
+    p  = 3
+    ne = 64
+
+    print('> Grid   :: {ne}'.format(ne=ne))
+    print('> Degree :: {p}'.format(p=p))
+
+    grid = linspace(0., 1., ne+1)
+
+    V1 = SplineSpace(p, grid=grid)
+    V2 = SplineSpace(p, grid=grid)
+
+    V = VectorFemSpace(V1, V2)
+    # ...
+
+    # ... create a glt symbol from a string without evaluation
+    expr = glt_symbol(a, space=V)
+    print('> glt symbol  := {0}'.format(expr))
+    # ...
+
+    # ...
+    symbol_f90 = compile_symbol('symbol_block_1', a, V, backend='fortran')
+    # ...
+
+    # ... example of symbol evaluation
+    t1 = linspace(-pi,pi, ne+1)
+    x1 = linspace(0.,1., ne+1)
+    e = zeros((2,2,ne+1))
+    symbol_f90(x1, t1, e)
+    # ...
+
+    print('')
+# ...
+
 # .....................................................
 if __name__ == '__main__':
 
-#    test_1d_1()
-#    test_1d_2()
-    test_1d_3()
-#    test_1d_4()
+    test_1d_scalar_1()
+    test_1d_scalar_2()
+    test_1d_scalar_3()
+#    test_1d_block_1()
