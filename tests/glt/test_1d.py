@@ -119,14 +119,36 @@ def test_1d_3():
     a = Lambda((x,v0,v1,u0,u1), dx(u0)*dx(v0) + dx(u1)*v0 + u0*dx(v1) + u1*v1)
     print('> input       := {0}'.format(a))
 
-    # ... create a glt symbol from a string without evaluation
-    #     a discretization is defined as a dictionary
-    discretization = {"n_elements": [16], "degrees": [3]}
+    # ...  create a finite element space
+    p  = 3
+    ne = 64
 
-    expr = glt_symbol(a, discretization=discretization, evaluate=False,
-                      is_block=True)
+    print('> Grid   :: {ne}'.format(ne=ne))
+    print('> Degree :: {p}'.format(p=p))
+
+    grid = linspace(0., 1., ne+1)
+
+    V1 = SplineSpace(p, grid=grid)
+    V2 = SplineSpace(p, grid=grid)
+
+    V = VectorFemSpace(V1, V2)
+    # ...
+
+    # ... create a glt symbol from a string without evaluation
+    expr = glt_symbol(a, space=V)
     print('> glt symbol  := {0}'.format(expr))
     # ...
+
+    # ...
+    symbol_f90 = compile_symbol('symbol_3', a, V, backend='fortran')
+    # ...
+
+    # ... example of symbol evaluation
+    t1 = linspace(-pi,pi, ne+1)
+    x1 = linspace(0.,1., ne+1)
+    e = zeros((2,2,ne+1))
+    symbol_f90(x1, t1, e)
+    # ...
 
     print('')
 # ...
@@ -194,7 +216,7 @@ def test_1d_4():
 # .....................................................
 if __name__ == '__main__':
 
-    test_1d_1()
-    test_1d_2()
-#    test_1d_3()
-    test_1d_4()
+#    test_1d_1()
+#    test_1d_2()
+    test_1d_3()
+#    test_1d_4()

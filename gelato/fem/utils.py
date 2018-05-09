@@ -21,6 +21,10 @@ from gelato.fem.templates import symbol_1d_scalar, symbol_header_1d_scalar
 from gelato.fem.templates import symbol_2d_scalar, symbol_header_2d_scalar
 from gelato.fem.templates import symbol_3d_scalar, symbol_header_3d_scalar
 
+from gelato.fem.templates import symbol_1d_block, symbol_header_1d_block
+from gelato.fem.templates import symbol_2d_block, symbol_header_2d_block
+from gelato.fem.templates import symbol_3d_block, symbol_header_3d_block
+
 from numbers import Number
 from collections import OrderedDict
 
@@ -135,7 +139,7 @@ def compile_kernel(name, expr, V,
         if V.is_block:
             n_components = len(V.spaces)
 
-            # ... identation
+            # ... identation (def function body)
             tab = ' '*4
             # ...
 
@@ -158,7 +162,7 @@ def compile_kernel(name, expr, V,
             mat_init_str = '\n'.join(line for line in lines)
             # ...
 
-            # ... update identation
+            # ... update identation to be inside the loop
             for i in range(0, 2*dim):
                 tab += ' '*4
 
@@ -427,13 +431,50 @@ def compile_symbol(name, expr, V,
 
     # ...
     if isinstance(V, VectorFemSpace):
-        raise NotImplementedError('TODO')
+        if V.is_block:
+            n_components = len(V.spaces)
+
+            # ... identation (def function body)
+            tab = ' '*4
+            # ...
+
+            # ... update identation to be inside the loop
+            for i in range(0, dim):
+                tab += ' '*4
+
+            tab_base = tab
+            # ...
+
+            # ...
+            lines = []
+            indices = ','.join('i{}'.format(i) for i in range(1, dim+1))
+            for i in range(0, n_components):
+                for j in range(0, n_components):
+                    s_ij = 'symbol[{i},{j},{indices}]'.format(i=i, j=j, indices=indices)
+                    e_ij = expr.expr[i,j]
+                    line = '{s_ij} = {e_ij}'.format(s_ij=s_ij, e_ij=e_ij)
+                    line = tab + line
+
+                    lines.append(line)
+
+            symbol_expr = '\n'.join(line for line in lines)
+            # ...
+
+            code = template.format(__SYMBOL_NAME__=name,
+                                   __SYMBOL_EXPR__=symbol_expr,
+                                   __ARGS__=args)
+
+        else:
+            raise NotImplementedError('TODO')
 
     else:
         code = template.format(__SYMBOL_NAME__=name,
                                __SYMBOL_EXPR__=expr.expr,
                                __ARGS__=args)
     # ...
+
+#    print(code)
+#    import sys; sys.exit(0)
 
     # ...
     if context:
@@ -475,12 +516,8 @@ def compile_symbol(name, expr, V,
         # ...
 
         # ...
-        if isinstance(V, VectorFemSpace):
-            raise NotImplementedError('TODO')
-        else:
-            header = template.format(__SYMBOL_NAME__=name,
-                                     __TYPES__=dtypes)
-
+        header = template.format(__SYMBOL_NAME__=name,
+                                 __TYPES__=dtypes)
         # ...
 
         # compile the kernel

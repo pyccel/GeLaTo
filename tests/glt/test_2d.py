@@ -1,7 +1,5 @@
 # coding: utf-8
 
-# TODO block example test 2 and 3
-
 import numpy as np
 from numpy import linspace, zeros, pi
 
@@ -24,7 +22,7 @@ from spl.fem.vector  import VectorFemSpace
 
 
 # ...
-def test_2d_1():
+def test_2d_scalar_1():
     x,y = symbols('x y')
 
     u = Symbol('u')
@@ -55,7 +53,7 @@ def test_2d_1():
     # ...
 
     # ...
-    symbol_f90 = compile_symbol('symbol_1', a, V, backend='fortran')
+    symbol_f90 = compile_symbol('symbol_scalar_1', a, V, backend='fortran')
     # ...
 
     # ... example of symbol evaluation
@@ -71,78 +69,7 @@ def test_2d_1():
 # ...
 
 # ...
-# TODO
-def test_2d_2():
-    x,y = symbols('x y')
-
-    u = IndexedBase('u')
-    v = IndexedBase('v')
-
-    a = Lambda((x,y,v,u), Rot(u) * Rot(v) + Div(u) * Div(v) + 0.2 * Dot(u, v))
-    print('> input       := {0}'.format(a))
-
-    # ... create a glt symbol from a string without evaluation
-    #     a discretization is defined as a dictionary
-    discretization = {"n_elements": [16, 16], "degrees": [3, 3]}
-
-    expr = glt_symbol(a, discretization=discretization, evaluate=False,
-                      is_block=True)
-    print('> glt symbol  := {0}'.format(expr))
-    # ...
-
-    print('')
-# ...
-
-# ...
-# TODO
-def test_2d_3():
-    x,y = symbols('x y')
-
-    u = Symbol('u')
-    v = Symbol('v')
-
-    a = Lambda((x,y,v,u), Cross(Curl(u), Curl(v)) + 0.2 * u * v)
-    print('> input       := {0}'.format(a))
-
-    # ...  create a finite element space
-    p1  = 2 ; p2  = 2
-    ne1 = 8 ; ne2 = 8
-
-    print('> Grid   :: [{ne1},{ne2}]'.format(ne1=ne1, ne2=ne2))
-    print('> Degree :: [{p1},{p2}]'.format(p1=p1, p2=p2))
-
-    grid_1 = linspace(0., 1., ne1+1)
-    grid_2 = linspace(0., 1., ne2+1)
-
-    V1 = SplineSpace(p1, grid=grid_1)
-    V2 = SplineSpace(p2, grid=grid_2)
-
-    V = TensorSpace(V1, V2)
-    # ...
-
-    # ... create a glt symbol from a string without evaluation
-    expr = glt_symbol(a, space=V)
-    print('> glt symbol  := {0}'.format(expr))
-    # ...
-
-    # ...
-    symbol_f90 = compile_symbol('symbol_3', a, V, backend='fortran')
-    # ...
-
-    # ... example of symbol evaluation
-    t1 = linspace(-pi,pi, ne1+1)
-    t2 = linspace(-pi,pi, ne2+1)
-    x1 = linspace(0.,1., ne1+1)
-    x2 = linspace(0.,1., ne2+1)
-    e = zeros((ne1+1, ne2+1), order='F')
-    symbol_f90(x1,x2,t1,t2, e)
-    # ...
-
-    print('')
-# ...
-
-# ...
-def test_2d_4():
+def test_2d_scalar_2():
     x,y = symbols('x y')
 
     u = Symbol('u')
@@ -179,7 +106,7 @@ def test_2d_4():
     # ...
 
     # ...
-    symbol_f90 = compile_symbol('symbol_4', a, V,
+    symbol_f90 = compile_symbol('symbol_scalar_2', a, V,
                                 d_constants={'b0': 0.1, 'b1': 1., 'c': 0.2},
                                 backend='fortran')
     # ...
@@ -197,7 +124,7 @@ def test_2d_4():
 # ...
 
 # ...
-def test_2d_5():
+def test_2d_scalar_3():
     x,y = symbols('x y')
 
     u = Symbol('u')
@@ -238,14 +165,14 @@ def test_2d_5():
     # ... create an interactive pyccel context
     from pyccel.epyccel import ContextPyccel
 
-    context = ContextPyccel(name='context_5')
+    context = ContextPyccel(name='context_scalar_3')
     context.insert_function(b, ['double', 'double'], kind='function', results=['double'])
 
     context.compile()
     # ...
 
     # ...
-    symbol_f90 = compile_symbol('symbol_5', a, V,
+    symbol_f90 = compile_symbol('symbol_scalar_3', a, V,
                                 context=context,
                                 backend='fortran')
     # ...
@@ -262,11 +189,108 @@ def test_2d_5():
     print('')
 # ...
 
+# ...
+def test_2d_scalar_4():
+    x,y = symbols('x y')
+
+    u = Symbol('u')
+    v = Symbol('v')
+
+    a = Lambda((x,y,v,u), Cross(Curl(u), Curl(v)) + 0.2 * u * v)
+    print('> input       := {0}'.format(a))
+
+    # ...  create a finite element space
+    p1  = 2 ; p2  = 2
+    ne1 = 8 ; ne2 = 8
+
+    print('> Grid   :: [{ne1},{ne2}]'.format(ne1=ne1, ne2=ne2))
+    print('> Degree :: [{p1},{p2}]'.format(p1=p1, p2=p2))
+
+    grid_1 = linspace(0., 1., ne1+1)
+    grid_2 = linspace(0., 1., ne2+1)
+
+    V1 = SplineSpace(p1, grid=grid_1)
+    V2 = SplineSpace(p2, grid=grid_2)
+
+    V = TensorSpace(V1, V2)
+    # ...
+
+    # ... create a glt symbol from a string without evaluation
+    expr = glt_symbol(a, space=V)
+    print('> glt symbol  := {0}'.format(expr))
+    # ...
+
+    # ...
+    symbol_f90 = compile_symbol('symbol_scalar_4', a, V, backend='fortran')
+    # ...
+
+    # ... example of symbol evaluation
+    t1 = linspace(-pi,pi, ne1+1)
+    t2 = linspace(-pi,pi, ne2+1)
+    x1 = linspace(0.,1., ne1+1)
+    x2 = linspace(0.,1., ne2+1)
+    e = zeros((ne1+1, ne2+1), order='F')
+    symbol_f90(x1,x2,t1,t2, e)
+    # ...
+
+    print('')
+# ...
+
+# ...
+def test_2d_block_1():
+    x,y = symbols('x y')
+
+    u = IndexedBase('u')
+    v = IndexedBase('v')
+
+    a = Lambda((x,y,v,u), Rot(u) * Rot(v) + Div(u) * Div(v) + 0.2 * Dot(u, v))
+    print('> input       := {0}'.format(a))
+
+    # ...  create a finite element space
+    p1  = 2 ; p2  = 2
+    ne1 = 8 ; ne2 = 8
+
+    print('> Grid   :: [{ne1},{ne2}]'.format(ne1=ne1, ne2=ne2))
+    print('> Degree :: [{p1},{p2}]'.format(p1=p1, p2=p2))
+
+    grid_1 = linspace(0., 1., ne1+1)
+    grid_2 = linspace(0., 1., ne2+1)
+
+    V1 = SplineSpace(p1, grid=grid_1)
+    V2 = SplineSpace(p2, grid=grid_2)
+
+    Vx = TensorSpace(V1, V2)
+    Vy = TensorSpace(V1, V2)
+
+    V = VectorFemSpace(Vx, Vy)
+    # ...
+
+    # ... create a glt symbol from a string without evaluation
+    expr = glt_symbol(a, space=V)
+    print('> glt symbol  := {0}'.format(expr))
+    # ...
+
+    # ...
+    symbol_f90 = compile_symbol('symbol_block_2', a, V, backend='fortran')
+    # ...
+
+    # ... example of symbol evaluation
+    t1 = linspace(-pi,pi, ne1+1)
+    t2 = linspace(-pi,pi, ne2+1)
+    x1 = linspace(0.,1., ne1+1)
+    x2 = linspace(0.,1., ne2+1)
+    e = zeros((2, 2, ne1+1, ne2+1), order='F')
+    symbol_f90(x1,x2,t1,t2, e)
+    # ...
+
+    print('')
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
-    test_2d_1()
-#    test_2d_2()
-#    test_2d_3()
-    test_2d_4()
-    test_2d_5()
+    test_2d_scalar_1()
+    test_2d_scalar_2()
+    test_2d_scalar_3()
+    test_2d_scalar_4()
+    test_2d_block_1()
