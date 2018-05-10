@@ -27,6 +27,12 @@ from gelato.fem.templates import symbol_3d_block, symbol_header_3d_block
 
 from numbers import Number
 from collections import OrderedDict
+from sympy import Integer, Float
+
+def _convert_int_to_float(expr):
+    sub = zip( expr.atoms(Integer), map(Float, expr.atoms(Integer)) )
+    expr = expr.subs(sub)
+    return expr
 
 def compile_kernel(name, expr, V,
                    namespace=globals(),
@@ -191,7 +197,8 @@ def compile_kernel(name, expr, V,
             for i in range(0, n_components):
                 for j in range(0, n_components):
                     line = 'v_{i}{j} += ({__WEAK_FORM__}) * wvol'
-                    line = line.format(i=i, j=j, __WEAK_FORM__=expr[i,j])
+                    e = _convert_int_to_float(expr[i,j])
+                    line = line.format(i=i, j=j, __WEAK_FORM__=e)
                     line = tab + line
 
                     lines.append(line)
@@ -234,8 +241,9 @@ def compile_kernel(name, expr, V,
                                       'which all components have are identical.')
 
     else:
+        e = _convert_int_to_float(expr)
         code = template.format(__KERNEL_NAME__=name,
-                               __WEAK_FORM__=expr,
+                               __WEAK_FORM__=e,
                                __ARGS__=args)
 
     # ...
@@ -451,7 +459,7 @@ def compile_symbol(name, expr, V,
             for i in range(0, n_components):
                 for j in range(0, n_components):
                     s_ij = 'symbol[{i},{j},{indices}]'.format(i=i, j=j, indices=indices)
-                    e_ij = expr.expr[i,j]
+                    e_ij = _convert_int_to_float(expr.expr[i,j])
                     line = '{s_ij} = {e_ij}'.format(s_ij=s_ij, e_ij=e_ij)
                     line = tab + line
 
@@ -468,8 +476,9 @@ def compile_symbol(name, expr, V,
             raise NotImplementedError('TODO')
 
     else:
+        e = _convert_int_to_float(expr.expr)
         code = template.format(__SYMBOL_NAME__=name,
-                               __SYMBOL_EXPR__=expr.expr,
+                               __SYMBOL_EXPR__=e,
                                __ARGS__=args)
     # ...
 
