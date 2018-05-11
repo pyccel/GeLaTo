@@ -56,6 +56,23 @@ from sympy import Indexed
 
 # ...
 class Constant(Symbol):
+    """
+    Represents a constant symbol.
+
+    Examples
+
+    """
+    pass
+# ...
+
+# ...
+class Field(Symbol):
+    """
+    Represents a Field variable.
+
+    Examples
+
+    """
     pass
 # ...
 

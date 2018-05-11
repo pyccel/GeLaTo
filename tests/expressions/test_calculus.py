@@ -9,6 +9,7 @@ from sympy import Lambda
 
 from gelato.calculus import (dx, dy, dz)
 from gelato.calculus import LinearOperator
+from gelato.calculus import Field
 
 
 # ...
@@ -83,7 +84,23 @@ def test_1():
     # ...
 # ...
 
+# ...
+def test_2():
+    u, v = symbols('u v')
+    F = Field('F')
+
+    # ...
+    expr = F*v*u
+    print('> expr := {0}'.format(expr))
+
+    expr = dx(expr)
+    print('> gelatized := {0}'.format(expr))
+    print('')
+    # ...
+# ...
+
 # .....................................................
 if __name__ == '__main__':
     test_0()
     test_1()
+    test_2()

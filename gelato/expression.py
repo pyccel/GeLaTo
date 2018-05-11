@@ -39,6 +39,7 @@ from gelato.calculus import _generic_ops, _partial_derivatives
 from gelato.calculus import (Dot_1d, Grad_1d, Div_1d)
 from gelato.calculus import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
 from gelato.calculus import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
+from gelato.calculus import Field
 
 #try:
 #    from pyccel.ast.core import Variable
@@ -364,6 +365,9 @@ def normalize_weak_from(f):
     tests  = Tuple(*args[dim:dim+n])
     trials = Tuple(*args[dim+n:])
 
+    # Field symbols
+    fields = [i for i in expr.free_symbols if isinstance(i, Field)]
+
     # ... we first need to find the ordered list of generic operators
     ops = [a for a in preorder_traversal(expr) if isinstance(a, _partial_derivatives)]
     # ...
@@ -388,6 +392,14 @@ def normalize_weak_from(f):
 
             if isinstance(a, Indexed) and a.base in trials:
                 expr = expr.subs({i: Symbol('Nj_{0}'.format(coordinate))})
+            # ...
+
+            # ... fields
+            if a in fields:
+                expr = expr.subs({i: Symbol('{name}_{coor}'.format(name=a.name, coor=coordinate))})
+
+            if isinstance(a, Indexed) and a.base in tests:
+                expr = expr.subs({i: Symbol('{name}_{coor}'.format(name=a.name, coor=coordinate))})
             # ...
     # ...
 
