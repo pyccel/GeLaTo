@@ -344,3 +344,57 @@ def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_x3, arr_t1, arr_t2, arr_t3, symbol {__
 
 symbol_header_3d_block = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:], double [:], double [:], double [:], double [:,:,:,:,:] {__TYPES__})'
 # .............................................
+
+# .............................................
+#          FIELD EVALUATION 1D case - scalar
+# .............................................
+eval_field_1d_scalar = """
+def eval_field_{__KERNEL_NAME__}(p1, k1, basis, {__FIELD_COEFFS__}, {__FIELD_VALUES__}):
+{__FIELD_INIT__}
+    for g1 in range(0, k1):
+        for jl_1 in range(0, p1+1):
+            Nj = basis[jl_1, 0, g1]
+            Nj_x = basis[jl_1, 1, g1]
+
+{__FIELD_ACCUM__}
+"""
+# .............................................
+
+# .............................................
+#          FIELD EVALUATION 2D case - scalar
+# .............................................
+eval_field_2d_scalar = """
+def eval_field_{__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, {__FIELD_COEFFS__}, {__FIELD_VALUES__}):
+{__FIELD_INIT__}
+    for g1 in range(0, k1):
+        for g2 in range(0, k2):
+            for jl_1 in range(0, p1+1):
+                for jl_2 in range(0, p2+1):
+                    Nj = bs1[jl_1, 0, g1] * bs2[jl_2, 0, g2]
+                    Nj_x = bs1[jl_1, 1, g1] * bs2[jl_2, 0, g2]
+                    Nj_y = bs1[jl_1, 0, g1] * bs2[jl_2, 1, g2]
+
+{__FIELD_ACCUM__}
+"""
+# .............................................
+
+# .............................................
+#          FIELD EVALUATION 3D case - scalar
+# .............................................
+eval_field_3d_scalar = """
+def eval_field_{__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, {__FIELD_COEFFS__}, {__FIELD_VALUES__}):
+{__FIELD_INIT__}
+    for g1 in range(0, k1):
+        for g2 in range(0, k2):
+            for g3 in range(0, k3):
+                for jl_1 in range(0, p1+1):
+                    for jl_2 in range(0, p2+1):
+                        for jl_3 in range(0, p3+1):
+                            Nj = bs1[jl_1, 0, g1] * bs2[jl_2, 0, g2] * bs3[jl_3, 0, g3]
+                            Nj_x = bs1[jl_1, 1, g1] * bs2[jl_2, 0, g2] * bs3[jl_3, 0, g3]
+                            Nj_y = bs1[jl_1, 0, g1] * bs2[jl_2, 1, g2] * bs3[jl_3, 0, g3]
+                            Nj_z = bs1[jl_1, 0, g1] * bs2[jl_2, 0, g2] * bs3[jl_3, 1, g3]
+
+{__FIELD_ACCUM__}
+"""
+# .............................................

@@ -6,9 +6,11 @@
 #       - use redbaron to modify the template
 
 from gelato.expression import construct_weak_form
+from gelato.expression import BASIS_PREFIX
 from gelato.glt import glt_symbol
 from gelato.calculus   import (Dot, Cross, Grad, Curl, Rot, Div)
 from gelato.calculus   import Constant
+from gelato.calculus   import Field
 from gelato.fem.templates import template_1d_scalar, template_header_1d_scalar
 from gelato.fem.templates import template_2d_scalar, template_header_2d_scalar
 from gelato.fem.templates import template_3d_scalar, template_header_3d_scalar
@@ -24,6 +26,11 @@ from gelato.fem.templates import symbol_3d_scalar, symbol_header_3d_scalar
 from gelato.fem.templates import symbol_1d_block, symbol_header_1d_block
 from gelato.fem.templates import symbol_2d_block, symbol_header_2d_block
 from gelato.fem.templates import symbol_3d_block, symbol_header_3d_block
+
+from gelato.fem.templates import eval_field_1d_scalar
+from gelato.fem.templates import eval_field_2d_scalar
+from gelato.fem.templates import eval_field_3d_scalar
+
 
 from numbers import Number
 from collections import OrderedDict
@@ -551,4 +558,190 @@ def compile_symbol(name, expr, V,
     # ...
 
     return kernel
+
+
+
+
+def compile_eval_field(name, expr, V,
+                       namespace=globals(),
+                       verbose=False,
+                       d_constants={},
+                       d_args={},
+                       context=None,
+                       backend='python'):
+    """returns the field evaluation for a kernel from a Lambda expression on a Finite Elements space."""
+
+    from spl.fem.vector  import VectorFemSpace
+
+    # ... parametric dimension
+    dim = V.pdim
+    # ...
+
+    # ...
+    if verbose:
+        print('> input     := {0}'.format(expr))
+    # ...
+
+    # Field symbols
+    fields = [i for i in expr.free_symbols if isinstance(i, Field)]
+    if not fields:
+        return None
+    else:
+        print('Fields = ', fields)
+
+    # ...
+    expr = construct_weak_form(expr, dim=dim,
+                               is_block=isinstance(V, VectorFemSpace))
+    if verbose:
+        print('> weak form := {0}'.format(expr))
+    # ...
+
+    # TODO compute nderiv needed to evaluate fields
+    nderiv = 1
+
+    # ... field coeffs
+    field_coeffs = OrderedDict()
+    for f in fields:
+        coeffs = 'coeff_{}'.format(f.name)
+        field_coeffs[str(f.name)] = coeffs
+
+    # TODO compute fiels values from expr
+    field_values = OrderedDict()
+    free_names = [str(f.name) for f in expr.free_symbols]
+    for f in fields:
+        ls = []
+        if f.name in free_names:
+            ls.append(f.name)
+        for deriv in BASIS_PREFIX:
+            f_d = '{field}_{deriv}'.format(field=f.name, deriv=deriv)
+            if f_d in free_names:
+                ls.append(f_d)
+
+        field_values[f.name] = ls
+#    print('>>> field_values = ', field_values)
+    # ...
+
+    # ... identation (def function body)
+    tab = ' '*4
+    # ...
+
+    # ... field values init
+    lines = []
+    for k, fs in list(field_values.items()):
+        for f in fs:
+            line = '{field} = 0.'.format(field=f)
+            line = tab + line
+
+            lines.append(line)
+
+    field_init_str = '\n'.join(line for line in lines)
+    # ...
+
+    # ... update identation to be inside the loop
+    for i in range(0, 2*dim):
+        tab += ' '*4
+
+    tab_base = tab
+    # ...
+#    print('>>>> expr = ', expr)
+
+    # ... assign accumulated values to element matrix
+    if dim == 1:
+        e_pattern = '{field}{deriv}[g1] += {coeff}[jl_1]*Nj{deriv}'
+    elif dim == 2:
+        e_pattern = '{field}{deriv}[g1,g2] += {coeff}[jl_1,jl_2]*Nj{deriv}'
+    elif dim ==3:
+        e_pattern = '{field}{deriv}[g1,g2,g3] += {coeff}[jl_1,jl_2,jl_3]*Nj{deriv}'
+    else:
+        raise NotImplementedError('only 1d, 2d and 3d are available')
+
+    lines = []
+    for k, fs in list(field_values.items()):
+        coeff = field_coeffs[k]
+        for f in fs:
+            ls = f.split('_')
+            if len(ls) == 1:
+                deriv = ''
+            else:
+                deriv = '_{}'.format(ls[-1])
+            line = e_pattern.format(field=k, deriv=deriv, coeff=coeff)
+            line = tab + line
+
+            lines.append(line)
+
+    field_accum_str = '\n'.join(line for line in lines)
+    # ...
+
+
+    # ...
+    if isinstance(V, VectorFemSpace) and not( V.is_block ):
+        raise NotImplementedError('We only treat the case of a block space, for '
+                                  'which all components have are identical.')
+    # ...
+
+    # ...
+    pattern = 'scalar'
+    if isinstance(V, VectorFemSpace):
+        if V.is_block:
+            pattern = 'block'
+
+        else:
+            raise NotImplementedError('We only treat the case of a block space, for '
+                                      'which all components have are identical.')
+    # ...
+
+    # ...
+    template_str = 'eval_field_{dim}d_{pattern}'.format(dim=dim, pattern=pattern)
+    try:
+        template = eval(template_str)
+    except:
+        raise ValueError('Could not find the corresponding template {}'.format(template_str))
+    # ...
+
+    # ...
+    if isinstance(V, VectorFemSpace):
+        raise NotImplementedError('TODO')
+
+    else:
+        e = _convert_int_to_float(expr)
+        # we call evalf to avoid having fortran doing the evaluation of rational
+        # division
+        field_coeffs_str = ', '.join('{}'.format(c) for c in list(field_coeffs.values()))
+
+        # get the name field and its derivatives
+        field_names = []
+        for k, fs in list(field_values.items()):
+            for f in fs:
+                ls = f.split('_')
+                if len(ls) == 1:
+                    deriv = ''
+                else:
+                    deriv = '_{}'.format(ls[-1])
+
+                field_names.append('{field}{deriv}'.format(field=k, deriv=deriv))
+        field_values_str = ', '.join('{}'.format(c) for c in field_names)
+
+        code = template.format(__KERNEL_NAME__=name,
+                               __FIELD_COEFFS__=field_coeffs_str,
+                               __FIELD_VALUES__=field_values_str,
+                               __FIELD_INIT__=field_init_str,
+                               __FIELD_ACCUM__=field_accum_str)
+
+    # ...
+
+    print(code)
+    import sys; sys.exit(0)
+
+    # ...
+    exec(code, namespace)
+    kernel = namespace[name]
+    # ...
+
+    # ...
+    if backend == 'fortran':
+        raise NotImplementedError('TODO')
+    # ...
+
+    return kernel
+
 
