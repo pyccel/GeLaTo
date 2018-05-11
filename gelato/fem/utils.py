@@ -198,7 +198,9 @@ def compile_kernel(name, expr, V,
                 for j in range(0, n_components):
                     line = 'v_{i}{j} += ({__WEAK_FORM__}) * wvol'
                     e = _convert_int_to_float(expr[i,j])
-                    line = line.format(i=i, j=j, __WEAK_FORM__=e)
+                    # we call evalf to avoid having fortran doing the evaluation of rational
+                    # division
+                    line = line.format(i=i, j=j, __WEAK_FORM__=e.evalf())
                     line = tab + line
 
                     lines.append(line)
@@ -242,8 +244,10 @@ def compile_kernel(name, expr, V,
 
     else:
         e = _convert_int_to_float(expr)
+        # we call evalf to avoid having fortran doing the evaluation of rational
+        # division
         code = template.format(__KERNEL_NAME__=name,
-                               __WEAK_FORM__=e,
+                               __WEAK_FORM__=e.evalf(),
                                __ARGS__=args)
 
     # ...
@@ -460,7 +464,9 @@ def compile_symbol(name, expr, V,
                 for j in range(0, n_components):
                     s_ij = 'symbol[{i},{j},{indices}]'.format(i=i, j=j, indices=indices)
                     e_ij = _convert_int_to_float(expr.expr[i,j])
-                    line = '{s_ij} = {e_ij}'.format(s_ij=s_ij, e_ij=e_ij)
+                    # we call evalf to avoid having fortran doing the evaluation of rational
+                    # division
+                    line = '{s_ij} = {e_ij}'.format(s_ij=s_ij, e_ij=e_ij.evalf())
                     line = tab + line
 
                     lines.append(line)
@@ -476,14 +482,22 @@ def compile_symbol(name, expr, V,
             raise NotImplementedError('TODO')
 
     else:
+        # we call evalf to avoid having fortran doing the evaluation of rational
+        # division
         e = _convert_int_to_float(expr.expr)
         code = template.format(__SYMBOL_NAME__=name,
-                               __SYMBOL_EXPR__=e,
+                               __SYMBOL_EXPR__=e.evalf(),
                                __ARGS__=args)
     # ...
 
-#    print(code)
-#    import sys; sys.exit(0)
+
+#    # TODO export only if a given flag is True
+#    # ... export the python code of the module
+#    f = open('{}.py'.format(name), 'w')
+#    for line in code:
+#        f.write(line)
+#    f.close()
+#    # ...
 
     # ...
     if context:
