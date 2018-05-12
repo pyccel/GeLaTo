@@ -2,7 +2,7 @@
 from numpy import zeros
 from collections import OrderedDict
 
-def assemble_matrix(V, kernel, args=None, M=None):
+def assemble_matrix(V, kernel, args=None, M=None, eval_field=None, fields=None):
     try:
         assemble = eval('assemble_matrix_{}d'.format(V.pdim))
     except:
@@ -17,10 +17,20 @@ def assemble_matrix(V, kernel, args=None, M=None):
         if not(isinstance(args, (list, tuple))):
             raise TypeError('Expecting list/tuple for args')
 
-    return assemble(V, kernel, args=args, M=M)
+    if not(eval_field is None) and not(fields is None):
+        from spl.fem.splines import Spline
+
+        assert(isinstance(fields, (dict, OrderedDict)))
+
+        for k,f in list(fields.items()):
+            # check validity of arguments
+            if not isinstance(f, Spline):
+                raise TypeError('Field must be a spl.fem.splines.Spline')
+
+    return assemble(V, kernel, args=args, M=M, eval_field=eval_field, fields=fields)
 
 
-def assemble_matrix_1d(V, kernel, args=None, M=None):
+def assemble_matrix_1d(V, kernel, args=None, M=None, eval_field=None, fields=None):
 
     from spl.fem.vector  import VectorFemSpace
 
@@ -77,6 +87,21 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
             mats.append(line)
     # ...
 
+    # ... fields
+    with_fields = False
+    if not(eval_field is None) and not(fields is None):
+        field_values = {}
+        field_coeffs = {}
+        for k,f in list(fields.items()):
+            # values over quad points for every field
+            field_values[k] = zeros(k1)
+
+            # arrays for local coefficients per element
+            field_coeffs[k] = zeros(p1+1)
+
+        with_fields = True
+    # ...
+
     # ... build matrices
     # TODO this is only for the parallel case
 #    for ie1 in range(s1, e1+1-p1):
@@ -87,12 +112,24 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
         w = weights_1[:, ie1]
         u = points_1[:, ie1]
 
+        s1 = i_span_1 - p1 - 1
+
+        if with_fields:
+            for k,f in list(fields.items()):
+                field_coeffs[k][:] = f.coeffs[s1:s1+p1+1]
+
+            coeffs = list(field_coeffs.values())
+            values = list(field_values.values())
+            eval_field(p1, k1, bs, *coeffs, *values)
+        else:
+            values = []
+
         if not is_block:
             if args is None:
-                kernel(p1, k1, bs, u, w, mat)
+                kernel(p1, k1, bs, u, w, mat, *values)
 
             else:
-                kernel(p1, k1, bs, u, w, mat, *args)
+                kernel(p1, k1, bs, u, w, mat, *args, *values)
 
         else:
             _mats = []
@@ -105,8 +142,6 @@ def assemble_matrix_1d(V, kernel, args=None, M=None):
 
             else:
                 kernel(p1, k1, bs, u, w, *_mats, *args)
-
-        s1 = i_span_1 - p1 - 1
 
         if not is_block:
             M._data[s1:s1+p1+1,:] += mat[:,:]

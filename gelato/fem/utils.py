@@ -147,14 +147,28 @@ def compile_kernel(name, expr, V,
         raise ValueError('Could not find the corresponding template {}'.format(template_str))
     # ...
 
+    # ... identation (def function body)
+    tab = ' '*4
+    # ...
+
+    # ... fields case
+    if True:
+    #if not(fields is None):
+        # ... update identation to be inside the quad loop
+        for i in range(0, 3*dim):
+            tab += ' '*4
+
+        tab_base = tab
+        # ...
+
+        line = 'F = F_values[g1]'
+        field_values_str = tab + line
+    # ...
+
     # ...
     if isinstance(V, VectorFemSpace):
         if V.is_block:
             n_components = len(V.spaces)
-
-            # ... identation (def function body)
-            tab = ' '*4
-            # ...
 
             # ... - initializing element matrices
             #     - define arguments
@@ -253,11 +267,20 @@ def compile_kernel(name, expr, V,
         e = _convert_int_to_float(expr)
         # we call evalf to avoid having fortran doing the evaluation of rational
         # division
+        # TODO
+        field_args_str = ', F_values'
         code = template.format(__KERNEL_NAME__=name,
                                __WEAK_FORM__=e.evalf(),
+#                               __FIELD_ARGS__=field_args_str,
+                               __FIELD_ARGS__='',
+                               __FIELD_VALUES__=field_values_str,
                                __ARGS__=args)
 
     # ...
+
+    print('--------------')
+    print(code)
+    print('--------------')
 
     # ...
     if context:
@@ -626,10 +649,11 @@ def compile_eval_field(name, expr, V,
     # ...
 
     # ... field values init
+    slices = ','.join(':' for i in range(0, dim))
     lines = []
     for k, fs in list(field_values.items()):
         for f in fs:
-            line = '{field} = 0.'.format(field=f)
+            line = '{field}[{slices}] = 0.'.format(field=f, slices=slices)
             line = tab + line
 
             lines.append(line)
@@ -721,7 +745,7 @@ def compile_eval_field(name, expr, V,
                 field_names.append('{field}{deriv}'.format(field=k, deriv=deriv))
         field_values_str = ', '.join('{}'.format(c) for c in field_names)
 
-        code = template.format(__KERNEL_NAME__=name,
+        code = template.format(__EVAL_FIELD_NAME__=name,
                                __FIELD_COEFFS__=field_coeffs_str,
                                __FIELD_VALUES__=field_values_str,
                                __FIELD_INIT__=field_init_str,
@@ -729,8 +753,10 @@ def compile_eval_field(name, expr, V,
 
     # ...
 
+    print('---------------------')
     print(code)
-    import sys; sys.exit(0)
+    print('---------------------')
+#    import sys; sys.exit(0)
 
     # ...
     exec(code, namespace)

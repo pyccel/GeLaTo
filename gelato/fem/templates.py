@@ -7,7 +7,7 @@
 #          KERNEL     1D case - scalar
 # .............................................
 template_1d_scalar = """
-def {__KERNEL_NAME__}(p1, k1, basis, u, w, mat {__ARGS__}):
+def {__KERNEL_NAME__}(p1, k1, basis, u, w, mat {__ARGS__} {__FIELD_ARGS__}):
     mat[:,:] = 0.
     for il_1 in range(0, p1+1):
         for jl_1 in range(0, p1+1):
@@ -22,6 +22,8 @@ def {__KERNEL_NAME__}(p1, k1, basis, u, w, mat {__ARGS__}):
 
                 x    = u[g1]
                 wvol = w[g1]
+
+{__FIELD_VALUES__}
 
                 v += ({__WEAK_FORM__}) * wvol
             mat[il_1, p1 + jl_1 - il_1] = v
@@ -349,7 +351,7 @@ symbol_header_3d_block = '#$ header procedure {__SYMBOL_NAME__}(double [:], doub
 #          FIELD EVALUATION 1D case - scalar
 # .............................................
 eval_field_1d_scalar = """
-def eval_field_{__KERNEL_NAME__}(p1, k1, basis, {__FIELD_COEFFS__}, {__FIELD_VALUES__}):
+def {__EVAL_FIELD_NAME__}(p1, k1, basis, {__FIELD_COEFFS__}, {__FIELD_VALUES__}):
 {__FIELD_INIT__}
     for g1 in range(0, k1):
         for jl_1 in range(0, p1+1):
@@ -364,7 +366,7 @@ def eval_field_{__KERNEL_NAME__}(p1, k1, basis, {__FIELD_COEFFS__}, {__FIELD_VAL
 #          FIELD EVALUATION 2D case - scalar
 # .............................................
 eval_field_2d_scalar = """
-def eval_field_{__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, {__FIELD_COEFFS__}, {__FIELD_VALUES__}):
+def {__EVAL_FIELD_NAME__}(p1, p2, k1, k2, bs1, bs2, {__FIELD_COEFFS__}, {__FIELD_VALUES__}):
 {__FIELD_INIT__}
     for g1 in range(0, k1):
         for g2 in range(0, k2):
@@ -382,7 +384,7 @@ def eval_field_{__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, {__FIELD_COEFFS__}, {
 #          FIELD EVALUATION 3D case - scalar
 # .............................................
 eval_field_3d_scalar = """
-def eval_field_{__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, {__FIELD_COEFFS__}, {__FIELD_VALUES__}):
+def {__EVAL_FIELD_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, {__FIELD_COEFFS__}, {__FIELD_VALUES__}):
 {__FIELD_INIT__}
     for g1 in range(0, k1):
         for g2 in range(0, k2):
