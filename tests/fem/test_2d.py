@@ -343,6 +343,54 @@ def test_2d_block_1():
 
 # ...
 
+# ...
+def test_2d_block_2():
+    # ... define the weak formulation
+    x,y = symbols('x y')
+
+    u = IndexedBase('u')
+    v = IndexedBase('v')
+
+    F = Field('F')
+
+    a = Lambda((x,y,v,u), Rot(u) * Rot(v) + Div(u) * Div(v) + 0.2 * Dot(u, v) + F*u[0]*v[0])
+    # ...
+
+    # ...  create a finite element space
+    p1  = 2 ; p2  = 2
+    ne1 = 8 ; ne2 = 8
+
+    print('> Grid   :: [{ne1},{ne2}]'.format(ne1=ne1, ne2=ne2))
+    print('> Degree :: [{p1},{p2}]'.format(p1=p1, p2=p2))
+
+    grid_1 = linspace(0., 1., ne1+1)
+    grid_2 = linspace(0., 1., ne2+1)
+
+    V1 = SplineSpace(p1, grid=grid_1)
+    V2 = SplineSpace(p2, grid=grid_2)
+
+    W = TensorSpace(V1, V2)
+    # ...
+
+    # ... vector space
+    V = VectorFemSpace(W, W)
+    # ...
+
+    F = Spline(W)
+    F.coeffs._data[:,:] = 1.
+
+    # ...
+    kernel_py  = compile_kernel('kernel_block_2', a, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_block_2', a, V, backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py, fields={'F': F})
+    M_f90 = assemble_matrix(V, kernel_f90, fields={'F': F})
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
+
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
@@ -351,5 +399,6 @@ if __name__ == '__main__':
 #    test_2d_scalar_2()
 #    test_2d_scalar_3()
 #    test_2d_scalar_4()
-    test_2d_scalar_5()
+#    test_2d_scalar_5()
 #    test_2d_block_1()
+    test_2d_block_2()

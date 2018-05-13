@@ -278,6 +278,54 @@ def test_3d_block_1():
 
 # ...
 
+# ...
+def test_3d_block_2():
+    x,y,z = symbols('x y z')
+
+    u = IndexedBase('u')
+    v = IndexedBase('v')
+
+    F = Field('F')
+
+    a = Lambda((x,y,z,v,u), Dot(Curl(u), Curl(v)) + 0.2 * Dot(u, v) + F*u[0]*v[0])
+
+    # ...  create a finite element space
+    p1  = 2 ; p2  = 2 ; p3  = 2
+    ne1 = 2 ; ne2 = 2 ; ne3 = 2
+
+    print('> Grid   :: [{},{},{}]'.format(ne1, ne2, ne3))
+    print('> Degree :: [{},{},{}]'.format(p1, p2, p3))
+
+    grid_1 = linspace(0., 1., ne1+1)
+    grid_2 = linspace(0., 1., ne2+1)
+    grid_3 = linspace(0., 1., ne3+1)
+
+    V1 = SplineSpace(p1, grid=grid_1)
+    V2 = SplineSpace(p2, grid=grid_2)
+    V3 = SplineSpace(p3, grid=grid_3)
+
+    W = TensorSpace(V1, V2, V3)
+    # ...
+
+    # ... vector space
+    V = VectorFemSpace(W, W, W)
+    # ...
+
+    F = Spline(W)
+    F.coeffs._data[:,:,:] = 1.
+
+    # ...
+    kernel_py  = compile_kernel('kernel_block_2', a, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_block_2', a, V, backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py, fields={'F': F})
+    M_f90 = assemble_matrix(V, kernel_f90, fields={'F': F})
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
+
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
@@ -285,5 +333,6 @@ if __name__ == '__main__':
 #    test_3d_scalar_1()
 #    test_3d_scalar_2()
 #    test_3d_scalar_3()
-    test_3d_scalar_4()
+#    test_3d_scalar_4()
 #    test_3d_block_1()
+    test_3d_block_2()

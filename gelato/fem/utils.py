@@ -170,7 +170,7 @@ def compile_kernel(name, expr, V,
         # add ',' for kernel signature
         field_coeffs_str = ', {}'.format(field_coeffs_str)
 
-        eval_field_str = print_eval_field(expr, V, fields, verbose=verbose)
+        eval_field_str = print_eval_field(expr, V.pdim, fields, verbose=verbose)
 
         # ...
         if dim == 1:
@@ -658,14 +658,10 @@ def compile_symbol(name, expr, V,
 
 
 
-def print_eval_field(expr, V, fields, verbose=False):
+def print_eval_field(expr, dim, fields, verbose=False):
     """."""
 
     from spl.fem.vector  import VectorFemSpace
-
-    # ... parametric dimension
-    dim = V.pdim
-    # ...
 
     # ...
     if verbose:
@@ -754,20 +750,8 @@ def print_eval_field(expr, V, fields, verbose=False):
 
 
     # ...
-    if isinstance(V, VectorFemSpace) and not( V.is_block ):
-        raise NotImplementedError('We only treat the case of a block space, for '
-                                  'which all components have are identical.')
-    # ...
-
-    # ...
+    # TODO
     pattern = 'scalar'
-    if isinstance(V, VectorFemSpace):
-        if V.is_block:
-            pattern = 'block'
-
-        else:
-            raise NotImplementedError('We only treat the case of a block space, for '
-                                      'which all components have are identical.')
     # ...
 
     # ...
@@ -779,18 +763,13 @@ def print_eval_field(expr, V, fields, verbose=False):
     # ...
 
     # ...
-    if isinstance(V, VectorFemSpace):
-        raise NotImplementedError('TODO')
+    e = _convert_int_to_float(expr)
+    # we call evalf to avoid having fortran doing the evaluation of rational
+    # division
+    field_coeffs_str = ', '.join('{}'.format(c) for c in list(field_coeffs.values()))
 
-    else:
-        e = _convert_int_to_float(expr)
-        # we call evalf to avoid having fortran doing the evaluation of rational
-        # division
-        field_coeffs_str = ', '.join('{}'.format(c) for c in list(field_coeffs.values()))
-
-        code = template.format(__FIELD_INIT__=field_init_str,
-                               __FIELD_ACCUM__=field_accum_str)
-
+    code = template.format(__FIELD_INIT__=field_init_str,
+                           __FIELD_ACCUM__=field_accum_str)
     # ...
 
     return code
