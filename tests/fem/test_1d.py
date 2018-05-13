@@ -26,7 +26,7 @@ from spl.fem.splines import Spline
 from utils import assert_identical_coo
 
 # ...
-def test_1d_1():
+def test_1d_scalar_1():
     # ... define the weak formulation
     x = Symbol('x')
 
@@ -49,8 +49,8 @@ def test_1d_1():
     # ...
 
     # ...
-    kernel_py  = compile_kernel('kernel_1', a, V, backend='python')
-    kernel_f90 = compile_kernel('kernel_1', a, V, backend='fortran')
+    kernel_py  = compile_kernel('kernel_scalar_1', a, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_scalar_1', a, V, backend='fortran')
 
     M_py  = assemble_matrix(V, kernel_py)
     M_f90 = assemble_matrix(V, kernel_f90)
@@ -61,7 +61,7 @@ def test_1d_1():
 # ...
 
 # ...
-def test_1d_2():
+def test_1d_scalar_2():
     # ... define the weak formulation
     x = Symbol('x')
 
@@ -87,11 +87,11 @@ def test_1d_2():
     # ...
 
     # ...
-    kernel_py  = compile_kernel('kernel_2', a, V,
+    kernel_py  = compile_kernel('kernel_scalar_2', a, V,
                                 d_constants={'nu': 0.1},
                                 d_args={'alpha': 'double'},
                                 backend='python')
-    kernel_f90 = compile_kernel('kernel_2', a, V,
+    kernel_f90 = compile_kernel('kernel_scalar_2', a, V,
                                 d_constants={'nu': 0.1},
                                 d_args={'alpha': 'double'},
                                 backend='fortran')
@@ -105,46 +105,7 @@ def test_1d_2():
 # ...
 
 # ...
-def test_1d_3():
-    # ... define the weak formulation
-    x = Symbol('x')
-
-    u0, u1 = symbols('u0 u1')
-    v0, v1 = symbols('v0 v1')
-
-    a = Lambda((x,v0,v1,u0,u1), dx(u0)*dx(v0) + dx(u1)*v0 + u0*dx(v1) + u1*v1)
-    # ...
-
-    # ...  create a finite element space
-    p  = 3
-    ne = 64
-
-    print('> Grid   :: {ne}'.format(ne=ne))
-    print('> Degree :: {p}'.format(p=p))
-
-    grid = linspace(0., 1., ne+1)
-
-    V = SplineSpace(p, grid=grid)
-    # ...
-
-    # ... Vector fem space
-    V = VectorFemSpace(V, V)
-    # ...
-
-    # ...
-    kernel_py  = compile_kernel('kernel_3', a, V, backend='python')
-    kernel_f90 = compile_kernel('kernel_3', a, V, backend='fortran')
-
-    M_py  = assemble_matrix(V, kernel_py)
-    M_f90 = assemble_matrix(V, kernel_f90)
-    # ...
-
-    assert_identical_coo(M_py, M_f90)
-
-# ...
-
-# ...
-def test_1d_4():
+def test_1d_scalar_3():
     x = Symbol('x')
 
     u = Symbol('u')
@@ -176,19 +137,19 @@ def test_1d_4():
     # ... create an interactive pyccel context
     from pyccel.epyccel import ContextPyccel
 
-    context = ContextPyccel(name='context_4')
+    context = ContextPyccel(name='context_3')
     context.insert_function(b, ['double'], kind='function', results=['double'])
 
     context.compile()
     # ...
 
     # ...
-    kernel_py  = compile_kernel('kernel_4', a, V,
+    kernel_py  = compile_kernel('kernel_scalar_3', a, V,
                                 context=context,
                                 verbose=True,
                                 backend='python')
 
-    kernel_f90 = compile_kernel('kernel_4', a, V,
+    kernel_f90 = compile_kernel('kernel_scalar_3', a, V,
                                 context=context,
                                 verbose=True,
                                 backend='fortran')
@@ -205,47 +166,7 @@ def test_1d_4():
 # ...
 
 # ...
-def test_1d_5():
-    # ... define the weak formulation
-    x = Symbol('x')
-
-    u = Symbol('u')
-    v = Symbol('v')
-
-    F = Field('F')
-
-    a = Lambda((x,v,u), Dot(Grad(u), Grad(v)) + F*u*v)
-    # ...
-
-    # ...  create a finite element space
-    p  = 3
-    ne = 64
-
-    print('> Grid   :: {ne}'.format(ne=ne))
-    print('> Degree :: {p}'.format(p=p))
-
-    grid = linspace(0., 1., ne+1)
-
-    V = SplineSpace(p, grid=grid)
-    # ...
-
-    # ...
-    kernel_py  = compile_kernel('kernel_5', a, V, backend='python')
-    kernel_f90 = compile_kernel('kernel_5', a, V, backend='fortran')
-
-    F = Spline(V)
-    F.coeffs._data[:] = 1.
-
-    M_py  = assemble_matrix(V, kernel_py, fields={'F': F})
-    M_f90 = assemble_matrix(V, kernel_f90, fields={'F': F})
-    # ...
-
-    assert_identical_coo(M_py, M_f90)
-
-# ...
-
-# ...
-def test_1d_6():
+def test_1d_scalar_4():
     # ... define the weak formulation
     x = Symbol('x')
 
@@ -269,15 +190,57 @@ def test_1d_6():
     V = SplineSpace(p, grid=grid)
     # ...
 
-#    # ...
-#    kernel_py  = compile_kernel('kernel_1', a, V, backend='python')
-#    kernel_f90 = compile_kernel('kernel_1', a, V, backend='fortran')
-#
-#    M_py  = assemble_matrix(V, kernel_py)
-#    M_f90 = assemble_matrix(V, kernel_f90)
-#    # ...
-#
-#    assert_identical_coo(M_py, M_f90)
+    # ...
+    kernel_py  = compile_kernel('kernel_scalar_4', a, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_scalar_4', a, V, backend='fortran')
+
+    F = Spline(V)
+    F.coeffs._data[:] = 1.
+
+    M_py  = assemble_matrix(V, kernel_py, fields={'F': F})
+    M_f90 = assemble_matrix(V, kernel_f90, fields={'F': F})
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
+
+# ...
+
+# ...
+def test_1d_block_1():
+    # ... define the weak formulation
+    x = Symbol('x')
+
+    u0, u1 = symbols('u0 u1')
+    v0, v1 = symbols('v0 v1')
+
+    a = Lambda((x,v0,v1,u0,u1), dx(u0)*dx(v0) + dx(u1)*v0 + u0*dx(v1) + u1*v1)
+    # ...
+
+    # ...  create a finite element space
+    p  = 3
+    ne = 64
+
+    print('> Grid   :: {ne}'.format(ne=ne))
+    print('> Degree :: {p}'.format(p=p))
+
+    grid = linspace(0., 1., ne+1)
+
+    V = SplineSpace(p, grid=grid)
+    # ...
+
+    # ... Vector fem space
+    V = VectorFemSpace(V, V)
+    # ...
+
+    # ...
+    kernel_py  = compile_kernel('kernel_block_1', a, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_block_1', backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py)
+    M_f90 = assemble_matrix(V, kernel_f90)
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
 
 # ...
 
@@ -285,9 +248,8 @@ def test_1d_6():
 # .....................................................
 if __name__ == '__main__':
 
-#    test_1d_1()
-#    test_1d_2()
-#    test_1d_3()
-#    test_1d_4()
-    test_1d_5()
-#    test_1d_6()
+#    test_1d_scalar_1()
+#    test_1d_scalar_2()
+#    test_1d_scalar_3()
+    test_1d_scalar_4()
+#    test_1d_block_1()
