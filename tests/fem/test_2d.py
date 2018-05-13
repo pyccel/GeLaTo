@@ -22,6 +22,7 @@ from gelato.fem.utils    import compile_kernel
 from spl.fem.splines import SplineSpace
 from spl.fem.tensor  import TensorSpace
 from spl.fem.vector  import VectorFemSpace
+from spl.fem.splines import Spline
 
 from utils import assert_identical_coo
 
@@ -327,15 +328,18 @@ def test_2d_6():
     V = TensorSpace(V1, V2)
     # ...
 
+    F = Spline(V)
+    F.coeffs._data[:,:] = 1.
+
     # ...
     kernel_py  = compile_kernel('kernel_6', a, V, backend='python')
     kernel_f90 = compile_kernel('kernel_6', a, V, backend='fortran')
 
-#    M_py  = assemble_matrix(V, kernel_py)
-#    M_f90 = assemble_matrix(V, kernel_f90)
-#    # ...
-#
-#    assert_identical_coo(M_py, M_f90)
+    M_py  = assemble_matrix(V, kernel_py, fields={'F': F})
+    M_f90 = assemble_matrix(V, kernel_f90, fields={'F': F})
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
 
 # ...
 

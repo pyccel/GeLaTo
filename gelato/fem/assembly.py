@@ -2,7 +2,7 @@
 from numpy import zeros
 from collections import OrderedDict
 
-def assemble_matrix(V, kernel, args=None, M=None, eval_field=None, fields=None):
+def assemble_matrix(V, kernel, args=None, M=None, fields=None):
     try:
         assemble = eval('assemble_matrix_{}d'.format(V.pdim))
     except:
@@ -17,7 +17,7 @@ def assemble_matrix(V, kernel, args=None, M=None, eval_field=None, fields=None):
         if not(isinstance(args, (list, tuple))):
             raise TypeError('Expecting list/tuple for args')
 
-    if not(eval_field is None) and not(fields is None):
+    if not(fields is None):
         from spl.fem.splines import Spline
 
         assert(isinstance(fields, (dict, OrderedDict)))
@@ -27,10 +27,10 @@ def assemble_matrix(V, kernel, args=None, M=None, eval_field=None, fields=None):
             if not isinstance(f, Spline):
                 raise TypeError('Field must be a spl.fem.splines.Spline')
 
-    return assemble(V, kernel, args=args, M=M, eval_field=eval_field, fields=fields)
+    return assemble(V, kernel, args=args, M=M, fields=fields)
 
 
-def assemble_matrix_1d(V, kernel, args=None, M=None, eval_field=None, fields=None):
+def assemble_matrix_1d(V, kernel, args=None, M=None, fields=None):
 
     from spl.fem.vector  import VectorFemSpace
 
@@ -87,21 +87,6 @@ def assemble_matrix_1d(V, kernel, args=None, M=None, eval_field=None, fields=Non
             mats.append(line)
     # ...
 
-    # ... fields
-    with_fields = False
-    if not(eval_field is None) and not(fields is None):
-        field_values = {}
-        field_coeffs = {}
-        for k,f in list(fields.items()):
-            # values over quad points for every field
-            field_values[k] = zeros(k1)
-
-            # arrays for local coefficients per element
-            field_coeffs[k] = zeros(p1+1)
-
-        with_fields = True
-    # ...
-
     # ... build matrices
     # TODO this is only for the parallel case
 #    for ie1 in range(s1, e1+1-p1):
@@ -114,22 +99,16 @@ def assemble_matrix_1d(V, kernel, args=None, M=None, eval_field=None, fields=Non
 
         s1 = i_span_1 - p1 - 1
 
-        if with_fields:
-            for k,f in list(fields.items()):
-                field_coeffs[k][:] = f.coeffs[s1:s1+p1+1]
-
-            coeffs = list(field_coeffs.values())
-            values = list(field_values.values())
-            eval_field(p1, k1, bs, *coeffs, *values)
-        else:
-            values = []
+        field_coeffs = []
+        for k,f in list(fields.items()):
+            field_coeffs.append(f.coeffs[s1:s1+p1+1])
 
         if not is_block:
             if args is None:
-                kernel(p1, k1, bs, u, w, mat, *values)
+                kernel(p1, k1, bs, u, w, mat, *field_coeffs)
 
             else:
-                kernel(p1, k1, bs, u, w, mat, *args, *values)
+                kernel(p1, k1, bs, u, w, mat, *args, *field_coeffs)
 
         else:
             _mats = []
@@ -138,10 +117,10 @@ def assemble_matrix_1d(V, kernel, args=None, M=None, eval_field=None, fields=Non
                     _mats.append(mats[i][j])
 
             if args is None:
-                kernel(p1, k1, bs, u, w, *_mats)
+                kernel(p1, k1, bs, u, w, *_mats, *field_coeffs)
 
             else:
-                kernel(p1, k1, bs, u, w, *_mats, *args)
+                kernel(p1, k1, bs, u, w, *_mats, *args, *field_coeffs)
 
         if not is_block:
             M._data[s1:s1+p1+1,:] += mat[:,:]
@@ -157,7 +136,7 @@ def assemble_matrix_1d(V, kernel, args=None, M=None, eval_field=None, fields=Non
     return M
 
 
-def assemble_matrix_2d(V, kernel, args=None, M=None):
+def assemble_matrix_2d(V, kernel, args=None, M=None, fields=None):
 
     from spl.fem.vector  import VectorFemSpace
 
@@ -232,6 +211,13 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
             u1 = points_1[:, ie1]
             u2 = points_2[:, ie2]
 
+            s1 = i_span_1 - p1 - 1
+            s2 = i_span_2 - p2 - 1
+
+            field_coeffs = []
+            for k,f in list(fields.items()):
+                field_coeffs.append(f.coeffs[s1:s1+p1+1,s2:s2+p2+1])
+
             if not is_block:
                 if args is None:
                     kernel(p1, p2,
@@ -239,7 +225,7 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
                            bs1, bs2,
                            u1, u2,
                            w1, w2,
-                           mat)
+                           mat, *field_coeffs)
 
                 else:
                     kernel(p1, p2,
@@ -247,7 +233,7 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
                            bs1, bs2,
                            u1, u2,
                            w1, w2,
-                           mat, *args)
+                           mat, *args, *field_coeffs)
 
             else:
                 _mats = []
@@ -261,7 +247,7 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
                            bs1, bs2,
                            u1, u2,
                            w1, w2,
-                           *_mats)
+                           *_mats, *field_coeffs)
 
                 else:
                     kernel(p1, p2,
@@ -269,10 +255,7 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
                            bs1, bs2,
                            u1, u2,
                            w1, w2,
-                           *_mats, *args)
-
-            s1 = i_span_1 - p1 - 1
-            s2 = i_span_2 - p2 - 1
+                           *_mats, *args, *field_coeffs)
 
             if not is_block:
                 M._data[s1:s1+p1+1,s2:s2+p2+1,:,:] += mat[:,:,:,:]
@@ -288,7 +271,7 @@ def assemble_matrix_2d(V, kernel, args=None, M=None):
     return M
 
 
-def assemble_matrix_3d(V, kernel, args=None, M=None):
+def assemble_matrix_3d(V, kernel, args=None, M=None, fields=None):
 
     from spl.fem.vector  import VectorFemSpace
 
@@ -369,6 +352,14 @@ def assemble_matrix_3d(V, kernel, args=None, M=None):
                 u2 = points_2[:, ie2]
                 u3 = points_3[:, ie3]
 
+                s1 = i_span_1 - p1 - 1
+                s2 = i_span_2 - p2 - 1
+                s3 = i_span_3 - p3 - 1
+
+                field_coeffs = []
+                for k,f in list(fields.items()):
+                    field_coeffs.append(f.coeffs[s1:s1+p1+1,s2:s2+p2+1,s3:s3+p3+1])
+
                 if not is_block:
                     if args is None:
                         kernel(p1, p2, p3,
@@ -376,7 +367,7 @@ def assemble_matrix_3d(V, kernel, args=None, M=None):
                                bs1, bs2, bs3,
                                u1, u2, u3,
                                w1, w2, w3,
-                               mat)
+                               mat, *field_coeffs)
 
                     else:
                         kernel(p1, p2, p3,
@@ -384,7 +375,7 @@ def assemble_matrix_3d(V, kernel, args=None, M=None):
                                bs1, bs2, bs3,
                                u1, u2, u3,
                                w1, w2, w3,
-                               mat, *args)
+                               mat, *args, *field_coeffs)
 
                 else:
                     _mats = []
@@ -398,18 +389,14 @@ def assemble_matrix_3d(V, kernel, args=None, M=None):
                                bs1, bs2, bs3,
                                u1, u2, u3,
                                w1, w2, w3,
-                               *_mats)
+                               *_mats, *field_coeffs)
                     else:
                         kernel(p1, p2, p3,
                                k1, k2, k3,
                                bs1, bs2, bs3,
                                u1, u2, u3,
                                w1, w2, w3,
-                               *_mats, *args)
-
-                s1 = i_span_1 - p1 - 1
-                s2 = i_span_2 - p2 - 1
-                s3 = i_span_3 - p3 - 1
+                               *_mats, *args, *field_coeffs)
 
                 if not is_block:
                     M._data[s1:s1+p1+1,s2:s2+p2+1,s3:s3+p3+1,:,:,:] += mat[:,:,:,:,:,:]
