@@ -17,7 +17,6 @@ from gelato.calculus     import Constant
 from gelato.calculus     import Field
 from gelato.fem.assembly import assemble_matrix
 from gelato.fem.utils    import compile_kernel
-from gelato.fem.utils    import compile_eval_field
 
 from spl.fem.splines import SplineSpace
 from spl.fem.tensor  import TensorSpace
@@ -230,16 +229,14 @@ def test_1d_5():
     V = SplineSpace(p, grid=grid)
     # ...
 
-    eval_field_py  = compile_eval_field('eval_field_5', a, V, backend='python')
-
-#    # ...
+    # ...
     kernel_py  = compile_kernel('kernel_5', a, V, backend='python')
-#    kernel_f90 = compile_kernel('kernel_5', a, V, backend='fortran')
+    kernel_f90 = compile_kernel('kernel_5', a, V, backend='fortran')
 
-    F = Spline(V)
-    F.coeffs._data[:] = 1.
+#    F = Spline(V)
+#    F.coeffs._data[:] = 1.
 
-    M_py  = assemble_matrix(V, kernel_py, eval_field=eval_field_py, fields={'F': F})
+#    M_py  = assemble_matrix(V, kernel_py, eval_field=eval_field_py, fields={'F': F})
 #    M_f90 = assemble_matrix(V, kernel_f90)
 #    # ...
 #
@@ -271,8 +268,6 @@ def test_1d_6():
 
     V = SplineSpace(p, grid=grid)
     # ...
-
-    eval_field_py  = compile_eval_field('kernel_5', a, V, backend='python')
 
 #    # ...
 #    kernel_py  = compile_kernel('kernel_1', a, V, backend='python')
