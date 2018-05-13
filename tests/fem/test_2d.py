@@ -395,10 +395,10 @@ def test_2d_block_2():
 # .....................................................
 if __name__ == '__main__':
 
-#    test_2d_scalar_1()
-#    test_2d_scalar_2()
-#    test_2d_scalar_3()
-#    test_2d_scalar_4()
-#    test_2d_scalar_5()
-#    test_2d_block_1()
+    test_2d_scalar_1()
+    test_2d_scalar_2()
+    test_2d_scalar_3()
+    test_2d_scalar_4()
+    test_2d_scalar_5()
+    test_2d_block_1()
     test_2d_block_2()

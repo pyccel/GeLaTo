@@ -2,7 +2,7 @@
 from numpy import zeros
 from collections import OrderedDict
 
-def assemble_matrix(V, kernel, args=None, M=None, fields=None):
+def assemble_matrix(V, kernel, args=None, M=None, fields={}):
     try:
         assemble = eval('assemble_matrix_{}d'.format(V.pdim))
     except:
@@ -17,7 +17,7 @@ def assemble_matrix(V, kernel, args=None, M=None, fields=None):
         if not(isinstance(args, (list, tuple))):
             raise TypeError('Expecting list/tuple for args')
 
-    if not(fields is None):
+    if fields:
         from spl.fem.splines import Spline
 
         assert(isinstance(fields, (dict, OrderedDict)))
@@ -30,7 +30,7 @@ def assemble_matrix(V, kernel, args=None, M=None, fields=None):
     return assemble(V, kernel, args=args, M=M, fields=fields)
 
 
-def assemble_matrix_1d(V, kernel, args=None, M=None, fields=None):
+def assemble_matrix_1d(V, kernel, args=None, M=None, fields={}):
 
     from spl.fem.vector  import VectorFemSpace
 
@@ -136,7 +136,7 @@ def assemble_matrix_1d(V, kernel, args=None, M=None, fields=None):
     return M
 
 
-def assemble_matrix_2d(V, kernel, args=None, M=None, fields=None):
+def assemble_matrix_2d(V, kernel, args=None, M=None, fields={}):
 
     from spl.fem.vector  import VectorFemSpace
 
@@ -271,7 +271,7 @@ def assemble_matrix_2d(V, kernel, args=None, M=None, fields=None):
     return M
 
 
-def assemble_matrix_3d(V, kernel, args=None, M=None, fields=None):
+def assemble_matrix_3d(V, kernel, args=None, M=None, fields={}):
 
     from spl.fem.vector  import VectorFemSpace
 

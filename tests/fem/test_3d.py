@@ -330,9 +330,9 @@ def test_3d_block_2():
 # .....................................................
 if __name__ == '__main__':
 
-#    test_3d_scalar_1()
-#    test_3d_scalar_2()
-#    test_3d_scalar_3()
-#    test_3d_scalar_4()
-#    test_3d_block_1()
+    test_3d_scalar_1()
+    test_3d_scalar_2()
+    test_3d_scalar_3()
+    test_3d_scalar_4()
+    test_3d_block_1()
     test_3d_block_2()
