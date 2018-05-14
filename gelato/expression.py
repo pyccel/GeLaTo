@@ -78,6 +78,71 @@ def _is_valid_op(expr):
 # ...
 
 # ...
+def _is_base_function(a, base):
+    """Returns True if the atom is a test/trial function or a partial derivative of a
+    test/trial function.
+
+    base: str
+        must be `Ni` or `Nj`
+    """
+    name = a.name
+    if name == base:
+        return True
+
+    if not name.startswith('{}_'.format(base)):
+        return False
+
+    # name starts with `Ni_` or `Nj_`
+    names = name[3:]
+
+    # letters
+    ls = [i for i in names]
+    ls = np.unique(ls)
+
+    # we should have only x,y or z
+    for i in ls:
+        if not(i in ['x', 'y', 'z']):
+            return False
+
+    return True
+# ...
+
+# ...
+is_test_function = lambda a: _is_base_function(a, 'Ni')
+is_trial_function = lambda a: _is_base_function(a, 'Nj')
+# ...
+
+# ...
+def is_field_function(a, field):
+    """Returns True if the atom is a field function or a partial derivative of a
+    field function.
+
+    field: str
+        name of the field
+    """
+    name = a.name
+    if name == field:
+        return True
+
+    if not name.startswith('{}_'.format(field)):
+        return False
+
+    # name starts with `Field_`
+    names = name[3:]
+
+    # letters
+    ls = [i for i in names]
+    ls = np.unique(ls)
+
+    # we should have only x,y or z
+    for i in ls:
+        if not(i in ['x', 'y', 'z']):
+            return False
+
+    return True
+# ...
+
+# ...
 def gelatize(expr, dim):
     # ... in the case of a Lambda expression
     args = None
@@ -368,11 +433,9 @@ def normalize_weak_from(f):
     # Field symbols
     fields = [i for i in expr.free_symbols if isinstance(i, Field)]
 
-    # ... we first need to find the ordered list of generic operators
+    # ... derivatives that operate on test/trial/fields
+    #     we first need to find the ordered list of generic operators
     ops = [a for a in preorder_traversal(expr) if isinstance(a, _partial_derivatives)]
-    # ...
-
-    # ...
     for i in ops:
         # if i = dx(u) then type(i) is dx
         op = type(i)
@@ -401,6 +464,47 @@ def normalize_weak_from(f):
             if isinstance(a, Indexed) and a.base in tests:
                 expr = expr.subs({i: Symbol('{name}_{coor}'.format(name=a.name, coor=coordinate))})
             # ...
+    # ...
+
+    # ... we do another treatment for the case of dx(dx(u)) etc
+    # TODO - indexed case
+    ops = [a for a in preorder_traversal(expr) if isinstance(a, _partial_derivatives)]
+    while(ops):
+        for i in ops:
+            # if i = dx(u) then type(i) is dx
+            op = type(i)
+            coordinate = op.coordinate
+            for a in i.args:
+                # ... test functions
+                if is_test_function(a):
+                    if a.name == 'Ni':
+                        name = '{a}_{coord}'.format(a=a.name, coord=coordinate)
+                    else:
+                        name = '{a}{coord}'.format(a=a.name, coord=coordinate)
+                    expr = expr.subs({i: Symbol(name)})
+                # ...
+
+                # ... trial functions
+                if is_trial_function(a):
+                    if a.name == 'Nj':
+                        name = '{a}_{coord}'.format(a=a.name, coord=coordinate)
+                    else:
+                        name = '{a}{coord}'.format(a=a.name, coord=coordinate)
+                    expr = expr.subs({i: Symbol(name)})
+                # ...
+
+                # ... field functions
+                for F in fields:
+                    if is_field_function(a, F.name):
+                        if a.name == F.name:
+                            name = '{a}_{coord}'.format(a=a.name, coord=coordinate)
+                        else:
+                            name = '{a}{coord}'.format(a=a.name, coord=coordinate)
+                        expr = expr.subs({i: Symbol(name)})
+                # ...
+
+        # we look if partial derivatives remain
+        ops = [a for a in preorder_traversal(expr) if isinstance(a, _partial_derivatives)]
     # ...
 
     # ...
