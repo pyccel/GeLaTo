@@ -206,6 +206,41 @@ def test_1d_scalar_4():
 # ...
 
 # ...
+def test_1d_scalar_5():
+    # ... define the weak formulation
+    x = Symbol('x')
+
+    u = Symbol('u')
+    v = Symbol('v')
+
+    a = Lambda((x,v,u), dx(dx(u)) * dx(dx(v)))
+    # ...
+
+    # ...  create a finite element space
+    p  = 3
+    ne = 64
+
+    print('> Grid   :: {ne}'.format(ne=ne))
+    print('> Degree :: {p}'.format(p=p))
+
+    grid = linspace(0., 1., ne+1)
+
+    V = SplineSpace(p, grid=grid, nderiv=2)
+    # ...
+
+    # ...
+    kernel_py  = compile_kernel('kernel_scalar_5', a, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_scalar_5', a, V, backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py)
+    M_f90 = assemble_matrix(V, kernel_f90)
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
+
+# ...
+
+# ...
 def test_1d_block_1():
     # ... define the weak formulation
     x = Symbol('x')
@@ -248,8 +283,9 @@ def test_1d_block_1():
 # .....................................................
 if __name__ == '__main__':
 
-    test_1d_scalar_1()
-    test_1d_scalar_2()
-    test_1d_scalar_3()
-    test_1d_scalar_4()
+#    test_1d_scalar_1()
+#    test_1d_scalar_2()
+#    test_1d_scalar_3()
+#    test_1d_scalar_4()
+    test_1d_scalar_5()
 #    test_1d_block_1()

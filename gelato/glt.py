@@ -1152,7 +1152,7 @@ class glt_symbol_b(Function):
         # ...
 
         # ... scaling
-        m *= n**2
+        m *= n**3
         # ...
 
         return m
