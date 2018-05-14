@@ -23,6 +23,8 @@ from spl.fem.vector  import VectorFemSpace
 
 # ...
 def test_2d_scalar_1():
+    print('============== test_2d_scalar_1 ================')
+
     x,y = symbols('x y')
 
     u = Symbol('u')
@@ -70,6 +72,8 @@ def test_2d_scalar_1():
 
 # ...
 def test_2d_scalar_2():
+    print('============== test_2d_scalar_2 ================')
+
     x,y = symbols('x y')
 
     u = Symbol('u')
@@ -125,6 +129,8 @@ def test_2d_scalar_2():
 
 # ...
 def test_2d_scalar_3():
+    print('============== test_2d_scalar_3 ================')
+
     x,y = symbols('x y')
 
     u = Symbol('u')
@@ -191,6 +197,8 @@ def test_2d_scalar_3():
 
 # ...
 def test_2d_scalar_4():
+    print('============== test_2d_scalar_4 ================')
+
     x,y = symbols('x y')
 
     u = Symbol('u')
@@ -238,6 +246,8 @@ def test_2d_scalar_4():
 
 # ...
 def test_2d_scalar_5():
+    print('============== test_2d_scalar_5 ================')
+
     x,y = symbols('x y')
 
     u = Symbol('u')
@@ -285,6 +295,8 @@ def test_2d_scalar_5():
 
 # ...
 def test_2d_block_1():
+    print('============== test_2d_block_1 ================')
+
     x,y = symbols('x y')
 
     u = IndexedBase('u')
@@ -336,9 +348,9 @@ def test_2d_block_1():
 
 # .....................................................
 if __name__ == '__main__':
-#    test_2d_scalar_1()
-#    test_2d_scalar_2()
-#    test_2d_scalar_3()
-#    test_2d_scalar_4()
+    test_2d_scalar_1()
+    test_2d_scalar_2()
+    test_2d_scalar_3()
+    test_2d_scalar_4()
     test_2d_scalar_5()
-#    test_2d_block_1()
+    test_2d_block_1()

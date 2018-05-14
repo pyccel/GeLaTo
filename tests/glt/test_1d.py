@@ -22,6 +22,8 @@ from spl.fem.vector  import VectorFemSpace
 
 # ...
 def test_1d_scalar_1():
+    print('============== test_1d_scalar_1 ================')
+
     x = Symbol('x')
 
     u = Symbol('u')
@@ -63,6 +65,8 @@ def test_1d_scalar_1():
 
 # ...
 def test_1d_scalar_2():
+    print('============== test_1d_scalar_2 ================')
+
     x = Symbol('x')
 
     u = Symbol('u')
@@ -108,6 +112,8 @@ def test_1d_scalar_2():
 
 # ...
 def test_1d_scalar_3():
+    print('============== test_1d_scalar_3 ================')
+
     x = Symbol('x')
 
     u = Symbol('u')
@@ -168,6 +174,8 @@ def test_1d_scalar_3():
 
 # ...
 def test_1d_scalar_4():
+    print('============== test_1d_scalar_4 ================')
+
     x = Symbol('x')
 
     u = Symbol('u')
@@ -209,6 +217,8 @@ def test_1d_scalar_4():
 
 # ... TODO
 def test_1d_block_1():
+    print('============== test_1d_block_1 ================')
+
     x = Symbol('x')
 
     u0, u1 = symbols('u0 u1')
@@ -254,8 +264,8 @@ def test_1d_block_1():
 # .....................................................
 if __name__ == '__main__':
 
-#    test_1d_scalar_1()
-#    test_1d_scalar_2()
-#    test_1d_scalar_3()
+    test_1d_scalar_1()
+    test_1d_scalar_2()
+    test_1d_scalar_3()
     test_1d_scalar_4()
-##    test_1d_block_1()
+#    test_1d_block_1()

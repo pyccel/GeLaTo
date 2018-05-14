@@ -23,6 +23,8 @@ from spl.fem.vector  import VectorFemSpace
 
 # ...
 def test_3d_scalar_1():
+    print('============== test_3d_scalar_1 ================')
+
     x,y,z = symbols('x y z')
 
     u = Symbol('u')
@@ -75,6 +77,8 @@ def test_3d_scalar_1():
 
 # ...
 def test_3d_scalar_2():
+    print('============== test_3d_scalar_2 ================')
+
     x,y,z = symbols('x y z')
 
     u = Symbol('u')
@@ -136,6 +140,8 @@ def test_3d_scalar_2():
 
 # ...
 def test_3d_scalar_3():
+    print('============== test_3d_scalar_3 ================')
+
     x,y,z = symbols('x y z')
 
     u = Symbol('u')
@@ -207,6 +213,8 @@ def test_3d_scalar_3():
 
 # ...
 def test_3d_scalar_4():
+    print('============== test_3d_scalar_4 ================')
+
     x,y,z = symbols('x y z')
 
     u = Symbol('u')
@@ -261,6 +269,8 @@ def test_3d_scalar_4():
 
 # ...
 def test_3d_block_1():
+    print('============== test_3d_block_1 ================')
+
     x,y,z = symbols('x y z')
 
     u = IndexedBase('u')
@@ -318,6 +328,8 @@ def test_3d_block_1():
 
 # ...
 def test_3d_block_2():
+    print('============== test_3d_block_2 ================')
+
     x,y,z = symbols('x y z')
 
     u = IndexedBase('u')
@@ -376,6 +388,8 @@ def test_3d_block_2():
 
 # ...
 def test_3d_block_3():
+    print('============== test_3d_block_3 ================')
+
     x,y,z = symbols('x y z')
 
     u = IndexedBase('u')
@@ -434,6 +448,8 @@ def test_3d_block_3():
 
 # ...
 def test_3d_block_4():
+    print('============== test_3d_block_4 ================')
+
     """Alfven operator."""
     x,y,z = symbols('x y z')
 
@@ -505,11 +521,11 @@ def test_3d_block_4():
 
 # .....................................................
 if __name__ == '__main__':
-#    test_3d_scalar_1()
-#    test_3d_scalar_2()
-#    test_3d_scalar_3()
+    test_3d_scalar_1()
+    test_3d_scalar_2()
+    test_3d_scalar_3()
     test_3d_scalar_4()
-#    test_3d_block_1()
-#    test_3d_block_2()
-#    test_3d_block_3()
-#    test_3d_block_4()
+    test_3d_block_1()
+    test_3d_block_2()
+    test_3d_block_3()
+    test_3d_block_4()

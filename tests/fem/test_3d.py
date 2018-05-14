@@ -28,6 +28,8 @@ from utils import assert_identical_coo
 
 # ...
 def test_3d_scalar_1():
+    print('============== test_3d_scalar_1 ================')
+
     # ... define the weak formulation
     x,y,z = symbols('x y z')
 
@@ -70,6 +72,8 @@ def test_3d_scalar_1():
 
 # ...
 def test_3d_scalar_2():
+    print('============== test_3d_scalar_2 ================')
+
     # ... define the weak formulation
     x,y,z = symbols('x y z')
 
@@ -121,6 +125,8 @@ def test_3d_scalar_2():
 
 # ...
 def test_3d_scalar_3():
+    print('============== test_3d_scalar_3 ================')
+
     # ... define the weak formulation
     x,y,z = symbols('x y z')
 
@@ -190,6 +196,8 @@ def test_3d_scalar_3():
 
 # ...
 def test_3d_scalar_4():
+    print('============== test_3d_scalar_4 ================')
+
     # ... define the weak formulation
     x,y,z = symbols('x y z')
 
@@ -237,6 +245,8 @@ def test_3d_scalar_4():
 
 # ...
 def test_3d_scalar_5():
+    print('============== test_3d_scalar_5 ================')
+
     # ... define the weak formulation
     x,y,z = symbols('x y z')
 
@@ -280,6 +290,8 @@ def test_3d_scalar_5():
 
 # ...
 def test_3d_block_1():
+    print('============== test_3d_block_1 ================')
+
     x,y,z = symbols('x y z')
 
     u = IndexedBase('u')
@@ -323,6 +335,8 @@ def test_3d_block_1():
 
 # ...
 def test_3d_block_2():
+    print('============== test_3d_block_2 ================')
+
     x,y,z = symbols('x y z')
 
     u = IndexedBase('u')
@@ -373,10 +387,10 @@ def test_3d_block_2():
 # .....................................................
 if __name__ == '__main__':
 
-#    test_3d_scalar_1()
-#    test_3d_scalar_2()
-#    test_3d_scalar_3()
-#    test_3d_scalar_4()
+    test_3d_scalar_1()
+    test_3d_scalar_2()
+    test_3d_scalar_3()
+    test_3d_scalar_4()
     test_3d_scalar_5()
-#    test_3d_block_1()
-#    test_3d_block_2()
+    test_3d_block_1()
+    test_3d_block_2()
