@@ -457,6 +457,12 @@ def compile_symbol(name, expr, V,
     # ...
 
     # ...
+    fields = [i for i in expr.free_symbols if isinstance(i, Field)]
+    if verbose:
+        print('> Fields = ', fields)
+    # ...
+
+    # ...
     expr = glt_symbol(expr, space=V, evaluate=True)
     if verbose:
         print('> weak form := {0}'.format(expr))
@@ -545,6 +551,16 @@ def compile_symbol(name, expr, V,
     # ...
 
     # ...
+    if fields:
+        raise NotImplementedError('TODO')
+    else:
+        field_coeffs_str = ''
+        eval_field_str   = ''
+        field_value_str  = ''
+        field_types_str  = ''
+    # ...
+
+    # ...
     if isinstance(V, VectorFemSpace):
         if V.is_block:
             n_components = len(V.spaces)
@@ -579,6 +595,9 @@ def compile_symbol(name, expr, V,
 
             code = template.format(__SYMBOL_NAME__=name,
                                    __SYMBOL_EXPR__=symbol_expr,
+                                   __FIELD_COEFFS__=field_coeffs_str,
+                                   __FIELD_EVALUATION__=eval_field_str,
+                                   __FIELD_VALUE__=field_value_str,
                                    __ARGS__=args)
 
         else:
@@ -590,6 +609,9 @@ def compile_symbol(name, expr, V,
         e = _convert_int_to_float(expr.expr)
         code = template.format(__SYMBOL_NAME__=name,
                                __SYMBOL_EXPR__=e.evalf(),
+                               __FIELD_COEFFS__=field_coeffs_str,
+                               __FIELD_EVALUATION__=eval_field_str,
+                               __FIELD_VALUE__=field_value_str,
                                __ARGS__=args)
     # ...
 
@@ -643,6 +665,7 @@ def compile_symbol(name, expr, V,
 
         # ...
         header = template.format(__SYMBOL_NAME__=name,
+                                 __FIELD_TYPES__=field_types_str,
                                  __TYPES__=dtypes)
         # ...
 

@@ -193,16 +193,16 @@ def test_1d_scalar_4():
     print('> glt symbol  := {0}'.format(expr))
     # ...
 
-#    # ...
-#    symbol_f90 = compile_symbol('symbol_scalar_4', a, V, backend='fortran')
-#    # ...
-#
-#    # ... example of symbol evaluation
-#    t1 = linspace(-pi,pi, ne+1)
-#    x1 = linspace(0.,1., ne+1)
-#    e = zeros(ne+1)
-#    symbol_f90(x1, t1, e)
-#    # ...
+    # ...
+    symbol_f90 = compile_symbol('symbol_scalar_4', a, V, backend='fortran')
+    # ...
+
+    # ... example of symbol evaluation
+    t1 = linspace(-pi,pi, ne+1)
+    x1 = linspace(0.,1., ne+1)
+    e = zeros(ne+1)
+    symbol_f90(x1, t1, e)
+    # ...
 
     print('')
 # ...

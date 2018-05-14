@@ -236,24 +236,24 @@ def test_3d_scalar_4():
     # ...
 
     # ... create a glt symbol from a string without evaluation
-    expr = glt_symbol(a, space=V, evaluate=True)
+    expr = glt_symbol(a, space=V)
     print('> glt symbol  := {0}'.format(expr))
     # ...
 
-#    # ...
-#    symbol_f90 = compile_symbol('symbol_scalar_4', a, V, backend='fortran')
-#    # ...
-#
-#    # ... example of symbol evaluation
-#    t1 = linspace(-pi,pi, ne1+1)
-#    t2 = linspace(-pi,pi, ne2+1)
-#    t3 = linspace(-pi,pi, ne3+1)
-#    x1 = linspace(0.,1., ne1+1)
-#    x2 = linspace(0.,1., ne2+1)
-#    x3 = linspace(0.,1., ne3+1)
-#    e = zeros((ne1+1, ne2+1, ne3+1), order='F')
-#    symbol_f90(x1,x2,x3,t1,t2,t3, e)
-#    # ...
+    # ...
+    symbol_f90 = compile_symbol('symbol_scalar_4', a, V, backend='fortran')
+    # ...
+
+    # ... example of symbol evaluation
+    t1 = linspace(-pi,pi, ne1+1)
+    t2 = linspace(-pi,pi, ne2+1)
+    t3 = linspace(-pi,pi, ne3+1)
+    x1 = linspace(0.,1., ne1+1)
+    x2 = linspace(0.,1., ne2+1)
+    x3 = linspace(0.,1., ne3+1)
+    e = zeros((ne1+1, ne2+1, ne3+1), order='F')
+    symbol_f90(x1,x2,x3,t1,t2,t3, e)
+    # ...
 
     print('')
 # ...

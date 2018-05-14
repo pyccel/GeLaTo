@@ -267,18 +267,18 @@ def test_2d_scalar_5():
     print('> glt symbol  := {0}'.format(expr))
     # ...
 
-#    # ...
-#    symbol_f90 = compile_symbol('symbol_scalar_5', a, V, backend='fortran')
-#    # ...
-#
-#    # ... example of symbol evaluation
-#    t1 = linspace(-pi,pi, ne1+1)
-#    t2 = linspace(-pi,pi, ne2+1)
-#    x1 = linspace(0.,1., ne1+1)
-#    x2 = linspace(0.,1., ne2+1)
-#    e = zeros((ne1+1, ne2+1), order='F')
-#    symbol_f90(x1,x2,t1,t2, e)
-#    # ...
+    # ...
+    symbol_f90 = compile_symbol('symbol_scalar_5', a, V, backend='fortran')
+    # ...
+
+    # ... example of symbol evaluation
+    t1 = linspace(-pi,pi, ne1+1)
+    t2 = linspace(-pi,pi, ne2+1)
+    x1 = linspace(0.,1., ne1+1)
+    x2 = linspace(0.,1., ne2+1)
+    e = zeros((ne1+1, ne2+1), order='F')
+    symbol_f90(x1,x2,t1,t2, e)
+    # ...
 
     print('')
 # ...
