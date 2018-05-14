@@ -301,6 +301,45 @@ def test_2d_scalar_5():
 # ...
 
 # ...
+def test_2d_scalar_6():
+    # ... define the weak formulation
+    x,y = symbols('x y')
+
+    u = Symbol('u')
+    v = Symbol('v')
+
+    a = Lambda((x,y,v,u), dx(dx(u))*dx(dx(v)) + dy(dy(u))*dy(dy(v)) + Dot(Grad(u), Grad(v)) + u*v)
+    # ...
+
+    # ...  create a finite element space
+    p1  = 2 ; p2  = 2
+    ne1 = 8 ; ne2 = 8
+
+    print('> Grid   :: [{ne1},{ne2}]'.format(ne1=ne1, ne2=ne2))
+    print('> Degree :: [{p1},{p2}]'.format(p1=p1, p2=p2))
+
+    grid_1 = linspace(0., 1., ne1+1)
+    grid_2 = linspace(0., 1., ne2+1)
+
+    V1 = SplineSpace(p1, grid=grid_1, nderiv=2)
+    V2 = SplineSpace(p2, grid=grid_2, nderiv=2)
+
+    V = TensorSpace(V1, V2)
+    # ...
+
+    # ...
+    kernel_py  = compile_kernel('kernel_scalar_6', a, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_scalar_6', a, V, backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py)
+    M_f90 = assemble_matrix(V, kernel_f90)
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
+
+# ...
+
+# ...
 def test_2d_block_1():
     # ... define the weak formulation
     x,y = symbols('x y')
@@ -395,10 +434,11 @@ def test_2d_block_2():
 # .....................................................
 if __name__ == '__main__':
 
-    test_2d_scalar_1()
-    test_2d_scalar_2()
-    test_2d_scalar_3()
-    test_2d_scalar_4()
-    test_2d_scalar_5()
-    test_2d_block_1()
-    test_2d_block_2()
+#    test_2d_scalar_1()
+#    test_2d_scalar_2()
+#    test_2d_scalar_3()
+#    test_2d_scalar_4()
+#    test_2d_scalar_5()
+    test_2d_scalar_6()
+#    test_2d_block_1()
+#    test_2d_block_2()

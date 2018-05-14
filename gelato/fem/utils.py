@@ -6,6 +6,7 @@
 #       - use redbaron to modify the template
 
 from gelato.expression import construct_weak_form
+from gelato.expression import is_test_function, is_trial_function
 from gelato.expression import BASIS_PREFIX
 from gelato.glt import glt_symbol
 from gelato.calculus   import (Dot, Cross, Grad, Curl, Rot, Div)
@@ -41,57 +42,36 @@ def _convert_int_to_float(expr):
     expr = expr.subs(sub)
     return expr
 
-def print_test_function(nderiv, k):
-    """prints test functions and their derivatives for a direction k.
+def _count_letter(word, char):
+    count = 0
+    for c in word:
+        if c == char:
+            count += 1
+    return count
+
+def construct_test_functions(nderiv, dim):
+    """constructs test functions and their derivatives for every direction k.
     on return, we get a list of statements, that we need to indent later
     """
-    lines = []
+    d_basis = OrderedDict()
+    for k in range(1, dim+1):
+        d_basis[k,0] = 'bs{k}[il_{k}, 0, g{k}]'.format(k=k)
+        for d in range(1, nderiv+1):
+            d_basis[k,d] = 'bs{k}[il_{k}, {d}, g{k}]'.format(d=d, k=k)
 
-    # ... test function
-    line = 'Ni = bs{k}[il_{k}, 0, g{k}]'.format(k=k)
-    lines.append(line)
-    # ...
+    return d_basis
 
-    # derivative of test function
-    if k == 1:
-        coord = 'x'
-    elif k == 2:
-        coord = 'y'
-    elif k == 3:
-        coord = 'z'
-
-    for d in range(1, nderiv+1):
-        x = coord*d
-        line = 'Ni_{x} = bs{k}[il_{k}, {d}, g{k}]'.format(x=x, d=d, k=k)
-        lines.append(line)
-
-    return lines
-
-def print_trial_function(nderiv, k):
-    """prints trial functions and their derivatives for a direction k.
+def construct_trial_functions(nderiv, dim):
+    """constructs trial functions and their derivatives for every direction k.
     on return, we get a list of statements, that we need to indent later
     """
-    lines = []
+    d_basis = OrderedDict()
+    for k in range(1, dim+1):
+        d_basis[k,0] = 'bs{k}[jl_{k}, 0, g{k}]'.format(k=k)
+        for d in range(1, nderiv+1):
+            d_basis[k,d] = 'bs{k}[jl_{k}, {d}, g{k}]'.format(d=d, k=k)
 
-    # ... trial function
-    line = 'Nj = bs{k}[jl_{k}, 0, g{k}]'.format(k=k)
-    lines.append(line)
-    # ...
-
-    # derivative of trial function
-    if k == 1:
-        coord = 'x'
-    elif k == 2:
-        coord = 'y'
-    elif k == 3:
-        coord = 'z'
-
-    for d in range(1, nderiv+1):
-        x = coord*d
-        line = 'Nj_{x} = bs{k}[jl_{k}, {d}, g{k}]'.format(x=x, d=d, k=k)
-        lines.append(line)
-
-    return lines
+    return d_basis
 
 def compile_kernel(name, expr, V,
                    namespace=globals(),
@@ -308,16 +288,53 @@ def compile_kernel(name, expr, V,
 
     # ...
 
-    # ... print test and trial function statements
+    # ... compute indentation
     tab_base = tab
-    # compute indentation
     for i in range(0, 3*dim):
         tab += ' '*4
+    # ...
 
-    test_function_str = '\n'.join(tab+line for line in
-                                  print_test_function(nderiv, 1))
-    trial_function_str = '\n'.join(tab+line for line in
-                                   print_trial_function(nderiv, 1))
+    # ... print test functions
+    d_test_basis = construct_test_functions(nderiv, dim)
+    test_symbols = [i for i in expr.free_symbols if is_test_function(i)]
+
+    lines = []
+    for a in test_symbols:
+        if a.name == 'Ni':
+            basis = ' * '.join(d_test_basis[k,0] for k in range(1, dim+1))
+            line = 'Ni = {basis}'.format(basis=basis)
+        else:
+            deriv = a.name.split('_')[-1]
+            nx = _count_letter(deriv, 'x')
+            ny = _count_letter(deriv, 'y')
+            nz = _count_letter(deriv, 'z')
+            basis = ' * '.join(d_test_basis[k,d] for k,d in zip(range(1, dim+1), [nx,ny,nz]))
+            line = 'Ni_{deriv} = {basis}'.format(deriv=deriv, basis=basis)
+        lines.append(tab+line)
+    test_function_str = '\n'.join(l for l in lines)
+    # ...
+
+    # ... print trial functions
+    d_trial_basis = construct_trial_functions(nderiv, dim)
+    trial_symbols = [i for i in expr.free_symbols if is_trial_function(i)]
+
+    lines = []
+    for a in trial_symbols:
+        if a.name == 'Nj':
+            basis = ' * '.join(d_trial_basis[k,0] for k in range(1, dim+1))
+            line = 'Nj = {basis}'.format(basis=basis)
+        else:
+            deriv = a.name.split('_')[-1]
+            nx = _count_letter(deriv, 'x')
+            ny = _count_letter(deriv, 'y')
+            nz = _count_letter(deriv, 'z')
+            basis = ' * '.join(d_trial_basis[k,d] for k,d in zip(range(1, dim+1), [nx,ny,nz]))
+            line = 'Nj_{deriv} = {basis}'.format(deriv=deriv, basis=basis)
+        lines.append(tab+line)
+    trial_function_str = '\n'.join(l for l in lines)
+    # ...
+
+    # ...
     tab = tab_base
     # ...
 
@@ -439,9 +456,9 @@ def compile_kernel(name, expr, V,
 
     # ...
 
-    print('--------------')
-    print(code)
-    print('--------------')
+#    print('--------------')
+#    print(code)
+#    print('--------------')
 
     # ...
     if context:

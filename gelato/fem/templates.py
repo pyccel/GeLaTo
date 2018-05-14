@@ -43,13 +43,8 @@ def {__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, u1, u2, w1, w2, mat{__ARGS__}{__
                     v = 0.0
                     for g1 in range(0, k1):
                         for g2 in range(0, k2):
-                            Ni = bs1[il_1, 0, g1] * bs2[il_2, 0, g2]
-                            Ni_x = bs1[il_1, 1, g1] * bs2[il_2, 0, g2]
-                            Ni_y = bs1[il_1, 0, g1] * bs2[il_2, 1, g2]
-
-                            Nj = bs1[jl_1, 0, g1] * bs2[jl_2, 0, g2]
-                            Nj_x = bs1[jl_1, 1, g1] * bs2[jl_2, 0, g2]
-                            Nj_y = bs1[jl_1, 0, g1] * bs2[jl_2, 1, g2]
+{__TEST_FUNCTION__}
+{__TRIAL_FUNCTION__}
 
                             x    = u1[g1]
                             y    = u2[g2]
@@ -82,15 +77,8 @@ def {__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, u1, u2, u3, w1, w2,
                             for g1 in range(0, k1):
                                 for g2 in range(0, k2):
                                     for g3 in range(0, k3):
-                                        Ni = bs1[il_1, 0, g1] * bs2[il_2, 0, g2] * bs3[il_3, 0, g3]
-                                        Ni_x = bs1[il_1, 1, g1] * bs2[il_2, 0, g2] * bs3[il_3, 0, g3]
-                                        Ni_y = bs1[il_1, 0, g1] * bs2[il_2, 1, g2] * bs3[il_3, 0, g3]
-                                        Ni_z = bs1[il_1, 0, g1] * bs2[il_2, 0, g2] * bs3[il_3, 1, g3]
-
-                                        Nj = bs1[jl_1, 0, g1] * bs2[jl_2, 0, g2] * bs3[jl_3, 0, g3]
-                                        Nj_x = bs1[jl_1, 1, g1] * bs2[jl_2, 0, g2] * bs3[jl_3, 0, g3]
-                                        Nj_y = bs1[jl_1, 0, g1] * bs2[jl_2, 1, g2] * bs3[jl_3, 0, g3]
-                                        Nj_z = bs1[jl_1, 0, g1] * bs2[jl_2, 0, g2] * bs3[jl_3, 1, g3]
+{__TEST_FUNCTION__}
+{__TRIAL_FUNCTION__}
 
                                         x    = u1[g1]
                                         y    = u2[g2]
@@ -118,11 +106,8 @@ def {__KERNEL_NAME__}(p1, k1, basis, u, w, {__MAT_ARGS__}{__ARGS__}{__FIELD_COEF
 
 {__ACCUM_INIT__}
             for g1 in range(0, k1):
-                Ni = basis[il_1, 0, g1]
-                Ni_x = basis[il_1, 1, g1]
-
-                Nj = basis[jl_1, 0, g1]
-                Nj_x = basis[jl_1, 1, g1]
+{__TEST_FUNCTION__}
+{__TRIAL_FUNCTION__}
 
                 x    = u[g1]
                 wvol = w[g1]
@@ -151,13 +136,8 @@ def {__KERNEL_NAME__}(p1, p2, k1, k2, bs1, bs2, u1, u2, w1, w2, {__MAT_ARGS__}{_
 {__ACCUM_INIT__}
                     for g1 in range(0, k1):
                         for g2 in range(0, k2):
-                            Ni = bs1[il_1, 0, g1] * bs2[il_2, 0, g2]
-                            Ni_x = bs1[il_1, 1, g1] * bs2[il_2, 0, g2]
-                            Ni_y = bs1[il_1, 0, g1] * bs2[il_2, 1, g2]
-
-                            Nj = bs1[jl_1, 0, g1] * bs2[jl_2, 0, g2]
-                            Nj_x = bs1[jl_1, 1, g1] * bs2[jl_2, 0, g2]
-                            Nj_y = bs1[jl_1, 0, g1] * bs2[jl_2, 1, g2]
+{__TEST_FUNCTION__}
+{__TRIAL_FUNCTION__}
 
                             x    = u1[g1]
                             y    = u2[g2]
@@ -190,15 +170,8 @@ def {__KERNEL_NAME__}(p1, p2, p3, k1, k2, k3, bs1, bs2, bs3, u1, u2, u3, w1, w2,
                             for g1 in range(0, k1):
                                 for g2 in range(0, k2):
                                     for g3 in range(0, k3):
-                                        Ni = bs1[il_1, 0, g1] * bs2[il_2, 0, g2] * bs3[il_3, 0, g3]
-                                        Ni_x = bs1[il_1, 1, g1] * bs2[il_2, 0, g2] * bs3[il_3, 0, g3]
-                                        Ni_y = bs1[il_1, 0, g1] * bs2[il_2, 1, g2] * bs3[il_3, 0, g3]
-                                        Ni_z = bs1[il_1, 0, g1] * bs2[il_2, 0, g2] * bs3[il_3, 1, g3]
-
-                                        Nj = bs1[jl_1, 0, g1] * bs2[jl_2, 0, g2] * bs3[jl_3, 0, g3]
-                                        Nj_x = bs1[jl_1, 1, g1] * bs2[jl_2, 0, g2] * bs3[jl_3, 0, g3]
-                                        Nj_y = bs1[jl_1, 0, g1] * bs2[jl_2, 1, g2] * bs3[jl_3, 0, g3]
-                                        Nj_z = bs1[jl_1, 0, g1] * bs2[jl_2, 0, g2] * bs3[jl_3, 1, g3]
+{__TEST_FUNCTION__}
+{__TRIAL_FUNCTION__}
 
                                         x    = u1[g1]
                                         y    = u2[g2]
