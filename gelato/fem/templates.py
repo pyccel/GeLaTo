@@ -364,8 +364,8 @@ eval_field_1d_scalar = """
 {__FIELD_INIT__}
     for g1 in range(0, k1):
         for jl_1 in range(0, p1+1):
-            Nj = basis[jl_1, 0, g1]
-            Nj_x = basis[jl_1, 1, g1]
+            Nj = bs1[jl_1, 0, g1]
+            Nj_x = bs1[jl_1, 1, g1]
 
 {__FIELD_ACCUM__}
 """
