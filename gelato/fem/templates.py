@@ -7,7 +7,7 @@
 #          KERNEL     1D case - scalar
 # .............................................
 template_1d_scalar = """
-def {__KERNEL_NAME__}(p1, k1, basis, u, w, mat{__ARGS__}{__FIELD_COEFFS__}):
+def {__KERNEL_NAME__}(p1, k1, bs1, u1, w1, mat{__ARGS__}{__FIELD_COEFFS__}):
 {__FIELD_EVALUATION__}
     mat[:,:] = 0.
     for il_1 in range(0, p1+1):
@@ -15,19 +15,12 @@ def {__KERNEL_NAME__}(p1, k1, basis, u, w, mat{__ARGS__}{__FIELD_COEFFS__}):
 
             v = 0.0
             for g1 in range(0, k1):
-                Ni    = basis[il_1, 0, g1]
-                Ni_x  = basis[il_1, 1, g1]
-                Ni_xx = basis[il_1, 2, g1]
+{__TEST_FUNCTION__}
+{__TRIAL_FUNCTION__}
 
-                Nj    = basis[jl_1, 0, g1]
-                Nj_x  = basis[jl_1, 1, g1]
-                Nj_xx = basis[jl_1, 2, g1]
-
-                x    = u[g1]
-                wvol = w[g1]
-
+                x    = u1[g1]
+                wvol = w1[g1]
 {__FIELD_VALUE__}
-
                 v += ({__WEAK_FORM__}) * wvol
             mat[il_1, p1 + jl_1 - il_1] = v
 """

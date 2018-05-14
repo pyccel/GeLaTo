@@ -41,6 +41,44 @@ def _convert_int_to_float(expr):
     expr = expr.subs(sub)
     return expr
 
+def print_test_function(nderiv):
+    """prints test functions and their derivatives.
+    on return, we get a list of statements, that we need to indent later
+    """
+    lines = []
+
+    # ... test function
+    line = 'Ni = bs1[il_1, 0, g1]'
+    lines.append(line)
+    # ...
+
+    # derivative of test function
+    for d in range(1, nderiv+1):
+        x = 'x'*d
+        line = 'Ni_{x} = bs1[il_1, {d}, g1]'.format(x=x, d=d)
+        lines.append(line)
+
+    return lines
+
+def print_trial_function(nderiv):
+    """prints trial functions and their derivatives.
+    on return, we get a list of statements, that we need to indent later
+    """
+    lines = []
+
+    # ... trial function
+    line = 'Nj = bs1[jl_1, 0, g1]'
+    lines.append(line)
+    # ...
+
+    # derivative of trial function
+    for d in range(1, nderiv+1):
+        x = 'x'*d
+        line = 'Nj_{x} = bs1[jl_1, {d}, g1]'.format(x=x, d=d)
+        lines.append(line)
+
+    return lines
+
 def compile_kernel(name, expr, V,
                    namespace=globals(),
                    verbose=False,
@@ -51,9 +89,29 @@ def compile_kernel(name, expr, V,
     """returns a kernel from a Lambda expression on a Finite Elements space."""
 
     from spl.fem.vector  import VectorFemSpace
+    from spl.fem.splines import SplineSpace
+    from spl.fem.tensor  import TensorSpace
 
     # ... parametric dimension
     dim = V.pdim
+    # ...
+
+    # ... number of partial derivatives
+    #     TODO must be computed from the weak form then we re-initialize the
+    #     space
+    if isinstance(V, SplineSpace):
+        nderiv = V.nderiv
+    elif isinstance(V, TensorSpace):
+        nderiv = max(W.nderiv for W in V.spaces)
+    elif isinstance(V, VectorFemSpace):
+        nds = []
+        for W in V.spaces:
+            if isinstance(W, SplineSpace):
+                nderiv = W.nderiv
+            elif isinstance(W, TensorSpace):
+                nderiv = max(X.nderiv for X in W.spaces)
+            nds.append(nderiv)
+        nderiv = max(nds)
     # ...
 
     # ...
@@ -236,6 +294,17 @@ def compile_kernel(name, expr, V,
 
     # ...
 
+    # ... print test and trial function statements
+    tab_base = tab
+    # compute indentation
+    for i in range(0, 3*dim):
+        tab += ' '*4
+
+    test_function_str = '\n'.join(tab+line for line in print_test_function(nderiv))
+    trial_function_str = '\n'.join(tab+line for line in print_trial_function(nderiv))
+    tab = tab_base
+    # ...
+
     # ...
     if isinstance(V, VectorFemSpace):
         if V.is_block:
@@ -329,6 +398,8 @@ def compile_kernel(name, expr, V,
                                    __MAT_INIT__=mat_init_str,
                                    __ACCUM_INIT__=accum_init_str,
                                    __FIELD_VALUE__=field_value_str,
+                                   __TEST_FUNCTION__=test_function_str,
+                                   __TRIAL_FUNCTION__=trial_function_str,
                                    __ACCUM__=accum_str,
                                    __ACCUM_ASSIGN__=accum_assign_str,
                                    __ARGS__=args)
@@ -345,14 +416,16 @@ def compile_kernel(name, expr, V,
                                __FIELD_COEFFS__=field_coeffs_str,
                                __FIELD_EVALUATION__=eval_field_str,
                                __FIELD_VALUE__=field_value_str,
+                               __TEST_FUNCTION__=test_function_str,
+                               __TRIAL_FUNCTION__=trial_function_str,
                                __WEAK_FORM__=e.evalf(),
                                __ARGS__=args)
 
     # ...
 
-#    print('--------------')
-#    print(code)
-#    print('--------------')
+    print('--------------')
+    print(code)
+    print('--------------')
 
     # ...
     if context:
