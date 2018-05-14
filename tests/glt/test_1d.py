@@ -166,6 +166,47 @@ def test_1d_scalar_3():
     print('')
 # ...
 
+# ...
+def test_1d_scalar_4():
+    x = Symbol('x')
+
+    u = Symbol('u')
+    v = Symbol('v')
+
+    a = Lambda((x,v,u), dx(dx(u)) * dx(dx(v)))
+    print('> input       := {0}'.format(a))
+
+    # ...  create a finite element space
+    p  = 3
+    ne = 64
+
+    print('> Grid   :: {ne}'.format(ne=ne))
+    print('> Degree :: {p}'.format(p=p))
+
+    grid = linspace(0., 1., ne+1)
+
+    V = SplineSpace(p, grid=grid)
+    # ...
+
+    # ... create a glt symbol from a string without evaluation
+    expr = glt_symbol(a, space=V)
+    print('> glt symbol  := {0}'.format(expr))
+    # ...
+
+#    # ...
+#    symbol_f90 = compile_symbol('symbol_scalar_4', a, V, backend='fortran')
+#    # ...
+#
+#    # ... example of symbol evaluation
+#    t1 = linspace(-pi,pi, ne+1)
+#    x1 = linspace(0.,1., ne+1)
+#    e = zeros(ne+1)
+#    symbol_f90(x1, t1, e)
+#    # ...
+
+    print('')
+# ...
+
 # ... TODO
 def test_1d_block_1():
     x = Symbol('x')
@@ -213,7 +254,8 @@ def test_1d_block_1():
 # .....................................................
 if __name__ == '__main__':
 
-    test_1d_scalar_1()
-    test_1d_scalar_2()
-    test_1d_scalar_3()
-#    test_1d_block_1()
+#    test_1d_scalar_1()
+#    test_1d_scalar_2()
+#    test_1d_scalar_3()
+    test_1d_scalar_4()
+##    test_1d_block_1()

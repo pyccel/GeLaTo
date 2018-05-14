@@ -55,7 +55,7 @@ except:
 #      this code is duplicated in printing.latex
 ARGS_x       = ["x", "y", "z"]
 ARGS_u       = ["u", "v", "w"]
-ARGS_s       = ["s", "ss"]
+ARGS_s       = ["s", "ss", "sss", "ssss"]
 BASIS_TEST   = "Ni"
 BASIS_TRIAL  = "Nj"
 BASIS_PREFIX = ["x", "y", "z", "xx", "yy", "zz", "xy", "yz", "xz"]
@@ -131,6 +131,12 @@ def apply_mapping(expr, dim, instructions=None, **settings):
             B_x = B + "_" + x
             B_u = B + "_" + u
             expr = expr.subs({Symbol(B_x): Symbol(B_u)})
+
+            # TODO make it recursive for higher derivatives
+            for (xx,uu) in zip(args_x, args_u):
+                B_xx = B_x + x
+                B_uu = B_u + u
+                expr = expr.subs({Symbol(B_xx): Symbol(B_uu)})
     # ...
 
     # ... updates the latex expression
@@ -184,6 +190,21 @@ def apply_tensor(expr, dim, instructions=None, **settings):
                     Bk_u = B + str(k+1)
                 prod *= Symbol(Bk_u)
             expr = expr.subs({Symbol(B_u): prod})
+
+        # TODO improve for higher derivatives
+        for i,u in enumerate(args_u):
+            for j,v in enumerate(args_u):
+                B_uv = B + "_" + u + v
+                prod = S.One
+                for k in range(0, dim):
+                    if k==i and k==j:
+                        Bk_uv = B + str(k+1) + "_ss"
+                    elif k==i or k==j:
+                        Bk_uv = B + str(k+1) + "_s"
+                    else:
+                        Bk_uv = B + str(k+1)
+                    prod *= Symbol(Bk_uv)
+                expr = expr.subs({Symbol(B_uv): prod})
         # ...
 
     # ... updates the latex expression
@@ -257,6 +278,15 @@ def apply_factor(expr, dim, instructions=None, **settings):
         expr = expr.subs({P: -ak})
         # ...
 
+        # ... bilaplacian symbol
+        Bik = Bi + str(k+1) + "_ss"
+        Bjk = Bj + str(k+1) + "_ss"
+        P = Symbol(Bik) * Symbol(Bjk)
+        bk = Symbol("b"+str(k+1))
+
+        expr = expr.subs({P: bk})
+        # ...
+
     # ... updates the latex expression
     if instructions is not None:
         # ...
@@ -310,6 +340,7 @@ def glt_update_atoms(expr, discretization):
         s   = glt_symbol_s(n,p,t)
         a   = glt_symbol_a(n,p,t)
         t_a = -a
+        b   = glt_symbol_b(n,p,t)
         # ...
 
         # ...
@@ -317,6 +348,7 @@ def glt_update_atoms(expr, discretization):
         expr = expr.subs({Symbol('s'+str(k+1)): s})
         expr = expr.subs({Symbol('a'+str(k+1)): a})
         expr = expr.subs({Symbol('t_a'+str(k+1)): t_a})
+        expr = expr.subs({Symbol('b'+str(k+1)): b})
         # ...
 
         # ...
@@ -409,7 +441,7 @@ def glt_symbol(expr,
 
     # ...
     if verbose:
-        print(("*** Input expression : ", expr))
+        print("*** Input expression : ", expr)
     # ...
 
     # ...
@@ -471,7 +503,7 @@ def glt_symbol(expr,
         instructions.append(glt_latex(expr, **settings))
         # ...
 
-        print((">>> weak formulation: ", expr))
+        print(">>> weak formulation: ", expr)
     # ...
 
     # ...
@@ -479,7 +511,7 @@ def glt_symbol(expr,
                          instructions=instructions, \
                          **settings)
     if verbose:
-        print(expr)
+        print('>>> apply mapping: ', expr)
     # ...
 
     # ...
@@ -487,7 +519,7 @@ def glt_symbol(expr,
                          instructions=instructions, \
                          **settings)
     if verbose:
-        print(expr)
+        print('>>> apply tensor: ', expr)
     # ...
 
     # ...
@@ -495,7 +527,7 @@ def glt_symbol(expr,
                          instructions=instructions, \
                          **settings)
     if verbose:
-        print(expr)
+        print('>>> apply factor: ', expr)
     # ...
 
     # ...
@@ -1075,6 +1107,58 @@ class glt_symbol_a(Function):
 # ...
 
 # ...
+class glt_symbol_b(Function):
+    """
+    A class for the bilaplacian symbol
+    """
+    nargs = 3
+
+    @classmethod
+    def eval(cls, n, p, t):
+        # ...
+        if not 0 <= p:
+            raise ValueError("must have 0 <= p")
+        if not 0 <= n:
+            raise ValueError("must have 0 <= n")
+        # ...
+
+        # ...
+        r  = Symbol('r')
+
+        pp = 2*p + 1
+        N = pp + 1
+        L = list(range(0, N + pp + 1))
+
+        b0    = bspline_basis(pp, L, 0, r)
+        b0_r  = diff(b0, r)
+        b0_rr = diff(b0_r, r)
+        b0_rrr = diff(b0_rr, r)
+        b0_rrrr = diff(b0_rrr, r)
+        bsp   = lambdify(r, b0_rrrr)
+        # ...
+
+        # ... we use nsimplify to get the rational number
+        phi = []
+        for i in range(0, p+1):
+            y = bsp(p+1-i)
+            y = nsimplify(y, tolerance=TOLERANCE, rational=True)
+            phi.append(y)
+        # ...
+
+        # ...
+        m = phi[0] * cos(S.Zero)
+        for i in range(1, p+1):
+            m += 2 * phi[i] * cos(i * t)
+        # ...
+
+        # ... scaling
+        m *= n**2
+        # ...
+
+        return m
+# ...
+
+# ...
 def glt_symbol_laplace(discretization, \
                        verbose=False, evaluate=True, \
                        instructions=[], \
@@ -1169,7 +1253,7 @@ def glt_formatting_atoms(expr, **settings):
         # ...
         t = Symbol('t'+str(k+1))
 
-        for s in ["m", "s", "a"]:
+        for s in ["m", "s", "a", "b"]:
             sk = s + str(k+1)
             s_old = Symbol(sk)
             s_new = Symbol(prefix + sk + suffix)
@@ -1204,6 +1288,7 @@ def glt_latex_definitions():
     m = Symbol('m')
     s = Symbol('s')
     a = Symbol('a')
+    b = Symbol('b')
     # ...
 
     # ...
@@ -1214,6 +1299,7 @@ def glt_latex_definitions():
         txt_m = r"\phi_{2p+1}(p+1) + 2 \sum_{k=1}^p \phi_{2p+1}(p+1-k) \cos(k \theta)"
         txt_s = r"- {\phi}''_{2p+1}(p+1) - 2 \sum_{k=1}^p {\phi}''_{2p+1}(p+1-k) \cos(k \theta)"
         txt_a = r"\phi_{2p+1}(p+1) + 2 \sum_{k=1}^p \phi_{2p+1}(p+1-k) \cos(k \theta)"
+        txt_b = r"{\phi}''''_{2p+1}(p+1) - 2 \sum_{k=1}^p {\phi}''''_{2p+1}(p+1-k) \cos(k \theta)"
 
         if str(symbol) == "m":
             return txt_m
@@ -1221,6 +1307,8 @@ def glt_latex_definitions():
             return txt_s
         elif str(symbol) == "a":
             return txt_a
+        elif str(symbol) == "b":
+            return txt_b
         else:
             print ("not yet available.")
     # ...
@@ -1269,7 +1357,7 @@ def glt_latex_names():
     for i in ["i","j"]:
         Bi = B + i
         for k in range(0, dim):
-            for s in ["", "s", "ss"]:
+            for s in ["", "s", "ss", "sss", "ssss"]:
                 Bk  = Bi + str(k+1)
                 _Bk = B + "_{" + i + "_" + str(k+1) + "}"
 
@@ -1294,7 +1382,7 @@ def glt_latex_names():
     degree = "p"
     for k in range(0, dim):
         # ...
-        for s in ["m", "s", "a"]:
+        for s in ["m", "s", "a", "b"]:
             symbol_names[Symbol(s+str(k+1))] = r"\mathfrak{" + s + "}_" \
                                              + degree \
                                              + r"(\theta_" \
