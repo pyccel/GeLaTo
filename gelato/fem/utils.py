@@ -41,40 +41,54 @@ def _convert_int_to_float(expr):
     expr = expr.subs(sub)
     return expr
 
-def print_test_function(nderiv):
-    """prints test functions and their derivatives.
+def print_test_function(nderiv, k):
+    """prints test functions and their derivatives for a direction k.
     on return, we get a list of statements, that we need to indent later
     """
     lines = []
 
     # ... test function
-    line = 'Ni = bs1[il_1, 0, g1]'
+    line = 'Ni = bs{k}[il_{k}, 0, g{k}]'.format(k=k)
     lines.append(line)
     # ...
 
     # derivative of test function
+    if k == 1:
+        coord = 'x'
+    elif k == 2:
+        coord = 'y'
+    elif k == 3:
+        coord = 'z'
+
     for d in range(1, nderiv+1):
-        x = 'x'*d
-        line = 'Ni_{x} = bs1[il_1, {d}, g1]'.format(x=x, d=d)
+        x = coord*d
+        line = 'Ni_{x} = bs{k}[il_{k}, {d}, g{k}]'.format(x=x, d=d, k=k)
         lines.append(line)
 
     return lines
 
-def print_trial_function(nderiv):
-    """prints trial functions and their derivatives.
+def print_trial_function(nderiv, k):
+    """prints trial functions and their derivatives for a direction k.
     on return, we get a list of statements, that we need to indent later
     """
     lines = []
 
     # ... trial function
-    line = 'Nj = bs1[jl_1, 0, g1]'
+    line = 'Nj = bs{k}[jl_{k}, 0, g{k}]'.format(k=k)
     lines.append(line)
     # ...
 
     # derivative of trial function
+    if k == 1:
+        coord = 'x'
+    elif k == 2:
+        coord = 'y'
+    elif k == 3:
+        coord = 'z'
+
     for d in range(1, nderiv+1):
-        x = 'x'*d
-        line = 'Nj_{x} = bs1[jl_1, {d}, g1]'.format(x=x, d=d)
+        x = coord*d
+        line = 'Nj_{x} = bs{k}[jl_{k}, {d}, g{k}]'.format(x=x, d=d, k=k)
         lines.append(line)
 
     return lines
@@ -300,8 +314,10 @@ def compile_kernel(name, expr, V,
     for i in range(0, 3*dim):
         tab += ' '*4
 
-    test_function_str = '\n'.join(tab+line for line in print_test_function(nderiv))
-    trial_function_str = '\n'.join(tab+line for line in print_trial_function(nderiv))
+    test_function_str = '\n'.join(tab+line for line in
+                                  print_test_function(nderiv, 1))
+    trial_function_str = '\n'.join(tab+line for line in
+                                   print_trial_function(nderiv, 1))
     tab = tab_base
     # ...
 
