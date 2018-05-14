@@ -13,7 +13,7 @@ from sympy import Function
 from sympy import IndexedBase
 
 from gelato.expression   import construct_weak_form
-from gelato.calculus     import (Dot, Cross, Grad, Curl, Rot, Div)
+from gelato.calculus     import (Dot, Cross, Grad, Curl, Rot, Div, dx, dy, dz)
 from gelato.calculus     import Constant
 from gelato.calculus     import Field
 from gelato.fem.assembly import assemble_matrix
@@ -236,6 +236,49 @@ def test_3d_scalar_4():
 # ...
 
 # ...
+def test_3d_scalar_5():
+    # ... define the weak formulation
+    x,y,z = symbols('x y z')
+
+    u = Symbol('u')
+    v = Symbol('v')
+
+    a = Lambda((x,y,z,v,u), dx(dx(u))*dx(dx(v)) + dy(dy(u))*dy(dy(v)) +
+               dz(dz(u))*dz(dz(v)) + Dot(Grad(u), Grad(v)) + u*v)
+    # ...
+
+    # ...  create a finite element space
+    p1  = 2 ; p2  = 2 ; p3  = 2
+    ne1 = 2 ; ne2 = 2 ; ne3 = 2
+    # ...
+
+    print('> Grid   :: [{},{},{}]'.format(ne1, ne2, ne3))
+    print('> Degree :: [{},{},{}]'.format(p1, p2, p3))
+
+    grid_1 = linspace(0., 1., ne1+1)
+    grid_2 = linspace(0., 1., ne2+1)
+    grid_3 = linspace(0., 1., ne3+1)
+
+    V1 = SplineSpace(p1, grid=grid_1, nderiv=2)
+    V2 = SplineSpace(p2, grid=grid_2, nderiv=2)
+    V3 = SplineSpace(p3, grid=grid_3, nderiv=2)
+
+    V = TensorSpace(V1, V2, V3)
+    # ...
+
+    # ...
+    kernel_py  = compile_kernel('kernel_scalar_5', a, V, backend='python')
+    kernel_f90 = compile_kernel('kernel_scalar_5', a, V, backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py)
+    M_f90 = assemble_matrix(V, kernel_f90)
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
+
+# ...
+
+# ...
 def test_3d_block_1():
     x,y,z = symbols('x y z')
 
@@ -330,9 +373,10 @@ def test_3d_block_2():
 # .....................................................
 if __name__ == '__main__':
 
-    test_3d_scalar_1()
-    test_3d_scalar_2()
-    test_3d_scalar_3()
-    test_3d_scalar_4()
-    test_3d_block_1()
-    test_3d_block_2()
+#    test_3d_scalar_1()
+#    test_3d_scalar_2()
+#    test_3d_scalar_3()
+#    test_3d_scalar_4()
+    test_3d_scalar_5()
+#    test_3d_block_1()
+#    test_3d_block_2()

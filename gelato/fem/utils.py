@@ -296,15 +296,16 @@ def compile_kernel(name, expr, V,
 
     # ... print test functions
     d_test_basis = construct_test_functions(nderiv, dim)
-    test_symbols = [i for i in expr.free_symbols if is_test_function(i)]
+    test_names = [i.name for i in expr.free_symbols if is_test_function(i)]
+    test_names.sort()
 
     lines = []
-    for a in test_symbols:
-        if a.name == 'Ni':
+    for a in test_names:
+        if a == 'Ni':
             basis = ' * '.join(d_test_basis[k,0] for k in range(1, dim+1))
             line = 'Ni = {basis}'.format(basis=basis)
         else:
-            deriv = a.name.split('_')[-1]
+            deriv = a.split('_')[-1]
             nx = _count_letter(deriv, 'x')
             ny = _count_letter(deriv, 'y')
             nz = _count_letter(deriv, 'z')
@@ -316,15 +317,16 @@ def compile_kernel(name, expr, V,
 
     # ... print trial functions
     d_trial_basis = construct_trial_functions(nderiv, dim)
-    trial_symbols = [i for i in expr.free_symbols if is_trial_function(i)]
+    trial_names = [i.name for i in expr.free_symbols if is_trial_function(i)]
+    trial_names.sort()
 
     lines = []
-    for a in trial_symbols:
-        if a.name == 'Nj':
+    for a in trial_names:
+        if a == 'Nj':
             basis = ' * '.join(d_trial_basis[k,0] for k in range(1, dim+1))
             line = 'Nj = {basis}'.format(basis=basis)
         else:
-            deriv = a.name.split('_')[-1]
+            deriv = a.split('_')[-1]
             nx = _count_letter(deriv, 'x')
             ny = _count_letter(deriv, 'y')
             nz = _count_letter(deriv, 'z')
