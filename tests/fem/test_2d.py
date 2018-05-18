@@ -446,15 +446,75 @@ def test_2d_block_2():
 
 # ...
 
+# ...
+def test_2d_block_3():
+    print('============== test_2d_block_3 ================')
+
+    x, y = symbols('x y')
+
+    u = Symbol('u')
+    v = Symbol('v')
+
+    epsilon = Constant('epsilon')
+
+    Laplace = lambda v,u: Dot(Grad(v), Grad(u))
+    Mass = lambda v,u: v*u
+
+    u1,u2,p = symbols('u1 u2 p')
+    v1,v2,q = symbols('v1 v2 q')
+
+    a = Lambda((x,y,v1,v2,q,u1,u2,p),
+                 Laplace(v1,u1) - dx(v1) * p
+               + Laplace(v2,u2) - dy(v2) * p
+               + q * (dx(u1) + dy(u2))
+               + epsilon * Mass(q,p))
+
+    print('> input       := {0}'.format(a))
+
+    # ...  create a finite element space
+    p1  = 2 ; p2  = 2
+    ne1 = 8 ; ne2 = 8
+
+    print('> Grid   :: [{ne1},{ne2}]'.format(ne1=ne1, ne2=ne2))
+    print('> Degree :: [{p1},{p2}]'.format(p1=p1, p2=p2))
+
+    grid_1 = linspace(0., 1., ne1+1)
+    grid_2 = linspace(0., 1., ne2+1)
+
+    V1 = SplineSpace(p1, grid=grid_1)
+    V2 = SplineSpace(p2, grid=grid_2)
+
+    V = TensorSpace(V1, V2)
+    V = VectorFemSpace(V, V, V)
+    # ...
+
+    # ...
+    kernel_py  = compile_kernel('kernel_block_3', a, V,
+                                d_args={'epsilon': 'double'},
+                                backend='python')
+    kernel_f90 = compile_kernel('kernel_block_3', a, V,
+                                d_args={'epsilon': 'double'},
+                                backend='fortran')
+
+    M_py  = assemble_matrix(V, kernel_py, args={'epsilon': 1.e-3})
+    M_f90 = assemble_matrix(V, kernel_f90, args={'epsilon': 1.e-3})
+    # ...
+
+    assert_identical_coo(M_py, M_f90)
+
+    print('')
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
 
-    test_2d_scalar_1()
-    test_2d_scalar_2()
-    test_2d_scalar_3()
-    test_2d_scalar_4()
-    test_2d_scalar_5()
-    test_2d_scalar_6()
-    test_2d_block_1()
-    test_2d_block_2()
+#    test_2d_scalar_1()
+#    test_2d_scalar_2()
+#    test_2d_scalar_3()
+#    test_2d_scalar_4()
+#    test_2d_scalar_5()
+#    test_2d_scalar_6()
+#    test_2d_block_1()
+#    test_2d_block_2()
+    test_2d_block_3()

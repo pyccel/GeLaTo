@@ -36,6 +36,7 @@ from gelato.fem.templates import eval_field_3d_scalar
 from numbers import Number
 from collections import OrderedDict
 from sympy import Integer, Float
+import os
 
 def _convert_int_to_float(expr):
     sub = zip( expr.atoms(Integer), map(Float, expr.atoms(Integer)) )
@@ -73,13 +74,31 @@ def construct_trial_functions(nderiv, dim):
 
     return d_basis
 
+
+def mkdir_p(dir):
+    if os.path.isdir(dir):
+        return
+    os.makedirs(dir)
+
+def write_code(name, code, ext='py', folder='.pyccel'):
+    filename = '{name}.{ext}'.format(name=name, ext=ext)
+    if folder:
+        mkdir_p(folder)
+        filename = os.path.join(folder, filename)
+
+    f = open(filename, 'w')
+    for line in code:
+        f.write(line)
+    f.close()
+
 def compile_kernel(name, expr, V,
                    namespace=globals(),
                    verbose=False,
                    d_constants={},
                    d_args={},
                    context=None,
-                   backend='python'):
+                   backend='python',
+                   export_pyfile=True):
     """returns a kernel from a Lambda expression on a Finite Elements space."""
 
     from spl.fem.vector  import VectorFemSpace
@@ -393,10 +412,10 @@ def compile_kernel(name, expr, V,
             for i in range(0, n_components):
                 for j in range(0, n_components):
                     line = 'v_{i}{j} += ({__WEAK_FORM__}) * wvol'
-                    e = _convert_int_to_float(expr[i,j])
+                    e = _convert_int_to_float(expr[i,j].evalf())
                     # we call evalf to avoid having fortran doing the evaluation of rational
                     # division
-                    line = line.format(i=i, j=j, __WEAK_FORM__=e.evalf())
+                    line = line.format(i=i, j=j, __WEAK_FORM__=e)
                     line = tab + line
 
                     lines.append(line)
@@ -444,7 +463,7 @@ def compile_kernel(name, expr, V,
                                       'which all components have are identical.')
 
     else:
-        e = _convert_int_to_float(expr)
+        e = _convert_int_to_float(expr.evalf())
         # we call evalf to avoid having fortran doing the evaluation of rational
         # division
         code = template.format(__KERNEL_NAME__=name,
@@ -453,7 +472,7 @@ def compile_kernel(name, expr, V,
                                __FIELD_VALUE__=field_value_str,
                                __TEST_FUNCTION__=test_function_str,
                                __TRIAL_FUNCTION__=trial_function_str,
-                               __WEAK_FORM__=e.evalf(),
+                               __WEAK_FORM__=e,
                                __ARGS__=args)
 
     # ...
@@ -483,6 +502,11 @@ def compile_kernel(name, expr, V,
     # ...
     exec(code, namespace)
     kernel = namespace[name]
+    # ...
+
+    # ... export the python code of the module
+    if export_pyfile:
+        write_code(name, code, ext='py', folder='.pyccel')
     # ...
 
     # ...
@@ -550,7 +574,8 @@ def compile_symbol(name, expr, V,
                    d_constants={},
                    d_args={},
                    context=None,
-                   backend='python'):
+                   backend='python',
+                   export_pyfile=True):
     """returns a lmabdified function for the GLT symbol."""
 
     from spl.fem.vector  import VectorFemSpace
@@ -723,14 +748,10 @@ def compile_symbol(name, expr, V,
                                __ARGS__=args)
     # ...
 
-
-#    # TODO export only if a given flag is True
-#    # ... export the python code of the module
-#    f = open('{}.py'.format(name), 'w')
-#    for line in code:
-#        f.write(line)
-#    f.close()
-#    # ...
+    # ... export the python code of the module
+    if export_pyfile:
+        write_code(name, code, ext='py', folder='.pyccel')
+    # ...
 
     # ...
     if context:
