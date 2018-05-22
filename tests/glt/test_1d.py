@@ -15,7 +15,7 @@ from gelato.calculus   import Constant
 from gelato.fem.utils  import compile_symbol
 
 from spl.fem.splines import SplineSpace
-from spl.fem.tensor  import TensorSpace
+from spl.fem.tensor  import TensorFemSpace
 from spl.fem.vector  import VectorFemSpace
 
 

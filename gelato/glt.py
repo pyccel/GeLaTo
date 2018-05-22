@@ -374,7 +374,7 @@ def glt_symbol(expr,
     expr: sympy.Expression
         a sympy expression or a text
 
-    space: spl.fem.SplineSpace, spl.fem.TensorSpace, spl.fem.VectorFemSpace
+    space: spl.fem.SplineSpace, spl.fem.TensorFemSpace, spl.fem.VectorFemSpace
         a Finite elements space from spl. Default: None
 
     n_deriv: int
@@ -574,7 +574,7 @@ def glt_approximate_eigenvalues(expr,
     expr: sympy.Expression
         a sympy expression or a text
 
-    space: spl.fem.SplineSpace, spl.fem.TensorSpace
+    space: spl.fem.SplineSpace, spl.fem.TensorFemSpace
         a Finite elements space from spl. Default: None
 
     discretization: dict

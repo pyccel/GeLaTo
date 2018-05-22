@@ -20,7 +20,7 @@ from gelato.fem.assembly import assemble_matrix
 from gelato.fem.utils    import compile_kernel
 
 from spl.fem.splines import SplineSpace
-from spl.fem.tensor  import TensorSpace
+from spl.fem.tensor  import TensorFemSpace
 from spl.fem.vector  import VectorFemSpace
 from spl.fem.splines import Spline
 
@@ -52,7 +52,7 @@ def test_2d_scalar_1():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     # ...
 
     # ...
@@ -96,7 +96,7 @@ def test_2d_scalar_2():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     # ...
 
     # ...
@@ -145,7 +145,7 @@ def test_2d_scalar_3():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     # ...
 
     # ... user defined function
@@ -214,7 +214,7 @@ def test_2d_scalar_4():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     # ...
 
     # ... user defined function
@@ -292,7 +292,7 @@ def test_2d_scalar_5():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     # ...
 
     F = Spline(V)
@@ -336,7 +336,7 @@ def test_2d_scalar_6():
     V1 = SplineSpace(p1, grid=grid_1, nderiv=2)
     V2 = SplineSpace(p2, grid=grid_2, nderiv=2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     # ...
 
     # ...
@@ -377,7 +377,7 @@ def test_2d_block_1():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    W = TensorSpace(V1, V2)
+    W = TensorFemSpace(V1, V2)
     # ...
 
     # ... vector space
@@ -424,7 +424,7 @@ def test_2d_block_2():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    W = TensorSpace(V1, V2)
+    W = TensorFemSpace(V1, V2)
     # ...
 
     # ... vector space
@@ -484,7 +484,7 @@ def test_2d_block_3():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     V = VectorFemSpace(V, V, V)
     # ...
 

@@ -103,7 +103,7 @@ def compile_kernel(name, expr, V,
 
     from spl.fem.vector  import VectorFemSpace
     from spl.fem.splines import SplineSpace
-    from spl.fem.tensor  import TensorSpace
+    from spl.fem.tensor  import TensorFemSpace
 
     # ... parametric dimension
     dim = V.pdim
@@ -114,14 +114,14 @@ def compile_kernel(name, expr, V,
     #     space
     if isinstance(V, SplineSpace):
         nderiv = V.nderiv
-    elif isinstance(V, TensorSpace):
+    elif isinstance(V, TensorFemSpace):
         nderiv = max(W.nderiv for W in V.spaces)
     elif isinstance(V, VectorFemSpace):
         nds = []
         for W in V.spaces:
             if isinstance(W, SplineSpace):
                 nderiv = W.nderiv
-            elif isinstance(W, TensorSpace):
+            elif isinstance(W, TensorFemSpace):
                 nderiv = max(X.nderiv for X in W.spaces)
             nds.append(nderiv)
         nderiv = max(nds)

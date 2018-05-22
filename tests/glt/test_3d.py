@@ -17,7 +17,7 @@ from gelato.calculus   import (Dot, Cross, Grad, Curl, Rot, Div, dx, dy, dz)
 from gelato.fem.utils    import compile_symbol
 
 from spl.fem.splines import SplineSpace
-from spl.fem.tensor  import TensorSpace
+from spl.fem.tensor  import TensorFemSpace
 from spl.fem.vector  import VectorFemSpace
 
 
@@ -49,7 +49,7 @@ def test_3d_scalar_1():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    V = TensorSpace(V1, V2, V3)
+    V = TensorFemSpace(V1, V2, V3)
     # ...
 
     # ... create a glt symbol from a string without evaluation
@@ -110,7 +110,7 @@ def test_3d_scalar_2():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    V = TensorSpace(V1, V2, V3)
+    V = TensorFemSpace(V1, V2, V3)
     # ...
 
     # ... create a glt symbol from a string without evaluation
@@ -168,7 +168,7 @@ def test_3d_scalar_3():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    V = TensorSpace(V1, V2, V3)
+    V = TensorFemSpace(V1, V2, V3)
     # ...
 
     # ... create a glt symbol from a string without evaluation
@@ -240,7 +240,7 @@ def test_3d_scalar_4():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    V = TensorSpace(V1, V2, V3)
+    V = TensorFemSpace(V1, V2, V3)
     # ...
 
     # ... create a glt symbol from a string without evaluation
@@ -296,9 +296,9 @@ def test_3d_block_1():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    Vx = TensorSpace(V1, V2, V3)
-    Vy = TensorSpace(V1, V2, V3)
-    Vz = TensorSpace(V1, V2, V3)
+    Vx = TensorFemSpace(V1, V2, V3)
+    Vy = TensorFemSpace(V1, V2, V3)
+    Vz = TensorFemSpace(V1, V2, V3)
 
     V = VectorFemSpace(Vx, Vy, Vz)
     # ...
@@ -354,9 +354,9 @@ def test_3d_block_2():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    Vx = TensorSpace(V1, V2, V3)
-    Vy = TensorSpace(V1, V2, V3)
-    Vz = TensorSpace(V1, V2, V3)
+    Vx = TensorFemSpace(V1, V2, V3)
+    Vy = TensorFemSpace(V1, V2, V3)
+    Vz = TensorFemSpace(V1, V2, V3)
 
     V = VectorFemSpace(Vx, Vy, Vz)
     # ...
@@ -416,9 +416,9 @@ def test_3d_block_3():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    Vx = TensorSpace(V1, V2, V3)
-    Vy = TensorSpace(V1, V2, V3)
-    Vz = TensorSpace(V1, V2, V3)
+    Vx = TensorFemSpace(V1, V2, V3)
+    Vy = TensorFemSpace(V1, V2, V3)
+    Vz = TensorFemSpace(V1, V2, V3)
 
     V = VectorFemSpace(Vx, Vy, Vz)
     # ...
@@ -486,9 +486,9 @@ def test_3d_block_4():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    Vx = TensorSpace(V1, V2, V3)
-    Vy = TensorSpace(V1, V2, V3)
-    Vz = TensorSpace(V1, V2, V3)
+    Vx = TensorFemSpace(V1, V2, V3)
+    Vy = TensorFemSpace(V1, V2, V3)
+    Vz = TensorFemSpace(V1, V2, V3)
 
     V = VectorFemSpace(Vx, Vy, Vz)
     # ...

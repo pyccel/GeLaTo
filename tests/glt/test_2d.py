@@ -17,7 +17,7 @@ from gelato.calculus   import Constant
 from gelato.fem.utils    import compile_symbol
 
 from spl.fem.splines import SplineSpace
-from spl.fem.tensor  import TensorSpace
+from spl.fem.tensor  import TensorFemSpace
 from spl.fem.vector  import VectorFemSpace
 
 
@@ -46,7 +46,7 @@ def test_2d_scalar_1():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     # ...
 
     # ... create a glt symbol from a string without evaluation
@@ -101,7 +101,7 @@ def test_2d_scalar_2():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     # ...
 
     # ... create a glt symbol from a string without evaluation
@@ -154,7 +154,7 @@ def test_2d_scalar_3():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     # ...
 
     # ... create a glt symbol from a string without evaluation
@@ -220,7 +220,7 @@ def test_2d_scalar_4():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     # ...
 
     # ... create a glt symbol from a string without evaluation
@@ -269,7 +269,7 @@ def test_2d_scalar_5():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     # ...
 
     # ... create a glt symbol from a string without evaluation
@@ -318,8 +318,8 @@ def test_2d_block_1():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    Vx = TensorSpace(V1, V2)
-    Vy = TensorSpace(V1, V2)
+    Vx = TensorFemSpace(V1, V2)
+    Vy = TensorFemSpace(V1, V2)
 
     V = VectorFemSpace(Vx, Vy)
     # ...
@@ -383,7 +383,7 @@ def test_2d_block_2():
     V1 = SplineSpace(p1, grid=grid_1)
     V2 = SplineSpace(p2, grid=grid_2)
 
-    V = TensorSpace(V1, V2)
+    V = TensorFemSpace(V1, V2)
     V = VectorFemSpace(V, V, V)
     # ...
 

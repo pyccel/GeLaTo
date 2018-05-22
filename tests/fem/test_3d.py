@@ -20,7 +20,7 @@ from gelato.fem.assembly import assemble_matrix
 from gelato.fem.utils    import compile_kernel
 
 from spl.fem.splines import SplineSpace
-from spl.fem.tensor  import TensorSpace
+from spl.fem.tensor  import TensorFemSpace
 from spl.fem.vector  import VectorFemSpace
 from spl.fem.splines import Spline
 
@@ -55,7 +55,7 @@ def test_3d_scalar_1():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    V = TensorSpace(V1, V2, V3)
+    V = TensorFemSpace(V1, V2, V3)
     # ...
 
     # ...
@@ -102,7 +102,7 @@ def test_3d_scalar_2():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    V = TensorSpace(V1, V2, V3)
+    V = TensorFemSpace(V1, V2, V3)
     # ...
 
     # ...
@@ -154,7 +154,7 @@ def test_3d_scalar_3():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    V = TensorSpace(V1, V2, V3)
+    V = TensorFemSpace(V1, V2, V3)
     # ...
 
     # ... user defined function
@@ -225,7 +225,7 @@ def test_3d_scalar_4():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    V = TensorSpace(V1, V2, V3)
+    V = TensorFemSpace(V1, V2, V3)
     # ...
 
     F = Spline(V)
@@ -273,7 +273,7 @@ def test_3d_scalar_5():
     V2 = SplineSpace(p2, grid=grid_2, nderiv=2)
     V3 = SplineSpace(p3, grid=grid_3, nderiv=2)
 
-    V = TensorSpace(V1, V2, V3)
+    V = TensorFemSpace(V1, V2, V3)
     # ...
 
     # ...
@@ -314,7 +314,7 @@ def test_3d_block_1():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    W = TensorSpace(V1, V2, V3)
+    W = TensorFemSpace(V1, V2, V3)
     # ...
 
     # ... vector space
@@ -361,7 +361,7 @@ def test_3d_block_2():
     V2 = SplineSpace(p2, grid=grid_2)
     V3 = SplineSpace(p3, grid=grid_3)
 
-    W = TensorSpace(V1, V2, V3)
+    W = TensorFemSpace(V1, V2, V3)
     # ...
 
     # ... vector space

@@ -19,7 +19,7 @@ from gelato.fem.assembly import assemble_matrix
 from gelato.fem.utils    import compile_kernel
 
 from spl.fem.splines import SplineSpace
-from spl.fem.tensor  import TensorSpace
+from spl.fem.tensor  import TensorFemSpace
 from spl.fem.vector  import VectorFemSpace
 from spl.fem.splines import Spline
 
