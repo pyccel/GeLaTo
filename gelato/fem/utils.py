@@ -178,7 +178,7 @@ def compile_kernel(name, expr, V,
                 raise TypeError('Wrong type for {} :: {}'.format(k, a))
 
         # we convert the dictionaries to OrderedDict, to avoid wrong ordering
-        d_args = OrderedDict(d_args)
+        d_args = OrderedDict(sorted(list(d_args.items())))
 
         names = []
         dtypes = []
@@ -637,7 +637,7 @@ def compile_symbol(name, expr, V,
                 raise TypeError('Wrong type for {} :: {}'.format(k, a))
 
         # we convert the dictionaries to OrderedDict, to avoid wrong ordering
-        d_args = OrderedDict(d_args)
+        d_args = OrderedDict(sorted(list(d_args.items())))
 
         names = []
         dtypes = []
