@@ -11,7 +11,7 @@ def assemble_matrix(V, kernel, args=None, M=None, fields={}):
 
     if not( args is None ):
         if isinstance(args, (dict, OrderedDict)):
-            d_args = OrderedDict(args)
+            d_args = OrderedDict(sorted(list(args.items())))
             args = list(d_args.values())
 
         if not(isinstance(args, (list, tuple))):
@@ -406,7 +406,7 @@ def assemble_matrix_3d(V, kernel, args=None, M=None, fields={}):
                             _mat = mats[i][j]
                             _M = M[i][j]
 
-                    _M._data[s1:s1+p1+1,s2:s2+p2+1,s3:s3+p3+1,:,:,:] += _mat[:,:,:,:,:,:]
+                            _M._data[s1:s1+p1+1,s2:s2+p2+1,s3:s3+p3+1,:,:,:] += _mat[:,:,:,:,:,:]
     # ...
 
     return M
