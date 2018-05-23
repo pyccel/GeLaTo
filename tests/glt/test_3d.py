@@ -466,7 +466,7 @@ def test_3d_block_4():
     c2 = Constant('c2')
 
     a = Lambda((x,y,z,v,u), (  c0 * Dot(u, v)
-                             - c1 * Div(u) * Div(v)
+                             + c1 * Div(u) * Div(v)
                              + c2 * Dot(Curl(Cross(b,u)), Curl(Cross(b,v)))))
     print('> input       := {0}'.format(a))
 
