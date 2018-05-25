@@ -266,7 +266,7 @@ def apply_factor(expr, dim, instructions=None, **settings):
         P = Symbol(Bik) * Symbol(Bjk)
         ak = Symbol("a"+str(k+1))
 
-        expr = expr.subs({P: ak})
+        expr = expr.subs({P: sympy_I * ak})
         # ...
 
         # ... adjoint advection symbol
@@ -275,7 +275,7 @@ def apply_factor(expr, dim, instructions=None, **settings):
         P = Symbol(Bik) * Symbol(Bjk)
         ak = Symbol("a"+str(k+1))
 
-        expr = expr.subs({P: -ak})
+        expr = expr.subs({P: - sympy_I * ak})
         # ...
 
         # ... bilaplacian symbol
@@ -1099,9 +1099,9 @@ class glt_symbol_a(Function):
             m += -2 * phi[i] * sin(i * t)
         # ...
 
-        # ... make it pure imaginary
-        m *= sympy_I
-        # ...
+#        # ... make it pure imaginary
+#        m *= sympy_I
+#        # ...
 
         return m
 # ...
