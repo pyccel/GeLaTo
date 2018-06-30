@@ -9,10 +9,13 @@ Welcome to GeLaTo
 Installation
 ************
 
-Installation is done using::
+* **Standard mode**::
 
-  sudo python setup.py install
+    python3 -m pip install .
 
+* **Development mode**::
+
+    python3 -m pip install --user -e .
 
 
 .. |build-status| image:: https://travis-ci.org/pyccel/GeLaTo.svg?branch=master
