@@ -10,10 +10,13 @@ from sympy import Lambda
 from gelato.calculus import (dx, dy, dz)
 from gelato.calculus import LinearOperator
 from gelato.calculus import Field
+from gelato.calculus import grad, dot, inner
 
 
 # ...
 def test_0():
+    print('============ test_0 ==============')
+
     x,y, a = symbols('x y a')
 
     # ...
@@ -53,6 +56,8 @@ def test_0():
 
 # ...
 def test_1():
+    print('============ test_1 ==============')
+
     u, v, a = symbols('u v a')
 
     # ...
@@ -86,6 +91,8 @@ def test_1():
 
 # ...
 def test_2():
+    print('============ test_2 ==============')
+
     u, v = symbols('u v')
     F = Field('F')
 
@@ -99,8 +106,21 @@ def test_2():
     # ...
 # ...
 
+# ...
+def test_poisson():
+    print('============ test_poisson ==============')
+
+    u, v = symbols('u v')
+
+    # ...
+    expr = inner(grad(v), grad(u))
+    print('> expr := {0}'.format(expr))
+    # ...
+# ...
+
 # .....................................................
 if __name__ == '__main__':
     test_0()
     test_1()
     test_2()
+    test_poisson()

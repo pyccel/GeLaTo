@@ -1,7 +1,9 @@
 # coding: utf-8
 
 from sympy.core import Basic
+from sympy.core import Symbol
 from sympy.core.containers import Tuple
+
 
 class DottedName(Basic):
     """
@@ -28,6 +30,7 @@ class DottedName(Basic):
     def _sympystr(self, printer):
         sstr = printer.doprint
         return '.'.join(sstr(n) for n in self.name)
+
 
 class SplineFemSpace(Basic):
     """
@@ -110,6 +113,7 @@ class TensorFemSpace(Basic):
         sstr = printer.doprint
         return sstr(self.name)
 
+
 class VectorFemSpace(Basic):
     """
     Represents a tensor product of fem spaces.
@@ -153,3 +157,48 @@ class VectorFemSpace(Basic):
     def _sympystr(self, printer):
         sstr = printer.doprint
         return sstr(self.name)
+
+
+class TestFunction(Symbol):
+    """
+    Represents a test function as an element of a fem space.
+
+    Examples
+
+    >>> from gelato.fem.core import SplineFemSpace
+    >>> from gelato.fem.core import TestFunction
+    >>> V = SplineFemSpace('V')
+    >>> phi = TestFunction(V, 'phi')
+    """
+    def __new__(cls, space, name=None):
+        return Basic.__new__(cls, space, name)
+
+    @property
+    def space(self):
+        return self._args[0]
+
+    @property
+    def name(self):
+        return self._args[1]
+
+class TrialFunction(Symbol):
+    """
+    Represents a trial function as an element of a fem space.
+
+    Examples
+
+    >>> from gelato.fem.core import SplineFemSpace
+    >>> from gelato.fem.core import TrialFunction
+    >>> V = SplineFemSpace('V')
+    >>> u = TrialFunction(V, 'u')
+    """
+    def __new__(cls, space, name=None):
+        return Basic.__new__(cls, space, name)
+
+    @property
+    def space(self):
+        return self._args[0]
+
+    @property
+    def name(self):
+        return self._args[1]

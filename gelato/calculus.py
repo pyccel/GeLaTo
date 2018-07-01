@@ -716,3 +716,14 @@ class Div(GenericFunction):
 _generic_ops  = (Dot, Cross,
                  Grad, Curl, Rot, Div)
 # ...
+
+# ... alias for ufl compatibility
+cross = Cross
+dot = Dot
+inner = Dot # TODO do we need to add the Inner class Function?
+
+grad = Grad
+curl = Curl
+rot = Rot
+div = Div
+# ...
