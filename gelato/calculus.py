@@ -1,6 +1,10 @@
 # coding: utf-8
 
+# TODO add action of diff operators on sympy known functions
+
 import numpy as np
+from itertools import groupby
+from collections import OrderedDict
 
 from sympy.core.sympify import sympify
 from sympy.simplify.simplify import simplify
@@ -31,7 +35,7 @@ from sympy.core.expr import Expr
 from sympy.core.containers import Tuple
 from sympy import Integer, Float
 
-from sympy import symbols, Tuple, Lambda, Symbol, sympify, expand
+from sympy import symbols, Tuple, Symbol, sympify, expand
 from sympy import Add, Mul
 from sympy import preorder_traversal, Expr
 from sympy import simplify
@@ -69,6 +73,17 @@ class Constant(Symbol):
 class Field(Symbol):
     """
     Represents a Field variable.
+
+    Examples
+
+    """
+    pass
+# ...
+
+# ...
+class Unknown(Symbol):
+    """
+    Represents an unknown function
 
     Examples
 
@@ -194,17 +209,101 @@ class DifferentialOperator(LinearOperator):
 # ...
 class dx(DifferentialOperator):
     coordinate = 'x'
+    grad_index = 0 # index in grad
     pass
 
 class dy(DifferentialOperator):
     coordinate = 'y'
+    grad_index = 1 # index in grad
     pass
 
 class dz(DifferentialOperator):
     coordinate = 'z'
+    grad_index = 2 # index in grad
     pass
 
 _partial_derivatives = (dx, dy, dz)
+# ...
+
+# ...
+def find_partial_derivatives(expr):
+    """
+    returns all partial derivative expressions
+    """
+    if isinstance(expr, (Add, Mul)):
+        return find_partial_derivatives(expr.args)
+
+    elif isinstance(expr, (list, tuple)):
+        args = []
+        for a in expr:
+            args += find_partial_derivatives(a)
+        return args
+
+    elif isinstance(expr, _partial_derivatives):
+        return [expr]
+
+    return []
+# ...
+
+# ...
+def get_number_derivatives(expr):
+    """
+    returns the number of partial derivatives in expr.
+    this is still an experimental version, and it assumes that expr is of the
+    form d(a) where a is a single atom.
+    """
+    n = 0
+    if isinstance(expr, _partial_derivatives):
+        assert(len(expr.args) == 1)
+
+        n += 1 + get_number_derivatives(expr.args[0])
+    return n
+# ...
+
+# ...
+def sort_partial_derivatives(expr):
+    """returns the partial derivatives of an expression, sorted.
+    """
+    ls = []
+
+    args = find_partial_derivatives(expr)
+
+#    # ... Note
+#    #     group by is given the wrong answer for expr =mu * u + dx(u) + dx(dx(u))
+#    for key, group in groupby(args, lambda x: get_number_derivatives(x)):
+#        g = [a for a in group]
+#        for a in group:
+#            ls.append(a)
+#    # ...
+
+    # ...
+    d = {}
+    for a in args:
+        n = get_number_derivatives(a)
+        if n in d.keys():
+            d[n] += [a]
+        else:
+            d[n] = [a]
+    # ...
+
+    # ...
+    if not d:
+        return []
+    # ...
+
+    # ... sort keys from high to low
+    keys = np.asarray(list(d.keys()))
+    keys.sort()
+    keys = keys[::-1]
+    # ...
+
+    # ... construct a list of partial derivatives from high to low order
+    ls = []
+    for k in keys:
+        ls += d[k]
+    # ...
+
+    return ls
 # ...
 
 # ...
