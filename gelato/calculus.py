@@ -307,6 +307,45 @@ def sort_partial_derivatives(expr):
 # ...
 
 # ...
+def get_index_derivatives(expr):
+    """
+    """
+    coord = ['x','y','z']
+
+    d = OrderedDict()
+    for c in coord:
+        d[c] = 0
+
+    ops = [a for a in preorder_traversal(expr) if isinstance(a, _partial_derivatives)]
+    for i in ops:
+        op = type(i)
+
+        if isinstance(i, dx):
+            d['x'] += 1
+
+        elif isinstance(i, dy):
+            d['y'] += 1
+
+        elif isinstance(i, dz):
+            d['z'] += 1
+
+    return d
+# ...
+
+# ...
+def get_atom_derivatives(expr):
+    """
+    """
+
+    if isinstance(expr, _partial_derivatives):
+        assert(len(expr.args) == 1)
+
+        return get_atom_derivatives(expr.args[0])
+    else:
+        return expr
+# ...
+
+# ...
 class DotBasic(Function):
     """
 

@@ -3,5 +3,8 @@
 #
 # TODO: add dx operator
 
-def a( v, u ):
-    return inner(grad(v), grad(u))
+def a( W, V ):
+    w = TestFunction(W, name='w')
+    v = TrialFunction(V, name='v')
+
+    return inner(grad(w), grad(v))

@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from numpy import unique
+
 from sympy.core import Basic
 from sympy.core import Symbol
 from sympy.core.containers import Tuple
@@ -31,8 +33,34 @@ class DottedName(Basic):
         sstr = printer.doprint
         return '.'.join(sstr(n) for n in self.name)
 
+# ...
+class FemSpace(Basic):
+    """
+    Represents a symbolic finite elements space.
 
-class SplineFemSpace(Basic):
+    Examples
+
+    """
+    _ldim = None
+    def __new__(cls, name, ldim=None):
+        obj = Basic.__new__(cls, name)
+        obj._ldim = ldim
+        return obj
+
+    @property
+    def name(self):
+        return self._args[0]
+
+    @property
+    def ldim(self):
+        return self._ldim
+
+    def _sympystr(self, printer):
+        sstr = printer.doprint
+        return sstr(self.name)
+# ...
+
+class SplineFemSpace(FemSpace):
     """
     Represents a 1D fem space of splines.
 
@@ -45,6 +73,7 @@ class SplineFemSpace(Basic):
     >>> V.n_elements
     V.n
     """
+    _ldim = 1
     _degree = None
     _n_elements = None
     def __new__(cls, name):
@@ -72,7 +101,7 @@ class SplineFemSpace(Basic):
         sstr = printer.doprint
         return sstr(self.name)
 
-class TensorFemSpace(Basic):
+class TensorFemSpace(FemSpace):
     """
     Represents a tensor product of fem spaces.
 
@@ -88,6 +117,8 @@ class TensorFemSpace(Basic):
     >>> V.n_elements
     (V1.n, V2.n)
     """
+    _ldim = 0
+
     def __new__(cls, name, *args):
         return Basic.__new__(cls, name, *args)
 
@@ -109,12 +140,16 @@ class TensorFemSpace(Basic):
         args = [V.n_elements for V in self.spaces]
         return Tuple(*args)
 
+    @property
+    def ldim( self ):
+        return sum([V.ldim for V in self.spaces])
+
     def _sympystr(self, printer):
         sstr = printer.doprint
         return sstr(self.name)
 
 
-class VectorFemSpace(Basic):
+class VectorFemSpace(FemSpace):
     """
     Represents a tensor product of fem spaces.
 
@@ -133,6 +168,8 @@ class VectorFemSpace(Basic):
     >>> V.n_elements
     ((V1.n, V2.n), (V2.n, V1.n))
     """
+    _ldim = 0
+
     def __new__(cls, name, *args):
         return Basic.__new__(cls, name, *args)
 
@@ -153,6 +190,14 @@ class VectorFemSpace(Basic):
     def n_elements(self):
         args = [V.n_elements for V in self.spaces]
         return Tuple(*args)
+
+    @property
+    def ldim( self ):
+        # make sure that all spaces have the same parametric dimension
+        ldims = [V.ldim for V in self.spaces]
+        assert (len(unique(ldims)) == 1)
+
+        return ldims[0]
 
     def _sympystr(self, printer):
         sstr = printer.doprint
@@ -202,3 +247,4 @@ class TrialFunction(Symbol):
     @property
     def name(self):
         return self._args[1]
+

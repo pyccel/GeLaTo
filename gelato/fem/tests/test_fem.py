@@ -18,6 +18,7 @@ def test_fem_space_spline():
     V = SplineFemSpace('V')
 
     print('> space :: ', V)
+    print('> logical dim :: ', V.ldim)
     print('> degree :: ', V.degree)
     print('> n_elements :: ', V.n_elements)
 
@@ -37,6 +38,7 @@ def test_fem_space_tensor():
     V = TensorFemSpace('V', V1, V2)
 
     print('> space :: ', V)
+    print('> logical dim :: ', V.ldim)
     print('> degree :: ', V.degree)
     print('> n_elements :: ', V.n_elements)
 
@@ -65,6 +67,7 @@ def test_fem_space_vector():
     V = VectorFemSpace('V', Vx, Vy)
 
     print('> space :: ', V)
+    print('> logical dim :: ', V.ldim)
     print('> degree :: ', V.degree)
     print('> n_elements :: ', V.n_elements)
 

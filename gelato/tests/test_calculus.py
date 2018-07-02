@@ -11,6 +11,7 @@ from gelato.calculus import (dx, dy, dz)
 from gelato.calculus import LinearOperator
 from gelato.calculus import Field
 from gelato.calculus import grad, dot, inner
+from gelato.calculus import get_index_derivatives
 
 
 # ...
@@ -107,6 +108,39 @@ def test_2():
 # ...
 
 # ...
+def test_3():
+    print('============ test_3 ==============')
+
+    u = symbols('u')
+
+    # ...
+    expr = dx(u)
+    d = get_index_derivatives(expr)
+    assert(d['x'] == 1)
+    assert(d['y'] == 0)
+    assert(d['z'] == 0)
+    # ...
+
+    # ...
+    expr = dx(dy(u))
+    d = get_index_derivatives(expr)
+    assert(d['x'] == 1)
+    assert(d['y'] == 1)
+    assert(d['z'] == 0)
+    # ...
+
+    # ...
+    expr = dx(dy(dx(u)))
+    d = get_index_derivatives(expr)
+    assert(d['x'] == 2)
+    assert(d['y'] == 1)
+    assert(d['z'] == 0)
+    # ...
+
+    print('')
+# ...
+
+# ...
 def test_poisson():
     print('============ test_poisson ==============')
 
@@ -123,4 +157,5 @@ if __name__ == '__main__':
     test_0()
     test_1()
     test_2()
+    test_3()
     test_poisson()
