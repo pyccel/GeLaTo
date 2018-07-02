@@ -196,7 +196,11 @@ def normalize_weak_from(a):
         # terms like dx(..)
         expr = expr.subs({i: DerivativeSymbol(i)})
 
-    return expr
+    a = BilinearForm(expr,
+                     name=a.name,
+                     trial_space=a.trial_space,
+                     test_space=a.test_space)
+    return a
 # ...
 
 
