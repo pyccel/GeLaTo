@@ -19,7 +19,7 @@ from gelato.calculus import dx, dy, dz
 from gelato.calculus import LinearOperator
 from gelato.calculus import Constant
 from gelato.calculus import Field
-from gelato.calculus import grad, dot, inner
+from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 from gelato.calculus import _generic_ops, _partial_derivatives
 from gelato.calculus import (Dot_1d, Grad_1d, Div_1d)
 from gelato.calculus import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
@@ -344,6 +344,86 @@ def test_bilinear_form_1d_6():
     print('')
 # ...
 
+# ...
+def test_bilinear_form_2d_1():
+    print('============ test_bilinear_form_2d_1 =============')
+
+    W = FemSpace('W', ldim=2)
+    V = FemSpace('V', ldim=2)
+
+    w = TestFunction(W, name='w')
+    v = TrialFunction(V, name='v')
+
+    expr = inner(grad(w), grad(v))
+
+    a = BilinearForm(expr, name='a', trial_space=V, test_space=W)
+    print('> input         >>> {0}'.format(a))
+    print('> gelatized     >>> {0}'.format(gelatize(a)))
+    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('')
+# ...
+
+# ...
+def test_bilinear_form_2d_2():
+    print('============ test_bilinear_form_2d_2 =============')
+
+    W = FemSpace('W', ldim=2)
+    V = FemSpace('V', ldim=2)
+
+    w = TestFunction(W, name='w')
+    v = TrialFunction(V, name='v')
+
+    expr = cross(curl(w), curl(v)) + 0.2 * w * v
+
+    a = BilinearForm(expr, name='a', trial_space=V, test_space=W)
+    print('> input         >>> {0}'.format(a))
+    print('> gelatized     >>> {0}'.format(gelatize(a)))
+    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('')
+# ...
+
+# ...
+def test_bilinear_form_2d_3():
+    print('============ test_bilinear_form_2d_3 =============')
+
+    W = FemSpace('W', ldim=2)
+    V = FemSpace('V', ldim=2)
+
+    w = TestFunction(W, name='w')
+    v = TrialFunction(V, name='v')
+
+    bx = Constant('bx')
+    by = Constant('by')
+    b = Tuple(bx, by)
+
+    expr = 0.2 * w * v + dot(b, grad(v)) * w
+
+    a = BilinearForm(expr, name='a', trial_space=V, test_space=W)
+    print('> input         >>> {0}'.format(a))
+    print('> gelatized     >>> {0}'.format(gelatize(a)))
+    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('')
+# ...
+
+# ... TODO debug
+def test_bilinear_form_2d_4():
+    print('============ test_bilinear_form_2d_4 =============')
+
+    W = FemSpace('W', ldim=2)
+    V = FemSpace('V', ldim=2)
+
+    w = TestFunction(W, name='w')
+    v = TrialFunction(V, name='v')
+
+    expr = rot(w) * rot(v) + div(w) * div(v) + 0.2 * dot(w, v)
+
+    a = BilinearForm(expr, name='a', trial_space=V, test_space=W)
+    print('> input         >>> {0}'.format(a))
+    print('> gelatized     >>> {0}'.format(gelatize(a)))
+    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('')
+# ...
+
 # .....................................................
 if __name__ == '__main__':
     test_bilinear_form_1d_1()
@@ -352,3 +432,8 @@ if __name__ == '__main__':
     test_bilinear_form_1d_4()
     test_bilinear_form_1d_5()
     test_bilinear_form_1d_6()
+
+    test_bilinear_form_2d_1()
+    test_bilinear_form_2d_2()
+    test_bilinear_form_2d_3()
+#    test_bilinear_form_2d_4()
