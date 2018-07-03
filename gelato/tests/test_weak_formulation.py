@@ -1,5 +1,7 @@
 # coding: utf-8
 
+# TODO transpose of BilinearForm:
+
 import numpy as np
 
 from collections import OrderedDict
@@ -33,7 +35,7 @@ from gelato.fem.core import TestFunction
 from gelato.fem.core import TrialFunction
 
 # TODO once BilinearForm is stable
-class LinearForm(Basic):
+class LinearForm(Expr):
     pass
 
 
@@ -65,13 +67,37 @@ class BilinearForm(Expr):
     def trial_functions(self):
         ls = [a for a in self.expr.free_symbols if isinstance(a, TrialFunction)]
         # no redanduncy
-        return list(set(ls))
+        ls = list(set(ls))
+
+        # ... reorder symbols by name
+        # TODO can we do better?
+        d = {}
+        for i in ls:
+            d[i.name] = i
+        names = [i.name for i in ls]
+        names.sort()
+        ls = [d[name] for name in names]
+        # ...
+
+        return ls
 
     @property
     def test_functions(self):
         ls = [a for a in self.expr.free_symbols if isinstance(a, TestFunction)]
         # no redanduncy
-        return list(set(ls))
+        ls = list(set(ls))
+
+        # ... reorder symbols by name
+        # TODO can we do better?
+        d = {}
+        for i in ls:
+            d[i.name] = i
+        names = [i.name for i in ls]
+        names.sort()
+        ls = [d[name] for name in names]
+        # ...
+
+        return ls
 
     @property
     def fields(self):
@@ -132,52 +158,6 @@ class BilinearForm(Expr):
 
 
 # ...
-def gelatize(expr):
-    """
-    """
-    if not isinstance(expr, (BilinearForm, LinearForm, Add, Mul)):
-        msg = ('> Wrong input type.'
-               '  Expecting BilinearForm, LinearForm, Add, Mul')
-        raise TypeError(msg)
-
-    if isinstance(expr, Add):
-        args = [gelatize(i) for i in expr.args]
-        return Add(*args)
-
-    elif isinstance(expr, Mul):
-        coeffs  = [i for i in expr.args if isinstance(i, _coeffs_registery)]
-        vectors = [i for i in expr.args if not(i in coeffs)]
-
-        i = S.One
-        if coeffs:
-            i = Mul(*coeffs)
-
-        j = S.One
-        if vectors:
-            j = gelatize(Mul(*vectors), evaluate=False)
-
-        return Mul(i, j)
-
-
-    dim = expr.test_space.ldim
-
-    # ... we first need to find the ordered list of generic operators
-    ops = [a for a in preorder_traversal(expr) if isinstance(a, _generic_ops)]
-    # ...
-
-    # ...
-    for i in ops:
-        # if i = Grad(u) then type(i) is Grad
-        op = type(i)
-
-        new  = eval('{0}_{1}d'.format(op, dim))
-        expr = expr.subs(op, new)
-    # ...
-
-    return expr
-# ...
-
-# ...
 class DerivativeSymbol(Symbol):
     """
 
@@ -213,20 +193,54 @@ class DerivativeSymbol(Symbol):
 # ...
 
 # ...
+def gelatize(expr):
+    """
+    """
+    if not isinstance(expr, (BilinearForm, LinearForm, Add, Mul)):
+        msg = ('> Wrong input type.'
+               '  Expecting BilinearForm, LinearForm, Add, Mul')
+        raise TypeError(msg)
+
+    if isinstance(expr, Add):
+        args = [gelatize(i) for i in expr.args]
+        return Add(*args)
+
+    elif isinstance(expr, Mul):
+        coeffs  = [i for i in expr.args if isinstance(i, _coeffs_registery)]
+        vectors = [i for i in expr.args if not(i in coeffs)]
+
+        i = S.One
+        if coeffs:
+            i = Mul(*coeffs)
+
+        j = S.One
+        if vectors:
+            j = gelatize(Mul(*vectors), evaluate=False)
+
+        return Mul(i, j)
+
+    dim = expr.test_space.ldim
+
+    # ... we first need to find the ordered list of generic operators
+    ops = [a for a in preorder_traversal(expr) if isinstance(a, _generic_ops)]
+    # ...
+
+    # ...
+    for i in ops:
+        # if i = Grad(u) then type(i) is Grad
+        op = type(i)
+
+        new  = eval('{0}_{1}d'.format(op, dim))
+        expr = expr.subs(op, new)
+    # ...
+
+    return expr
+# ...
+
+# ...
 def normalize_weak_from(a):
     """
     """
-    # ...
-    if type(a) == dict:
-        d_expr = {}
-        for key, g in list(a.items()):
-            # ...
-            d_expr[key] = normalize_weak_from(g)
-            # ...
-
-        return dict_to_matrix(d_expr)
-    # ...
-
     # ...
     if not isinstance(a, (BilinearForm, LinearForm, Add, Mul)):
         msg = ('> Wrong input type.'
@@ -414,6 +428,55 @@ def test_bilinear_form_1d_6():
     print('> gelatized     >>> {0}'.format(gelatize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
     print('')
+# ...
+
+# ...
+def test_bilinear_form_1d_7():
+    print('============ test_bilinear_form_1d_7 =============')
+
+    W = FemSpace('W', ldim=1)
+    V = FemSpace('V', ldim=1)
+
+    w1 = TestFunction(W,  name='w1')
+    w2 = TestFunction(W,  name='w2')
+    v1 = TrialFunction(V, name='v1')
+    v2 = TrialFunction(V, name='v2')
+    t1 = TestFunction(W,  name='t1')
+    t2 = TestFunction(W,  name='t2')
+
+    a = BilinearForm(inner(grad(w1), grad(v1)) + w2*v2, trial_space=V, test_space=W)
+    b = BilinearForm(w1*v2, trial_space=V, test_space=W)
+
+    ls = [a + b, a((t1,t2), (v1,v2)) + b(t1, v2)]
+    for c in ls:
+        print('> input         >>> {0}'.format(c))
+        print('> gelatized     >>> {0}'.format(gelatize(c)))
+        print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
+        print('')
+# ...
+
+# ... TODO not wokring yet
+def test_bilinear_form_1d_8():
+    print('============ test_bilinear_form_1d_8 =============')
+
+    W = FemSpace('W', ldim=1)
+    V = FemSpace('V', ldim=1)
+
+    w1 = TestFunction(W,  name='w1')
+    w2 = TestFunction(W,  name='w2')
+    v1 = TrialFunction(V, name='v1')
+    v2 = TrialFunction(V, name='v2')
+    t1 = TestFunction(W,  name='t1')
+    t2 = TestFunction(W,  name='t2')
+
+    a = BilinearForm(w1*v2, trial_space=V, test_space=W)
+
+    ls = [a(t1, v2), a(v2, t1)]
+    for c in ls:
+        print('> input         >>> {0}'.format(c))
+        print('> gelatized     >>> {0}'.format(gelatize(c)))
+        print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
+        print('')
 # ...
 
 # ...
@@ -648,23 +711,25 @@ def test_bilinear_form_3d_5():
 
 # .....................................................
 if __name__ == '__main__':
-#    test_bilinear_form_1d_0()
-#    test_bilinear_form_1d_1()
-#    test_bilinear_form_1d_2()
-#    test_bilinear_form_1d_3()
-#    test_bilinear_form_1d_4()
-#    test_bilinear_form_1d_5()
-#    test_bilinear_form_1d_6()
-#
+    test_bilinear_form_1d_0()
+    test_bilinear_form_1d_1()
+    test_bilinear_form_1d_2()
+    test_bilinear_form_1d_3()
+    test_bilinear_form_1d_4()
+    test_bilinear_form_1d_5()
+    test_bilinear_form_1d_6()
+    test_bilinear_form_1d_7()
+#    test_bilinear_form_1d_8()
+
     test_bilinear_form_2d_0()
-#    test_bilinear_form_2d_1()
-#    test_bilinear_form_2d_2()
-#    test_bilinear_form_2d_3()
-##    test_bilinear_form_2d_4()
-#
-#    test_bilinear_form_3d_0()
+    test_bilinear_form_2d_1()
+    test_bilinear_form_2d_2()
+    test_bilinear_form_2d_3()
+#    test_bilinear_form_2d_4()
+
+    test_bilinear_form_3d_0()
+    test_bilinear_form_3d_1()
 #    test_bilinear_form_3d_1()
-##    test_bilinear_form_3d_1()
-##    test_bilinear_form_3d_2()
-##    test_bilinear_form_3d_3()
-##    test_bilinear_form_3d_4()
+#    test_bilinear_form_3d_2()
+#    test_bilinear_form_3d_3()
+#    test_bilinear_form_3d_4()
