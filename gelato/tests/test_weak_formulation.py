@@ -33,6 +33,8 @@ from gelato.calculus import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
 from gelato.fem.core import FemSpace
 from gelato.fem.core import TestFunction
 from gelato.fem.core import TrialFunction
+from gelato.fem.core import VectorTestFunction
+from gelato.fem.core import VectorTrialFunction
 
 # TODO once BilinearForm is stable
 class LinearForm(Expr):
@@ -189,7 +191,23 @@ class DerivativeSymbol(Symbol):
         for k,n in list(self.index.items()):
             code += k*n
 
-        return '{var}_{code}'.format(var=self.var, code=code)
+        var = self.var
+        if isinstance(var, TestFunction) and not(var.index is None):
+            assert(not(var.base is None))
+
+            index = var.index
+            base = var.base
+#            space = base.space
+#            name = '{name}_{code}'.format(name=base.name, code=code)
+#            var = VectorTestFunction(space, name=name)
+#            name = '{}'.format(var[index])
+            name = '{name}_{code}_{index}'.format(name=base.name,
+                                          index=index,
+                                          code=code)
+        else:
+            name = '{name}_{code}'.format(name=var.name, code=code)
+
+        return name
 # ...
 
 # ...
@@ -271,9 +289,20 @@ def normalize_weak_from(a):
     ops = sort_partial_derivatives(a.expr)
     trials = a.trial_functions
     tests = a.test_functions
+#    print('* trials = ', trials)
+#    print('* tests = ', tests)
+#    v1 = trials[0]
+#    x = DerivativeSymbol(dx(v1))
+#    print(type(v1))
+#    print(x)
+#    import sys; sys.exit(0)
 
     expr = a.expr
-    for i in ops:
+    print(len(ops))
+#    print('% ops = ', ops)
+    n = 0
+    for i in ops[1:2]:
+        n += 1
 
         if not(len(i.args) == 1):
             raise ValueError('expecting only one argument for partial derivatives')
@@ -282,6 +311,14 @@ def normalize_weak_from(a):
 
         # terms like dx(..)
         expr = expr.subs({i: DerivativeSymbol(i)})
+
+#        x = DerivativeSymbol(i)
+#        print('****** ', i, x, type(x))
+#        if n == 2:
+#            expr = expr.subs({i: DerivativeSymbol(i)})
+#            import sys; sys.exit(0)
+#        print(expr)
+    print('done')
 
     a = BilinearForm(expr,
                      trial_space=a.trial_space,
@@ -573,13 +610,13 @@ def test_bilinear_form_2d_3():
 def test_bilinear_form_2d_4():
     print('============ test_bilinear_form_2d_4 =============')
 
-    W = FemSpace('W', ldim=2)
-    V = FemSpace('V', ldim=2)
+    W = FemSpace('W', ldim=2, is_vector=True, shape=2)
+    V = FemSpace('V', ldim=2, is_vector=True, shape=2)
 
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
+    w = VectorTestFunction(W, name='w')
+    v = VectorTrialFunction(V, name='v')
 
-    expr = rot(w) * rot(v) + div(w) * div(v) + 0.2 * dot(w, v)
+    expr = rot(w) * rot(v) + div(w) * div(v) #+ 0.2 * dot(w, v)
 
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
@@ -711,25 +748,25 @@ def test_bilinear_form_3d_5():
 
 # .....................................................
 if __name__ == '__main__':
-    test_bilinear_form_1d_0()
-    test_bilinear_form_1d_1()
-    test_bilinear_form_1d_2()
-    test_bilinear_form_1d_3()
-    test_bilinear_form_1d_4()
-    test_bilinear_form_1d_5()
-    test_bilinear_form_1d_6()
-    test_bilinear_form_1d_7()
-#    test_bilinear_form_1d_8()
-
-    test_bilinear_form_2d_0()
-    test_bilinear_form_2d_1()
-    test_bilinear_form_2d_2()
-    test_bilinear_form_2d_3()
-#    test_bilinear_form_2d_4()
-
-    test_bilinear_form_3d_0()
-    test_bilinear_form_3d_1()
+#    test_bilinear_form_1d_0()
+#    test_bilinear_form_1d_1()
+#    test_bilinear_form_1d_2()
+#    test_bilinear_form_1d_3()
+#    test_bilinear_form_1d_4()
+#    test_bilinear_form_1d_5()
+#    test_bilinear_form_1d_6()
+#    test_bilinear_form_1d_7()
+##    test_bilinear_form_1d_8()
+#
+#    test_bilinear_form_2d_0()
+#    test_bilinear_form_2d_1()
+#    test_bilinear_form_2d_2()
+#    test_bilinear_form_2d_3()
+    test_bilinear_form_2d_4()
+#
+#    test_bilinear_form_3d_0()
 #    test_bilinear_form_3d_1()
-#    test_bilinear_form_3d_2()
-#    test_bilinear_form_3d_3()
-#    test_bilinear_form_3d_4()
+##    test_bilinear_form_3d_1()
+##    test_bilinear_form_3d_2()
+##    test_bilinear_form_3d_3()
+##    test_bilinear_form_3d_4()
