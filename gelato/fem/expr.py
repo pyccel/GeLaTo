@@ -218,9 +218,9 @@ def gelatize(expr):
 # ...
 
 # ...
-def normalize_weak_from(a, names=None):
+def normalize_weak_from(a, basis=None):
     """
-    names: dict
+    basis: dict
         for every space we give the name of the basis function symbol
     """
     # ...
@@ -277,15 +277,15 @@ def normalize_weak_from(a, names=None):
         arg = i.args[0]
 
         name = None
-        if not(names is None):
+        if not(basis is None):
             atom = get_atom_derivatives(i)
             if isinstance(atom, (TestFunction, VectorTestFunction)):
-                if atom.space in list(names.keys()):
-                    name = names[atom.space]
+                if atom.space in list(basis.keys()):
+                    name = basis[atom.space]
             elif isinstance(atom, Symbol) and atom.is_Indexed:
                 base = atom.base
-                if base.space in list(names.keys()):
-                    name = names[base.space]
+                if base.space in list(basis.keys()):
+                    name = basis[base.space]
 
         # terms like dx(..)
         new = partial_derivative_as_symbol(i, name=name)
@@ -293,16 +293,16 @@ def normalize_weak_from(a, names=None):
     # ...
 
     # ...
-    if not(names is None):
+    if not(basis is None):
         for a in trials + tests:
             if isinstance(a, (TestFunction, VectorTestFunction)):
-                if a.space in list(names.keys()):
-                    name = names[a.space]
+                if a.space in list(basis.keys()):
+                    name = basis[a.space]
 
             elif isinstance(a, Symbol) and a.is_Indexed:
                 base = a.base
-                if base.space in list(names.keys()):
-                    name = names[base.space]
+                if base.space in list(basis.keys()):
+                    name = basis[base.space]
 
             expr = expr.subs({a: Symbol(name)})
     # ...
