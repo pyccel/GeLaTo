@@ -265,7 +265,9 @@ class TestFunction(Symbol):
         sstr = printer.doprint
         return sstr(self.name)
 
-TrialFunction = TestFunction
+#TrialFunction = TestFunction
+class TrialFunction(TestFunction):
+    pass
 
 
 class VectorTestFunction(Symbol, IndexedBase):
@@ -309,4 +311,7 @@ class VectorTestFunction(Symbol, IndexedBase):
         obj = Indexed(self, *args)
         return obj
 
-VectorTrialFunction = VectorTestFunction
+#VectorTrialFunction = VectorTestFunction
+class VectorTrialFunction(VectorTestFunction):
+    pass
+
