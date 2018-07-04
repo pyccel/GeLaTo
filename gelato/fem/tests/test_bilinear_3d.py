@@ -55,15 +55,15 @@ def test_bilinear_form_3d_1():
     print('')
 # ...
 
-# ... TODO debug
+# ...
 def test_bilinear_form_3d_2():
     print('============ test_bilinear_form_3d_2 =============')
 
-    W = FemSpace('W', ldim=3)
-    V = FemSpace('V', ldim=3)
+    W = FemSpace('W', ldim=3, is_vector=True, shape=3)
+    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
 
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
+    w = VectorTestFunction(W, name='w')
+    v = VectorTrialFunction(V, name='v')
 
     expr = div(w) * div(v) + 0.2 * dot(w, v)
 
@@ -74,15 +74,15 @@ def test_bilinear_form_3d_2():
     print('')
 # ...
 
-# ... TODO debug
+# ...
 def test_bilinear_form_3d_3():
     print('============ test_bilinear_form_3d_3 =============')
 
-    W = FemSpace('W', ldim=3)
-    V = FemSpace('V', ldim=3)
+    W = FemSpace('W', ldim=3, is_vector=True, shape=3)
+    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
 
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
+    w = VectorTestFunction(W, name='w')
+    v = VectorTrialFunction(V, name='v')
 
     expr = dot(curl(w), curl(v)) + 0.2 * dot(w, v)
 
@@ -93,15 +93,20 @@ def test_bilinear_form_3d_3():
     print('')
 # ...
 
-# ... TODO debug
+# ...
 def test_bilinear_form_3d_4():
     print('============ test_bilinear_form_3d_4 =============')
 
-    W = FemSpace('W', ldim=3)
-    V = FemSpace('V', ldim=3)
+    W = FemSpace('W', ldim=3, is_vector=True, shape=3)
+    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
 
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
+    w = VectorTestFunction(W, name='w')
+    v = VectorTrialFunction(V, name='v')
+
+    bx = Constant('bx')
+    by = Constant('by')
+    bz = Constant('bz')
+    b = Tuple(bx, by, bz)
 
     expr = dot(curl(cross(b,w)), curl(cross(b,v))) + 0.2 * dot(w, v)
 
@@ -112,15 +117,15 @@ def test_bilinear_form_3d_4():
     print('')
 # ...
 
-# ... TODO debug
+# ...
 def test_bilinear_form_3d_5():
     print('============ test_bilinear_form_3d_5 =============')
 
-    W = FemSpace('W', ldim=3)
-    V = FemSpace('V', ldim=3)
+    W = FemSpace('W', ldim=3, is_vector=True, shape=3)
+    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
 
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
+    w = VectorTestFunction(W, name='w')
+    v = VectorTrialFunction(V, name='v')
 
     bx = Constant('bx')
     by = Constant('by')
@@ -142,7 +147,7 @@ def test_bilinear_form_3d_5():
 if __name__ == '__main__':
     test_bilinear_form_3d_0()
     test_bilinear_form_3d_1()
-#    test_bilinear_form_3d_1()
-#    test_bilinear_form_3d_2()
-#    test_bilinear_form_3d_3()
-#    test_bilinear_form_3d_4()
+    test_bilinear_form_3d_2()
+    test_bilinear_form_3d_3()
+    test_bilinear_form_3d_4()
+    test_bilinear_form_3d_5()

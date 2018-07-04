@@ -2,6 +2,8 @@
 
 # TODO add asserts
 
+from sympy import Symbol
+
 from gelato.fem.core import FemSpace
 from gelato.fem.core import SplineFemSpace
 from gelato.fem.core import TensorFemSpace
@@ -11,6 +13,7 @@ from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import gelatize
+from gelato.fem.expr import normalize_weak_from
 
 from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 from gelato.calculus import dx, dy, dz
@@ -93,9 +96,18 @@ def test_trialtest_2d_1():
     assert(gelatize(rot(v)) == -dx(v[1]) + dy(v[0]))
     assert(gelatize(div(v)) == dx(v[0]) + dy(v[1]))
 
+    v0_x = Symbol('v_x[0]')
+    v1_x = Symbol('v_x[1]')
+    v0_y = Symbol('v_y[0]')
+    v1_y = Symbol('v_y[1]')
+
+    assert(normalize_weak_from(rot(v)) == -v1_x + v0_y)
+    assert(normalize_weak_from(div(v)) == v0_x + v1_y)
+
 #    expr = div(v)
 #    print('> input         >>> {0}'.format(expr))
 #    print('> gelatized     >>> {0}'.format(gelatize(expr)))
+#    print('> normal form   >>> {0}'.format(normalize_weak_from(expr)))
 # ...
 
 # .....................................................

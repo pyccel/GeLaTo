@@ -6,6 +6,7 @@ from sympy.core import Basic
 from sympy.tensor import Indexed, IndexedBase
 from sympy.core.compatibility import is_sequence
 from sympy.core import Symbol
+from sympy.core import Expr
 from sympy.core.containers import Tuple
 
 from gelato.calculus import Field, Constant
@@ -235,8 +236,7 @@ class VectorFemSpace(FemSpace):
         sstr = printer.doprint
         return sstr(self.name)
 
-# TODO improve: base should be handled like for Indexed
-class TestFunction(Symbol, Indexed):
+class TestFunction(Symbol):
     """
     Represents a test function as an element of a fem space.
 
@@ -248,11 +248,9 @@ class TestFunction(Symbol, Indexed):
     >>> phi = TestFunction(V, 'phi')
     """
     _space = None
-    _base = None
-    def __new__(cls, space, name=None, index=None, base=None):
-        obj =  Basic.__new__(cls, name, index)
+    def __new__(cls, space, name=None):
+        obj =  Basic.__new__(cls, name)
         obj._space = space
-        obj._base = base
         return obj
 
     @property
@@ -260,38 +258,12 @@ class TestFunction(Symbol, Indexed):
         return self._space
 
     @property
-    def base(self):
-        return self._base
-
-    @property
     def name(self):
         return self._args[0]
 
-    @property
-    def index(self):
-        return self._args[1]
-
     def _sympystr(self, printer):
         sstr = printer.doprint
-        if self.index is None:
-            return sstr(self.name)
-        else:
-            return '{name}[{index}]'.format(name=sstr(self.name), index=sstr(self.index))
-
-
-
-#class TrialFunction(TestFunction):
-#    """
-#    Represents a trial function as an element of a fem space.
-#
-#    Examples
-#
-#    >>> from gelato.fem.core import SplineFemSpace
-#    >>> from gelato.fem.core import TrialFunction
-#    >>> V = SplineFemSpace('V')
-#    >>> u = TrialFunction(V, 'u')
-#    """
-#    pass
+        return sstr(self.name)
 
 TrialFunction = TestFunction
 
@@ -334,33 +306,7 @@ class VectorTestFunction(Symbol, IndexedBase):
             raise ValueError('expecting exactly one argument')
 
         assumptions ={}
-        name_space = '{name}_{i}'.format(name=self.space.name, i=args[0])
-        # TODO improve, using the specific space and not the general one?
-        space = FemSpace(name_space, ldim=self.space.ldim)
-        obj = TestFunction(space, name=self.name, index=args[0], base=self)
+        obj = Indexed(self, *args)
         return obj
-
-#class VectorTrialFunction(VectorTestFunction):
-#    """
-#    Represents a vector trial function as an element of a fem space.
-#
-#    Examples
-#
-#    """
-#
-#    def __getitem__(self, *args):
-#
-#        if self.shape and len(self.shape) != len(args):
-#            raise IndexException("Rank mismatch.")
-#
-#        if not(len(args) == 1):
-#            raise ValueError('expecting exactly one argument')
-#
-#        assumptions ={}
-#        name_space = '{name}_{i}'.format(name=self.space.name, i=args[0])
-#        # TODO improve, using the specific space and not the general one?
-#        space = FemSpace(name_space, ldim=self.space.ldim)
-#        obj = TrialFunction(space, name=self.name, index=args[0], base=self)
-#        return obj
 
 VectorTrialFunction = VectorTestFunction

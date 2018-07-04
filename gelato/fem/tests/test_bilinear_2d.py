@@ -107,7 +107,7 @@ def test_bilinear_form_2d_3():
     print('')
 # ...
 
-# ... TODO debug
+# ...
 def test_bilinear_form_2d_4():
     print('============ test_bilinear_form_2d_4 =============')
 
@@ -117,7 +117,7 @@ def test_bilinear_form_2d_4():
     w = VectorTestFunction(W, name='w')
     v = VectorTrialFunction(V, name='v')
 
-    expr = rot(w) * rot(v) + div(w) * div(v) #+ 0.2 * dot(w, v)
+    expr = rot(w) * rot(v) + div(w) * div(v) + 0.2 * dot(w, v)
 
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
@@ -129,8 +129,8 @@ def test_bilinear_form_2d_4():
 
 # .....................................................
 if __name__ == '__main__':
-#    test_bilinear_form_2d_0()
-#    test_bilinear_form_2d_1()
-#    test_bilinear_form_2d_2()
-#    test_bilinear_form_2d_3()
+    test_bilinear_form_2d_0()
+    test_bilinear_form_2d_1()
+    test_bilinear_form_2d_2()
+    test_bilinear_form_2d_3()
     test_bilinear_form_2d_4()

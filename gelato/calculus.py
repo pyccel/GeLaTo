@@ -879,30 +879,22 @@ def partial_derivative_as_symbol(expr):
     index = get_index_derivatives(expr)
     var = get_atom_derivatives(expr)
 
-    if not isinstance(var, Symbol):
-        raise TypeError('Expecting a Symbol')
+    if not isinstance(var, (Symbol, Indexed)):
+        print(type(var))
+        raise TypeError('Expecting a Symbol, Indexed')
 
     code = ''
     for k,n in list(index.items()):
         code += k*n
 
-#    if isinstance(var, TestFunction) and not(var.index is None):
-#        raise NotImplementedError('TODO')
-##        assert(not(var.base is None))
-##
-##        index = var.index
-##        base = var.base
-###            space = base.space
-###            name = '{name}_{code}'.format(name=base.name, code=code)
-###            var = VectorTestFunction(space, name=name)
-###            name = '{}'.format(var[index])
-##        name = '{name}_{code}_{index}'.format(name=base.name,
-##                                      index=index,
-##                                      code=code)
-#    else:
-#        name = '{name}_{code}'.format(name=var.name, code=code)
+    if var.is_Indexed:
+        indices = ''.join('{}'.format(i) for i in var.indices)
+        name = '{name}_{code}[{indices}]'.format(name=var.base,
+                                                 code=code,
+                                                 indices=indices)
 
-    name = '{name}_{code}'.format(name=var.name, code=code)
+    else:
+        name = '{name}_{code}'.format(name=var.name, code=code)
 
     return Symbol(name)
 # ...

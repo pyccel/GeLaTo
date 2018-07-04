@@ -5,6 +5,7 @@
 
 
 from sympy.core import Basic
+from sympy.core import Symbol
 from sympy.core import Expr, Add, Mul
 from sympy import S
 from sympy.core.containers import Tuple
@@ -221,10 +222,13 @@ def normalize_weak_from(a):
     """
     """
     # ...
-    if not isinstance(a, (BilinearForm, LinearForm, Add, Mul)):
+    if not isinstance(a, (BilinearForm, LinearForm, Add, Mul,
+                          _partial_derivatives, _calculus_operators)):
         msg = ('> Wrong input type.'
-               '  Expecting BilinearForm, LinearForm, Add, Mul')
+               '  Expecting BilinearForm, LinearForm, Add, Mul,'
+               '  partial derivatives, calculus operators')
         raise TypeError(msg)
+
 
     if isinstance(a, Add):
         args = [normalize_weak_from(i) for i in a.args]
@@ -245,16 +249,23 @@ def normalize_weak_from(a):
         return Mul(i, j)
     # ...
 
+    # ...
     a = gelatize(a)
+    # ...
 
-    ops = sort_partial_derivatives(a.expr)
-    trials = a.trial_functions
-    tests = a.test_functions
-#    print('* trials = ', trials)
-#    print('* tests = ', tests)
-#    import sys; sys.exit(0)
+    # ...
+    if isinstance(a, (BilinearForm, LinearForm)):
+        ops = sort_partial_derivatives(a.expr)
+        expr = a.expr
 
-    expr = a.expr
+        trials = a.trial_functions
+        tests = a.test_functions
+    else:
+        ops = sort_partial_derivatives(a)
+        expr = a
+    # ...
+
+    # ...
     for i in ops:
 
         if not(len(i.args) == 1):
@@ -265,10 +276,16 @@ def normalize_weak_from(a):
         # terms like dx(..)
         new = partial_derivative_as_symbol(i)
         expr = expr.subs({i: new})
+    # ...
 
-    a = BilinearForm(expr,
-                     trial_space=a.trial_space,
-                     test_space=a.test_space)
-    return a
+    if isinstance(a, BilinearForm):
+        return BilinearForm(expr,
+                            trial_space=a.trial_space,
+                            test_space=a.test_space)
+
+    elif isinstance(a, LinearForm):
+        raise NotImplementedError('TODO')
+
+    else:
+        return expr
 # ...
-
