@@ -229,7 +229,6 @@ def normalize_weak_from(a):
                '  partial derivatives, calculus operators')
         raise TypeError(msg)
 
-
     if isinstance(a, Add):
         args = [normalize_weak_from(i) for i in a.args]
         return Add(*args)

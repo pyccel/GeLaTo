@@ -6,7 +6,7 @@ import numpy as np
 from itertools import groupby
 from collections import OrderedDict
 
-from sympy.core.sympify import sympify
+#from sympy.core.sympify import sympify
 from sympy.simplify.simplify import simplify
 from sympy import Symbol
 from sympy import Lambda
@@ -27,7 +27,6 @@ from sympy.simplify.simplify import nsimplify
 from sympy.utilities.lambdify import implemented_function
 from sympy.matrices.dense import MutableDenseMatrix
 from sympy import Mul, Add
-from sympy import Tuple
 from sympy import postorder_traversal
 from sympy import preorder_traversal
 
@@ -35,7 +34,6 @@ from sympy.core.expr import Expr
 from sympy.core.containers import Tuple
 from sympy import Integer, Float
 
-from sympy import symbols, Tuple, Symbol, sympify, expand
 from sympy import Add, Mul
 from sympy import preorder_traversal, Expr
 from sympy import simplify
@@ -233,7 +231,7 @@ def find_partial_derivatives(expr):
     if isinstance(expr, (Add, Mul)):
         return find_partial_derivatives(expr.args)
 
-    elif isinstance(expr, (list, tuple)):
+    elif isinstance(expr, (list, tuple, Tuple)):
         args = []
         for a in expr:
             args += find_partial_derivatives(a)
