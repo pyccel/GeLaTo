@@ -13,7 +13,6 @@ from gelato.fem.core import TestFunction
 from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
-from gelato.fem.core import DerivativeSymbol
 from gelato.fem.expr import BilinearForm
 from gelato.fem.expr import gelatize, normalize_weak_from
 

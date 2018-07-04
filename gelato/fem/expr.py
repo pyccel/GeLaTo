@@ -10,6 +10,7 @@ from sympy import S
 from sympy.core.containers import Tuple
 from sympy import preorder_traversal
 
+from gelato.calculus import partial_derivative_as_symbol
 from gelato.calculus import sort_partial_derivatives
 from gelato.calculus import dx, dy, dz
 from gelato.calculus import Field
@@ -25,7 +26,6 @@ from gelato.fem.core import TestFunction
 from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
-from gelato.fem.core import DerivativeSymbol
 
 
 
@@ -233,18 +233,10 @@ def normalize_weak_from(a):
     tests = a.test_functions
 #    print('* trials = ', trials)
 #    print('* tests = ', tests)
-#    v1 = trials[0]
-#    x = DerivativeSymbol(dx(v1))
-#    print(type(v1))
-#    print(x)
 #    import sys; sys.exit(0)
 
     expr = a.expr
-#    print(len(ops))
-#    print('% ops = ', ops)
-#    n = 0
     for i in ops:
-#        n += 1
 
         if not(len(i.args) == 1):
             raise ValueError('expecting only one argument for partial derivatives')
@@ -252,14 +244,8 @@ def normalize_weak_from(a):
         arg = i.args[0]
 
         # terms like dx(..)
-        expr = expr.subs({i: DerivativeSymbol(i)})
-
-#        x = DerivativeSymbol(i)
-#        print('****** ', i, x, type(x))
-#        if n == 2:
-#            expr = expr.subs({i: DerivativeSymbol(i)})
-#            import sys; sys.exit(0)
-#        print(expr)
+        new = partial_derivative_as_symbol(i)
+        expr = expr.subs({i: new})
 
     a = BilinearForm(expr,
                      trial_space=a.trial_space,
