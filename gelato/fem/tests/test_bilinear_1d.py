@@ -53,6 +53,9 @@ def test_bilinear_form_1d_1():
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+
+    a_expr = normalize_weak_from(a, names={V: 'Nj', W: 'Ni'})
+    print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
 
@@ -74,6 +77,9 @@ def test_bilinear_form_1d_2():
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+
+    a_expr = normalize_weak_from(a, names={V: 'Nj', W: 'Ni'})
+    print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
 
@@ -94,6 +100,9 @@ def test_bilinear_form_1d_3():
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+
+    a_expr = normalize_weak_from(a, names={V: 'Nj', W: 'Ni'})
+    print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
 
@@ -115,6 +124,9 @@ def test_bilinear_form_1d_4():
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+
+    a_expr = normalize_weak_from(a, names={V: 'Nj', W: 'Ni'})
+    print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
 
@@ -134,6 +146,9 @@ def test_bilinear_form_1d_5():
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+
+    a_expr = normalize_weak_from(a, names={V: 'Nj', W: 'Ni'})
+    print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
 
@@ -155,6 +170,9 @@ def test_bilinear_form_1d_6():
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+
+    a_expr = normalize_weak_from(a, names={V: 'Nj', W: 'Ni'})
+    print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
 

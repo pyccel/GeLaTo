@@ -56,12 +56,15 @@ def test_bilinear_form_2d_1():
     w = TestFunction(W, name='w')
     v = TrialFunction(V, name='v')
 
-    expr = inner(grad(w), grad(v))
+    expr = inner(grad(w), grad(v)) + w*v
 
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+
+    a_expr = normalize_weak_from(a, names={V: 'Nj', W: 'Ni'})
+    print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
 
@@ -81,6 +84,9 @@ def test_bilinear_form_2d_2():
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+
+    a_expr = normalize_weak_from(a, names={V: 'Nj', W: 'Ni'})
+    print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
 
@@ -104,6 +110,9 @@ def test_bilinear_form_2d_3():
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+
+    a_expr = normalize_weak_from(a, names={V: 'Nj', W: 'Ni'})
+    print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
 

@@ -869,7 +869,7 @@ _calculus_operators = (Grad, Dot, Inner, Cross, Rot, Curl, Div)
 # ...
 
 # ...
-def partial_derivative_as_symbol(expr):
+def partial_derivative_as_symbol(expr, name=None):
     """Returns a Symbol from a partial derivative expression."""
     if not isinstance(expr, _partial_derivatives):
         raise TypeError('Expecting a partial derivative expression')
@@ -886,13 +886,19 @@ def partial_derivative_as_symbol(expr):
         code += k*n
 
     if var.is_Indexed:
+        if name is None:
+            name = var.base
+
         indices = ''.join('{}'.format(i) for i in var.indices)
-        name = '{name}_{code}[{indices}]'.format(name=var.base,
+        name = '{name}_{code}[{indices}]'.format(name=name,
                                                  code=code,
                                                  indices=indices)
 
     else:
-        name = '{name}_{code}'.format(name=var.name, code=code)
+        if name is None:
+            name = var.name
+
+        name = '{name}_{code}'.format(name=name, code=code)
 
     return Symbol(name)
 # ...

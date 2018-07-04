@@ -52,6 +52,9 @@ def test_bilinear_form_3d_1():
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+
+    a_expr = normalize_weak_from(a, names={V: 'Nj', W: 'Ni'})
+    print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
 

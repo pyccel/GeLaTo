@@ -218,8 +218,10 @@ def gelatize(expr):
 # ...
 
 # ...
-def normalize_weak_from(a):
+def normalize_weak_from(a, names=None):
     """
+    names: dict
+        for every space we give the name of the basis function symbol
     """
     # ...
     if not isinstance(a, (BilinearForm, LinearForm, Add, Mul,
@@ -262,6 +264,8 @@ def normalize_weak_from(a):
     else:
         ops = sort_partial_derivatives(a)
         expr = a
+        trials = [i for i in expr.free_symbols if isinstance(expr, TrialFunction)]
+        tests = [i for i in expr.free_symbols if isinstance(expr, TestFunction)]
     # ...
 
     # ...
@@ -272,9 +276,35 @@ def normalize_weak_from(a):
 
         arg = i.args[0]
 
+        name = None
+        if not(names is None):
+            atom = get_atom_derivatives(i)
+            if isinstance(atom, (TestFunction, VectorTestFunction)):
+                if atom.space in list(names.keys()):
+                    name = names[atom.space]
+            elif isinstance(atom, Symbol) and atom.is_Indexed:
+                base = atom.base
+                if base.space in list(names.keys()):
+                    name = names[base.space]
+
         # terms like dx(..)
-        new = partial_derivative_as_symbol(i)
+        new = partial_derivative_as_symbol(i, name=name)
         expr = expr.subs({i: new})
+    # ...
+
+    # ...
+    if not(names is None):
+        for a in trials + tests:
+            if isinstance(a, (TestFunction, VectorTestFunction)):
+                if a.space in list(names.keys()):
+                    name = names[a.space]
+
+            elif isinstance(a, Symbol) and a.is_Indexed:
+                base = a.base
+                if base.space in list(names.keys()):
+                    name = names[base.space]
+
+            expr = expr.subs({a: Symbol(name)})
     # ...
 
     if isinstance(a, BilinearForm):
