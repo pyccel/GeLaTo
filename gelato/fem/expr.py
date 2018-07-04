@@ -10,8 +10,11 @@ from sympy import S
 from sympy.core.containers import Tuple
 from sympy import preorder_traversal
 
+from gelato.calculus import _partial_derivatives
+from gelato.calculus import _calculus_operators
 from gelato.calculus import partial_derivative_as_symbol
 from gelato.calculus import sort_partial_derivatives
+from gelato.calculus import get_atom_derivatives
 from gelato.calculus import dx, dy, dz
 from gelato.calculus import Field
 from gelato.calculus import _generic_ops
@@ -156,9 +159,11 @@ class BilinearForm(Expr):
 def gelatize(expr):
     """
     """
-    if not isinstance(expr, (BilinearForm, LinearForm, Add, Mul)):
+    if not isinstance(expr, (BilinearForm, LinearForm, Add, Mul,
+                             _partial_derivatives, _calculus_operators)):
         msg = ('> Wrong input type.'
-               '  Expecting BilinearForm, LinearForm, Add, Mul')
+               '  Expecting BilinearForm, LinearForm, Add, Mul,'
+               '  partial derivatives, calculus operators')
         raise TypeError(msg)
 
     if isinstance(expr, Add):
@@ -179,10 +184,24 @@ def gelatize(expr):
 
         return Mul(i, j)
 
-    dim = expr.test_space.ldim
-
     # ... we first need to find the ordered list of generic operators
     ops = [a for a in preorder_traversal(expr) if isinstance(a, _generic_ops)]
+    # ...
+
+    # ...
+    if isinstance(expr, (BilinearForm, LinearForm)):
+        dim = expr.test_space.ldim
+    else:
+        op = ops[0]
+        atom = get_atom_derivatives(op)
+
+        if isinstance(atom, (TestFunction, TrialFunction,
+                             VectorTestFunction, VectorTrialFunction)):
+            dim = atom.space.ldim
+
+        else:
+            print(type(atom))
+            raise TypeError('Expecting TestFunction, TrialFunction')
     # ...
 
     # ...

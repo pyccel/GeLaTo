@@ -337,7 +337,7 @@ def get_atom_derivatives(expr):
     """
     """
 
-    if isinstance(expr, _partial_derivatives):
+    if isinstance(expr, (_partial_derivatives, _calculus_operators)):
         assert(len(expr.args) == 1)
 
         return get_atom_derivatives(expr.args[0])
@@ -858,12 +858,16 @@ _generic_ops  = (Dot, Cross,
 # ... alias for ufl compatibility
 cross = Cross
 dot = Dot
-inner = Dot # TODO do we need to add the Inner class Function?
+
+Inner = Dot # TODO do we need to add the Inner class Function?
+inner = Inner
 
 grad = Grad
 curl = Curl
 rot = Rot
 div = Div
+
+_calculus_operators = (Grad, Dot, Inner, Cross, Rot, Curl, Div)
 # ...
 
 # ...
