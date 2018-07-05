@@ -19,8 +19,8 @@ from gelato.fem.expr import gelatize, normalize_weak_from
 
 
 # ...
-def test_trialtest_2d_1():
-    print('============ test_trialtest_2d_1 =============')
+def test_expr_2d_1():
+    print('============ test_expr_2d_1 =============')
 
     V = FemSpace('V', ldim=2, is_vector=True, shape=2)
 
@@ -44,8 +44,8 @@ def test_trialtest_2d_1():
 # ...
 
 # ...
-def test_trialtest_2d_2():
-    print('============ test_trialtest_2d_2 =============')
+def test_expr_2d_2():
+    print('============ test_expr_2d_2 =============')
 
     V = FemSpace('V', ldim=2, is_vector=True, shape=2)
 
@@ -148,7 +148,7 @@ def test_bilinear_form_2d_4():
     print('')
 # ...
 
-# ...
+# ... TODO debug
 def test_bilinear_form_2d_10():
     print('============ test_bilinear_form_2d_10 =============')
 
@@ -180,11 +180,10 @@ def test_bilinear_form_2d_10():
 
 # .....................................................
 if __name__ == '__main__':
-    test_trialtest_2d_1()
-#    test_trialtest_2d_2()
-    test_bilinear_form_2d_1()
-    test_bilinear_form_2d_2()
-    test_bilinear_form_2d_3()
-    test_bilinear_form_2d_4()
-#    test_bilinear_form_2d_10()
-
+    test_expr_2d_1()
+#    test_expr_2d_2()
+#    test_bilinear_form_2d_1()
+#    test_bilinear_form_2d_2()
+#    test_bilinear_form_2d_3()
+#    test_bilinear_form_2d_4()
+##    test_bilinear_form_2d_10()

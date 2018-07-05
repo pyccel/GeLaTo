@@ -17,6 +17,28 @@ from gelato.fem.expr import BilinearForm
 from gelato.fem.expr import gelatize, normalize_weak_from
 
 
+# ...
+def test_expr_1d_1():
+    print('============ test_expr_1d_1 =============')
+
+    V = FemSpace('V', ldim=1)
+
+    v = TestFunction(V, name='v')
+    w = TestFunction(V, name='w')
+
+    assert(gelatize(grad(v)) == dx(v))
+    assert(gelatize(grad(v*w)) == w*dx(v) + v*dx(w))
+    assert(gelatize(div(grad(v*w))) == v*dx(dx(w)) + 2*dx(v)*dx(w) + dx(dx(v))*w)
+
+#    assert(normalize_weak_from(rot(v)) == -v1_x + v0_y)
+#    assert(normalize_weak_from(div(v)) == v0_x + v1_y)
+
+#    expr = grad(v*w)
+#    print('> input         >>> {0}'.format(expr))
+#    print('> gelatized     >>> {0}'.format(gelatize(expr)))
+
+#    print('> normal form   >>> {0}'.format(normalize_weak_from(expr)))
+# ...
 
 # ...
 def test_bilinear_form_1d_1():
@@ -157,7 +179,7 @@ def test_bilinear_form_1d_6():
     print('')
 # ...
 
-# ...
+# ... TODO debug
 def test_bilinear_form_1d_7():
     print('============ test_bilinear_form_1d_7 =============')
 
@@ -182,7 +204,7 @@ def test_bilinear_form_1d_7():
         print('')
 # ...
 
-# ... TODO not wokring yet
+# ... TODO debug
 def test_bilinear_form_1d_8():
     print('============ test_bilinear_form_1d_8 =============')
 
@@ -206,7 +228,7 @@ def test_bilinear_form_1d_8():
         print('')
 # ...
 
-# ...
+# ... TODO debug
 def test_bilinear_form_1d_10():
     print('============ test_bilinear_form_1d_10 =============')
 
@@ -227,13 +249,13 @@ def test_bilinear_form_1d_10():
 
 # .....................................................
 if __name__ == '__main__':
-    test_bilinear_form_1d_1()
-    test_bilinear_form_1d_2()
-    test_bilinear_form_1d_3()
-    test_bilinear_form_1d_4()
-    test_bilinear_form_1d_5()
-    test_bilinear_form_1d_6()
-#    test_bilinear_form_1d_7()
-#    test_bilinear_form_1d_8()
-#    test_bilinear_form_1d_10()
-
+    test_expr_1d_1()
+#    test_bilinear_form_1d_1()
+#    test_bilinear_form_1d_2()
+#    test_bilinear_form_1d_3()
+#    test_bilinear_form_1d_4()
+#    test_bilinear_form_1d_5()
+#    test_bilinear_form_1d_6()
+##    test_bilinear_form_1d_7()
+##    test_bilinear_form_1d_8()
+##    test_bilinear_form_1d_10()

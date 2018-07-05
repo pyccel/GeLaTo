@@ -102,6 +102,7 @@ class LinearOperator(Function):
 
     nargs = None
     name = 'Grad'
+    is_commutative = True
 
     def __new__(cls, *args, **options):
         # (Try to) sympify args first
