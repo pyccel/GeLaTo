@@ -153,12 +153,62 @@ def test_matrix_form_2d_2():
     Ni, Ni_x, Ni_y = symbols('Ni Ni_x Ni_y')
     Nj, Nj_x, Nj_y = symbols('Nj Nj_x Nj_y')
 
+    c = Symbol('c')
+
+    # ...
     expr = v[0]*u[0]
     expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
     expected = Matrix([[Ni*Nj, 0], [0, 0]])
     assert(matrix_form(expr) == expected)
+    # ...
 
-#    expr = v[0]*u[0]
+    # ...
+    expr = v[1]*dx(u[0])
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[0, Ni*Nj_x], [0, 0]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = dy(v[0])*u[1]
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[0, 0], [Ni_y*Nj, 0]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = dx(v[1])*dy(u[1])
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[0, 0], [0, Ni_x*Nj_y]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = div(v) * div(u)
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[Ni_x*Nj_x, Ni_y*Nj_x], [Ni_x*Nj_y, Ni_y*Nj_y]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = rot(v) * rot(u)
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[Ni_y*Nj_y, -Ni_x*Nj_y], [-Ni_y*Nj_x, Ni_x*Nj_x]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = div(v) * div(u) + rot(v) * rot(u)
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[Ni_x*Nj_x + Ni_y*Nj_y, -Ni_x*Nj_y + Ni_y*Nj_x],
+                       [Ni_x*Nj_y - Ni_y*Nj_x, Ni_x*Nj_x + Ni_y*Nj_y]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # TODO not working
+#    expr = rot(v) * rot(u) + c * div(v) * div(u)
+
+#    expr = rot(v) * rot(u) +  div(v) * div(u)
 #    print('> input         >>> {0}'.format(expr))
 #    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
 #    print('> matrix_form     >>> {0}'.format(matrix_form(expr)))

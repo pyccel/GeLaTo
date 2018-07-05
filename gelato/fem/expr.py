@@ -15,6 +15,7 @@ from sympy.core.containers import Tuple
 from sympy import preorder_traversal
 from sympy import Indexed, IndexedBase, Matrix
 from sympy.physics.quantum import TensorProduct
+from sympy import expand
 
 from gelato.calculus import _partial_derivatives
 from gelato.calculus import _calculus_operators
@@ -352,6 +353,10 @@ def matrix_form(expr):
     must be applied after calling normalize
     """
 
+    # ... we need first to expand the expression
+    expr = expand(expr)
+    # ...
+
 #    print('> expr = ', expr, type(expr))
 
     if isinstance(expr, (list, tuple, Tuple)):
@@ -360,7 +365,14 @@ def matrix_form(expr):
 
     elif isinstance(expr, Add):
         args = [matrix_form(i) for i in expr.args]
-        return Add(*args)
+        # we cannot return Add(*args)
+        # since it gives the error:
+        # TypeError: cannot add <class 'sympy.matrices.immutable.ImmutableDenseMatrix'> and <class 'sympy.core.numbers.Zero'>
+        # when args are of type Matrix
+        r = args[0]
+        for a in args[1:]:
+            r += a
+        return r
 
     elif isinstance(expr, Mul):
         coeffs  = [i for i in expr.args if isinstance(i, _coeffs_registery)]
@@ -385,7 +397,11 @@ def matrix_form(expr):
             else:
                 j = Mul(*args)
 
-        return Mul(i, j)
+        # we cannot return Mul(i, j)
+        # since it gives the error:
+        # TypeError: cannot add <class 'sympy.matrices.immutable.ImmutableDenseMatrix'> and <class 'sympy.core.mul.Mul'>
+        # when args are of type Matrix
+        return i * j
 
     elif isinstance(expr, Indexed):
         base = expr.base
