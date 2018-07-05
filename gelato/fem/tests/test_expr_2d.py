@@ -5,6 +5,7 @@
 from sympy import Symbol
 from sympy.core.containers import Tuple
 from sympy import symbols
+from sympy import IndexedBase
 
 from gelato.calculus import dx, dy, dz
 from gelato.calculus import Constant
@@ -18,7 +19,6 @@ from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import BilinearForm
 from gelato.fem.expr import gelatize, normalize
-from gelato.fem.expr import normalize_weak_from
 
 
 # ...
@@ -88,7 +88,7 @@ def test_normalize_2d_1():
 def test_gelatize_2d_2():
     print('============ test_gelatize_2d_2 =============')
 
-    V = FemSpace('V', ldim=2, is_vector=True, shape=2)
+    V = FemSpace('V', ldim=2, is_block=True, shape=2)
 
     v = VectorTestFunction(V, name='v')
 
@@ -104,21 +104,39 @@ def test_gelatize_2d_2():
 def test_normalize_2d_2():
     print('============ test_normalize_2d_2 =============')
 
-    V = FemSpace('V', ldim=2, is_vector=True, shape=2)
+    V = FemSpace('V', ldim=2, is_block=True, shape=2)
+    W = FemSpace('W', ldim=2, is_block=True, shape=2)
 
     v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(W, name='u')
 
-    v0_x = Symbol('v_x[0]')
-    v1_x = Symbol('v_x[1]')
-    v0_y = Symbol('v_y[0]')
-    v1_y = Symbol('v_y[1]')
+    Ni = IndexedBase('Ni')
+    Ni_x = IndexedBase('Ni_x')
+    Ni_y = IndexedBase('Ni_y')
 
-#    assert(normalize_weak_from(rot(v)) == -v1_x + v0_y)
-#    assert(normalize_weak_from(div(v)) == v0_x + v1_y)
+    Nj = IndexedBase('Nj')
+    Nj_x = IndexedBase('Nj_x')
+    Nj_y = IndexedBase('Nj_y')
 
-#    expr = div(v)
+    assert(normalize(v[0], basis={V: 'Ni'}) == Ni[0])
+    assert(normalize(dx(v[0]), basis={V: 'Ni'}) == Ni_x[0])
+    assert(normalize(div(v), basis={V: 'Ni'}) == Ni_x[0] + Ni_y[1])
+    assert(normalize(rot(v), basis={V: 'Ni'}) == -Ni_x[1] + Ni_y[0])
+
+    assert(normalize(v[0]*u[0], basis={V: 'Ni', W: 'Nj'}) == Ni[0]*Nj[0])
+    assert(normalize(v[1]*dx(u[0]), basis={V: 'Ni', W: 'Nj'}) == Ni[1]*Nj_x[0])
+    assert(normalize(dy(v[0])*u[1], basis={V: 'Ni', W: 'Nj'}) == Ni_y[0]*Nj[1])
+    assert(normalize(dx(v[1])*dy(u[1]), basis={V: 'Ni', W: 'Nj'}) == Ni_x[1]*Nj_y[1])
+
+    expected = (Ni_x[0] + Ni_y[1]) * (Nj_x[0] + Nj_y[1])
+    assert(normalize(div(v) * div(u), basis={V: 'Ni', W: 'Nj'}) == expected)
+
+    expected = (-Ni_x[1] + Ni_y[0]) * (-Nj_x[1] + Nj_y[0])
+    assert(normalize(rot(v) * rot(u), basis={V: 'Ni', W: 'Nj'}) == expected)
+
+#    expr = dx(v[0])
 #    print('> input         >>> {0}'.format(expr))
-#    print('> normal form   >>> {0}'.format(normalize_weak_from(expr)))
+#    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
 # ...
 
 # ...
@@ -242,11 +260,11 @@ def test_bilinear_form_2d_10():
 
 # .....................................................
 if __name__ == '__main__':
-    test_gelatize_2d_1()
-    test_normalize_2d_1()
-
+#    test_gelatize_2d_1()
+#    test_normalize_2d_1()
+#
 #    test_gelatize_2d_2()
-#    test_normalize_2d_2()
+    test_normalize_2d_2()
 
 #    test_bilinear_form_2d_1()
 #    test_bilinear_form_2d_2()

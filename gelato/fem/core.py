@@ -270,6 +270,45 @@ class TrialFunction(TestFunction):
     pass
 
 
+# this class is needed, otherwise sympy will convert VectorTestFunction to
+# IndexedBase
+class IndexedTestTrial(Indexed):
+    """Represents a mathematical object with indices.
+
+    """
+    is_commutative = True
+    is_Indexed = True
+    is_symbol = True
+    is_Atom = True
+
+    def __new__(cls, base, *args, **kw_args):
+        assert(isinstance(base, VectorTestFunction))
+
+        if not args:
+            raise IndexException("Indexed needs at least one index.")
+
+        return Expr.__new__(cls, base, *args, **kw_args)
+
+    # free_symbols is redefined otherwise an expression u[0].free_symbols will
+    # give the error:  AttributeError: 'int' object has no attribute 'free_symbols'
+    @property
+    def free_symbols(self):
+        base_free_symbols = self.base.free_symbols
+        symbolic_indices = [i for i in self.indices if isinstance(i, Basic)]
+        if len(symbolic_indices) > 0:
+            raise ValueError('symbolic indices not yet available')
+
+        return base_free_symbols
+
+        # TODO uncomment if needed
+#        indices_free_symbols = {
+#            fs for i in symbolic_indices for fs in i.free_symbols}
+#        if base_free_symbols:
+#            return {self} | base_free_symbols | indices_free_symbols
+#        else:
+#            return indices_free_symbols
+
+
 class VectorTestFunction(Symbol, IndexedBase):
     """
     Represents a vector test function as an element of a fem space.
@@ -308,7 +347,7 @@ class VectorTestFunction(Symbol, IndexedBase):
             raise ValueError('expecting exactly one argument')
 
         assumptions ={}
-        obj = Indexed(self, *args)
+        obj = IndexedTestTrial(self, *args)
         return obj
 
 #VectorTrialFunction = VectorTestFunction

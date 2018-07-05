@@ -12,7 +12,7 @@ from sympy.core import Expr, Add, Mul
 from sympy import S
 from sympy.core.containers import Tuple
 from sympy import preorder_traversal
-from sympy import Indexed
+from sympy import Indexed, IndexedBase
 
 from gelato.calculus import _partial_derivatives
 from gelato.calculus import _calculus_operators
@@ -182,9 +182,6 @@ def gelatize(expr, dim=None):
             dim = expr.test_space.ldim
         else:
             ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction, VectorTestFunction))]
-#            print('* ls = ', ls)
-#            if len(ls) == 0:
-#                raise ValueError('Unable to compute dim')
 
             if ls:
                 atom = ls[0]
@@ -349,7 +346,7 @@ def normalize(expr, basis=None):
     expr = gelatize(expr)
     # ...
 
-    # TODO compute basis if not given
+#    print('> expr = ', expr, type(expr))
 
     if isinstance(expr, (list, tuple, Tuple)):
         args = [normalize(i, basis=basis) for i in expr]
@@ -394,7 +391,8 @@ def normalize(expr, basis=None):
                 if isinstance(atom, (TestFunction, VectorTestFunction)):
                     if atom.space in list(basis.keys()):
                         name = basis[atom.space]
-                elif isinstance(atom, Symbol) and atom.is_Indexed:
+
+                elif isinstance(atom, Indexed):
                     base = atom.base
                     if base.space in list(basis.keys()):
                         name = basis[base.space]
@@ -411,11 +409,18 @@ def normalize(expr, basis=None):
             name = basis[expr.space]
             return Symbol(name)
 
-    elif isinstance(expr, Symbol) and expr.is_Indexed:
+#    elif isinstance(expr, Symbol) and expr.is_Indexed:
+#        base = expr.base
+#        if base.space in list(basis.keys()):
+#            name = basis[base.space]
+#            return Symbol(name)
+
+    elif isinstance(expr, Indexed):
         base = expr.base
         if base.space in list(basis.keys()):
             name = basis[base.space]
-            return Symbol(name)
+            indices = expr.indices
+            return IndexedBase(name)[indices]
 
     elif isinstance(expr, (BilinearForm, LinearForm)):
         e = normalize(expr.expr, basis=basis)
@@ -426,5 +431,3 @@ def normalize(expr, basis=None):
 
     return expr
 # ...
-
-

@@ -18,7 +18,6 @@ from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import BilinearForm
 from gelato.fem.expr import gelatize, normalize
-from gelato.fem.expr import normalize_weak_from
 
 
 # ...

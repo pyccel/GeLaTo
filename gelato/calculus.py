@@ -41,7 +41,7 @@ from sympy import S
 from sympy.core.compatibility import is_sequence
 from sympy import Basic
 from sympy import Function
-from sympy import Indexed
+from sympy import Indexed, IndexedBase
 
 #try:
 #    from pyccel.ast.core import IndexedElement as Indexed
@@ -895,15 +895,13 @@ def partial_derivative_as_symbol(expr, name=None):
             name = var.base
 
         indices = ''.join('{}'.format(i) for i in var.indices)
-        name = '{name}_{code}[{indices}]'.format(name=name,
-                                                 code=code,
-                                                 indices=indices)
+        name = '{name}_{code}'.format(name=name, code=code)
+        return IndexedBase(name)[indices]
 
     else:
         if name is None:
             name = var.name
 
         name = '{name}_{code}'.format(name=name, code=code)
-
-    return Symbol(name)
+        return Symbol(name)
 # ...
