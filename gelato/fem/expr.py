@@ -10,6 +10,7 @@ from sympy.core import Expr, Add, Mul
 from sympy import S
 from sympy.core.containers import Tuple
 from sympy import preorder_traversal
+from sympy import Indexed
 
 from gelato.calculus import _partial_derivatives
 from gelato.calculus import _calculus_operators
@@ -161,11 +162,12 @@ def gelatize(expr):
     """
     """
     if not isinstance(expr, (BilinearForm, LinearForm, Add, Mul,
-                             _partial_derivatives, _calculus_operators)):
+                          _partial_derivatives, _calculus_operators, Indexed)):
         msg = ('> Wrong input type.'
                '  Expecting BilinearForm, LinearForm, Add, Mul,'
-               '  partial derivatives, calculus operators')
-        raise TypeError(msg)
+               '  partial derivatives, calculus operators, Indexed')
+
+        raise TypeError(msg, ', given ', type(a))
 
     if isinstance(expr, Add):
         args = [gelatize(i) for i in expr.args]
@@ -181,7 +183,8 @@ def gelatize(expr):
 
         j = S.One
         if vectors:
-            j = gelatize(Mul(*vectors), evaluate=False)
+            args = [gelatize(i) for i in vectors]
+            j = Mul(*args)
 
         return Mul(i, j)
 
@@ -190,6 +193,8 @@ def gelatize(expr):
     # ...
 
     # ...
+#    print(ops)
+#    import sys; sys.exit(0)
     if isinstance(expr, (BilinearForm, LinearForm)):
         dim = expr.test_space.ldim
     else:
@@ -225,11 +230,12 @@ def normalize_weak_from(a, basis=None):
     """
     # ...
     if not isinstance(a, (BilinearForm, LinearForm, Add, Mul,
-                          _partial_derivatives, _calculus_operators)):
+                          _partial_derivatives, _calculus_operators, Indexed)):
         msg = ('> Wrong input type.'
                '  Expecting BilinearForm, LinearForm, Add, Mul,'
-               '  partial derivatives, calculus operators')
-        raise TypeError(msg)
+               '  partial derivatives, calculus operators, Indexed')
+
+        raise TypeError(msg, ', given ', type(a))
 
     if isinstance(a, Add):
         args = [normalize_weak_from(i) for i in a.args]
@@ -245,7 +251,8 @@ def normalize_weak_from(a, basis=None):
 
         j = S.One
         if vectors:
-            j = normalize_weak_from(Mul(*vectors), evaluate=False)
+            args = [normalize_weak_from(i) for i in vectors]
+            j = Mul(*args)
 
         return Mul(i, j)
     # ...
