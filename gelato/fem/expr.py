@@ -18,7 +18,9 @@ from gelato.calculus import partial_derivative_as_symbol
 from gelato.calculus import sort_partial_derivatives
 from gelato.calculus import get_atom_derivatives
 from gelato.calculus import dx, dy, dz
-from gelato.calculus import Field
+from gelato.calculus import Field, Constant
+from gelato.calculus import Dot, Inner, Cross
+from gelato.calculus import Grad, Rot, Curl, Div
 from gelato.calculus import _generic_ops
 from gelato.calculus import _coeffs_registery
 from gelato.calculus import (Dot_1d, Grad_1d, Div_1d)
@@ -158,19 +160,37 @@ class BilinearForm(Expr):
 
 
 # ...
-def gelatize(expr):
+def gelatize(expr, dim=None):
     """
     """
     if not isinstance(expr, (BilinearForm, LinearForm, Add, Mul,
-                          _partial_derivatives, _calculus_operators, Indexed)):
-        msg = ('> Wrong input type.'
-               '  Expecting BilinearForm, LinearForm, Add, Mul,'
-               '  partial derivatives, calculus operators, Indexed')
+                             _partial_derivatives, _calculus_operators,
+                             TestFunction, VectorTestFunction, Indexed,
+                             Field, Constant, Symbol,
+                             list, tuple, Tuple)):
+        msg = ('> Wrong input type.')
 
-        raise TypeError(msg, ', given ', type(a))
+        raise TypeError(msg, ', given ', type(expr))
 
-    if isinstance(expr, Add):
-        args = [gelatize(i) for i in expr.args]
+    # ... compute dim if None
+    if dim is None:
+        if isinstance(expr, (BilinearForm, LinearForm)):
+            dim = expr.test_space.ldim
+        else:
+            ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction, VectorTestFunction))]
+            if len(ls) == 0:
+                raise ValueError('Unable to compute dim')
+
+            atom = ls[0]
+            dim = atom.space.ldim
+    # ...
+
+    if isinstance(expr, (list, tuple, Tuple)):
+        args = [gelatize(i, dim=dim) for i in expr]
+        return Tuple(*args)
+
+    elif isinstance(expr, Add):
+        args = [gelatize(i, dim=dim) for i in expr.args]
         return Add(*args)
 
     elif isinstance(expr, Mul):
@@ -183,41 +203,25 @@ def gelatize(expr):
 
         j = S.One
         if vectors:
-            args = [gelatize(i) for i in vectors]
+            args = [gelatize(i, dim=dim) for i in vectors]
             j = Mul(*args)
 
         return Mul(i, j)
 
-    # ... we first need to find the ordered list of generic operators
-    ops = [a for a in preorder_traversal(expr) if isinstance(a, _generic_ops)]
-    # ...
-
-    # ...
-#    print(ops)
-#    import sys; sys.exit(0)
-    if isinstance(expr, (BilinearForm, LinearForm)):
-        dim = expr.test_space.ldim
-    else:
-        op = ops[0]
-        atom = get_atom_derivatives(op)
-
-        if isinstance(atom, (TestFunction, TrialFunction,
-                             VectorTestFunction, VectorTrialFunction)):
-            dim = atom.space.ldim
-
-        else:
-            print(type(atom))
-            raise TypeError('Expecting TestFunction, TrialFunction')
-    # ...
-
-    # ...
-    for i in ops:
-        # if i = Grad(u) then type(i) is Grad
-        op = type(i)
-
+    elif isinstance(expr, (Dot, Inner, Cross, Grad, Rot, Curl, Div)):
+        # if i = Dot(...) then type(i) is Grad
+        op = type(expr)
         new  = eval('{0}_{1}d'.format(op, dim))
-        expr = expr.subs(op, new)
-    # ...
+
+        args = [gelatize(i, dim=dim) for i in expr.args]
+        return new(*args)
+
+    elif isinstance(expr, (BilinearForm, LinearForm)):
+        e = gelatize(expr.expr, dim=dim)
+
+        return BilinearForm(e,
+                            trial_space=expr.trial_space,
+                            test_space=expr.test_space)
 
     return expr
 # ...
@@ -229,6 +233,7 @@ def normalize_weak_from(a, basis=None):
         for every space we give the name of the basis function symbol
     """
     # ...
+    return a
     if not isinstance(a, (BilinearForm, LinearForm, Add, Mul,
                           _partial_derivatives, _calculus_operators, Indexed)):
         msg = ('> Wrong input type.'

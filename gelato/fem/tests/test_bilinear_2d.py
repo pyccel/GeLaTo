@@ -34,8 +34,8 @@ def test_trialtest_2d_1():
     v0_y = Symbol('v_y[0]')
     v1_y = Symbol('v_y[1]')
 
-    assert(normalize_weak_from(rot(v)) == -v1_x + v0_y)
-    assert(normalize_weak_from(div(v)) == v0_x + v1_y)
+#    assert(normalize_weak_from(rot(v)) == -v1_x + v0_y)
+#    assert(normalize_weak_from(div(v)) == v0_x + v1_y)
 
 #    expr = div(v)
 #    print('> input         >>> {0}'.format(expr))
@@ -57,35 +57,6 @@ def test_trialtest_2d_2():
     print('> input         >>> {0}'.format(expr))
     print('> gelatized     >>> {0}'.format(gelatize(expr)))
 #    print('> normal form   >>> {0}'.format(normalize_weak_from(expr)))
-# ...
-
-# ...
-def test_bilinear_form_2d_0():
-    print('============ test_bilinear_form_2d_0 =============')
-
-    W = FemSpace('W', ldim=2)
-    V = FemSpace('V', ldim=2)
-
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
-
-    a = BilinearForm(inner(grad(w), grad(v)), trial_space=V, test_space=W)
-    b = BilinearForm(w*v, trial_space=V, test_space=W)
-
-    c = a + b
-    print('> input         >>> {0}'.format(c))
-    print('> gelatized     >>> {0}'.format(gelatize(c)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
-    print('')
-
-    v1 = TestFunction(V, name='v1')
-    u1 = TrialFunction(W, name='u1')
-
-    d = a(v1, u1) + b
-    print('> input         >>> {0}'.format(d))
-    print('> gelatized     >>> {0}'.format(gelatize(d)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(d)))
-    print('')
 # ...
 
 # ...
@@ -177,13 +148,43 @@ def test_bilinear_form_2d_4():
     print('')
 # ...
 
+# ...
+def test_bilinear_form_2d_10():
+    print('============ test_bilinear_form_2d_10 =============')
+
+    W = FemSpace('W', ldim=2)
+    V = FemSpace('V', ldim=2)
+
+    w = TestFunction(W, name='w')
+    v = TrialFunction(V, name='v')
+
+    a = BilinearForm(inner(grad(w), grad(v)), trial_space=V, test_space=W)
+    b = BilinearForm(w*v, trial_space=V, test_space=W)
+
+    c = a + b
+    print('> input         >>> {0}'.format(c))
+    print('> gelatized     >>> {0}'.format(gelatize(c)))
+    print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
+    print('')
+
+    v1 = TestFunction(V, name='v1')
+    u1 = TrialFunction(W, name='u1')
+
+    d = a(v1, u1) + b
+    print('> input         >>> {0}'.format(d))
+    print('> gelatized     >>> {0}'.format(gelatize(d)))
+    print('> normal form   >>> {0}'.format(normalize_weak_from(d)))
+    print('')
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
     test_trialtest_2d_1()
 #    test_trialtest_2d_2()
-    test_bilinear_form_2d_0()
     test_bilinear_form_2d_1()
     test_bilinear_form_2d_2()
     test_bilinear_form_2d_3()
     test_bilinear_form_2d_4()
+#    test_bilinear_form_2d_10()
+

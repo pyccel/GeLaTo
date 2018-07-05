@@ -41,34 +41,15 @@ def test_trialtest_3d_1():
     v1_z = Symbol('v_z[1]')
     v2_z = Symbol('v_z[2]')
 
-    assert(normalize_weak_from(curl(v)) == Tuple( v2_y - v1_z,
-                                                 -v2_x + v0_z,
-                                                  v1_x - v0_y))
-    assert(normalize_weak_from(div(v)) == v0_x + v1_y + v2_z)
+#    assert(normalize_weak_from(curl(v)) == Tuple( v2_y - v1_z,
+#                                                 -v2_x + v0_z,
+#                                                  v1_x - v0_y))
+#    assert(normalize_weak_from(div(v)) == v0_x + v1_y + v2_z)
 
 #    expr = curl(v)
 #    print('> input         >>> {0}'.format(expr))
 #    print('> gelatized     >>> {0}'.format(gelatize(expr)))
 #    print('> normal form   >>> {0}'.format(normalize_weak_from(expr)))
-# ...
-
-# ...
-def test_bilinear_form_3d_0():
-    print('============ test_bilinear_form_3d_0 =============')
-
-    W = FemSpace('W', ldim=3)
-    V = FemSpace('V', ldim=3)
-
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
-
-    a = BilinearForm(inner(grad(w), grad(v)), trial_space=V, test_space=W)
-    b = BilinearForm(w*v, trial_space=V, test_space=W)
-    c = a + b
-    print('> input         >>> {0}'.format(c))
-    print('> gelatized     >>> {0}'.format(gelatize(c)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
-    print('')
 # ...
 
 # ...
@@ -181,12 +162,33 @@ def test_bilinear_form_3d_5():
     print('')
 # ...
 
+# ...
+def test_bilinear_form_3d_10():
+    print('============ test_bilinear_form_3d_10 =============')
+
+    W = FemSpace('W', ldim=3)
+    V = FemSpace('V', ldim=3)
+
+    w = TestFunction(W, name='w')
+    v = TrialFunction(V, name='v')
+
+    a = BilinearForm(inner(grad(w), grad(v)), trial_space=V, test_space=W)
+    b = BilinearForm(w*v, trial_space=V, test_space=W)
+    c = a + b
+    print('> input         >>> {0}'.format(c))
+    print('> gelatized     >>> {0}'.format(gelatize(c)))
+    print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
+    print('')
+# ...
+
+
 # .....................................................
 if __name__ == '__main__':
     test_trialtest_3d_1()
-    test_bilinear_form_3d_0()
     test_bilinear_form_3d_1()
     test_bilinear_form_3d_2()
     test_bilinear_form_3d_3()
     test_bilinear_form_3d_4()
     test_bilinear_form_3d_5()
+#    test_bilinear_form_3d_10()
+

@@ -19,25 +19,6 @@ from gelato.fem.expr import gelatize, normalize_weak_from
 
 
 # ...
-def test_bilinear_form_1d_0():
-    print('============ test_bilinear_form_1d_0 =============')
-
-    W = FemSpace('W', ldim=1)
-    V = FemSpace('V', ldim=1)
-
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
-
-    a = BilinearForm(inner(grad(w), grad(v)), trial_space=V, test_space=W)
-    b = BilinearForm(w*v, trial_space=V, test_space=W)
-    c = a + b
-    print('> input         >>> {0}'.format(c))
-    print('> gelatized     >>> {0}'.format(gelatize(c)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
-    print('')
-# ...
-
-# ...
 def test_bilinear_form_1d_1():
     print('============ test_bilinear_form_1d_1 =============')
 
@@ -225,14 +206,34 @@ def test_bilinear_form_1d_8():
         print('')
 # ...
 
+# ...
+def test_bilinear_form_1d_10():
+    print('============ test_bilinear_form_1d_10 =============')
+
+    W = FemSpace('W', ldim=1)
+    V = FemSpace('V', ldim=1)
+
+    w = TestFunction(W, name='w')
+    v = TrialFunction(V, name='v')
+
+    a = BilinearForm(inner(grad(w), grad(v)), trial_space=V, test_space=W)
+    b = BilinearForm(w*v, trial_space=V, test_space=W)
+    c = a + b
+    print('> input         >>> {0}'.format(c))
+    print('> gelatized     >>> {0}'.format(gelatize(c)))
+    print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
+    print('')
+# ...
+
 # .....................................................
 if __name__ == '__main__':
-    test_bilinear_form_1d_0()
     test_bilinear_form_1d_1()
     test_bilinear_form_1d_2()
     test_bilinear_form_1d_3()
     test_bilinear_form_1d_4()
     test_bilinear_form_1d_5()
     test_bilinear_form_1d_6()
-    test_bilinear_form_1d_7()
+#    test_bilinear_form_1d_7()
 #    test_bilinear_form_1d_8()
+#    test_bilinear_form_1d_10()
+

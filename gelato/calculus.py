@@ -335,10 +335,14 @@ def get_atom_derivatives(expr):
     """
     """
 
-    if isinstance(expr, (_partial_derivatives, _calculus_operators)):
+    if isinstance(expr, _partial_derivatives):
         assert(len(expr.args) == 1)
 
         return get_atom_derivatives(expr.args[0])
+
+    elif isinstance(expr, _calculus_operators):
+        raise TypeError('remove this raise later')
+
     else:
         return expr
 # ...
