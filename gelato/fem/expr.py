@@ -1,7 +1,9 @@
 # coding: utf-8
 
-# TODO transpose of BilinearForm:
-
+# TODO - transpose of BilinearForm
+#      - check that a BilinearForm is bilinear (using Constant)
+#      - check that a LinearForm is linear
+#      - add is_symmetric property for BilinearForm
 
 
 from sympy.core import Basic

@@ -18,8 +18,8 @@ from gelato.fem.expr import gelatize, normalize_weak_from
 
 
 # ...
-def test_expr_1d_1():
-    print('============ test_expr_1d_1 =============')
+def test_gelatize_1d_1():
+    print('============ test_gelatize_1d_1 =============')
 
     V = FemSpace('V', ldim=1)
 
@@ -29,6 +29,20 @@ def test_expr_1d_1():
     assert(gelatize(grad(v)) == dx(v))
     assert(gelatize(grad(v*w)) == w*dx(v) + v*dx(w))
     assert(gelatize(div(grad(v*w))) == v*dx(dx(w)) + 2*dx(v)*dx(w) + dx(dx(v))*w)
+
+#    expr = grad(v*w)
+#    print('> input         >>> {0}'.format(expr))
+#    print('> gelatized     >>> {0}'.format(gelatize(expr)))
+# ...
+
+# ...
+def test_normalize_1d_1():
+    print('============ test_normalize_1d_1 =============')
+
+    V = FemSpace('V', ldim=1)
+
+    v = TestFunction(V, name='v')
+    w = TestFunction(V, name='w')
 
 #    assert(normalize_weak_from(rot(v)) == -v1_x + v0_y)
 #    assert(normalize_weak_from(div(v)) == v0_x + v1_y)
@@ -249,7 +263,9 @@ def test_bilinear_form_1d_10():
 
 # .....................................................
 if __name__ == '__main__':
-    test_expr_1d_1()
+    test_gelatize_1d_1()
+    test_normalize_1d_1()
+
 #    test_bilinear_form_1d_1()
 #    test_bilinear_form_1d_2()
 #    test_bilinear_form_1d_3()
