@@ -174,17 +174,21 @@ def gelatize(expr, dim=None):
 
         raise TypeError(msg, ', given ', type(expr))
 
+#    print('> expr = ', expr)
+
     # ... compute dim if None
     if dim is None:
         if isinstance(expr, (BilinearForm, LinearForm)):
             dim = expr.test_space.ldim
         else:
             ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction, VectorTestFunction))]
-            if len(ls) == 0:
-                raise ValueError('Unable to compute dim')
+#            print('* ls = ', ls)
+#            if len(ls) == 0:
+#                raise ValueError('Unable to compute dim')
 
-            atom = ls[0]
-            dim = atom.space.ldim
+            if ls:
+                atom = ls[0]
+                dim = atom.space.ldim
     # ...
 
     if isinstance(expr, (list, tuple, Tuple)):
@@ -332,3 +336,95 @@ def normalize_weak_from(a, basis=None):
     else:
         return expr
 # ...
+
+
+# ...
+def normalize(expr, basis=None):
+    """
+
+    basis: dict
+        for every space we give the name of the basis function symbol
+    """
+    # ...
+    expr = gelatize(expr)
+    # ...
+
+    # TODO compute basis if not given
+
+    if isinstance(expr, (list, tuple, Tuple)):
+        args = [normalize(i, basis=basis) for i in expr]
+        return Tuple(*args)
+
+    elif isinstance(expr, Add):
+        args = [normalize(i, basis=basis) for i in expr.args]
+        return Add(*args)
+
+    elif isinstance(expr, Mul):
+        coeffs  = [i for i in expr.args if isinstance(i, _coeffs_registery)]
+        vectors = [i for i in expr.args if not(i in coeffs)]
+
+        i = S.One
+        if coeffs:
+            i = Mul(*coeffs)
+
+        j = S.One
+        if vectors:
+            args = [normalize(i, basis=basis) for i in vectors]
+            j = Mul(*args)
+
+        return Mul(i, j)
+
+    elif isinstance(expr, _partial_derivatives):
+        ops = sort_partial_derivatives(expr)
+
+        trials = [i for i in expr.free_symbols if isinstance(expr, TrialFunction)]
+        tests = [i for i in expr.free_symbols if isinstance(expr, TestFunction)]
+
+        # ...
+        for i in ops:
+
+            if not(len(i.args) == 1):
+                raise ValueError('expecting only one argument for partial derivatives')
+
+            arg = i.args[0]
+
+            name = None
+            if not(basis is None):
+                atom = get_atom_derivatives(i)
+                if isinstance(atom, (TestFunction, VectorTestFunction)):
+                    if atom.space in list(basis.keys()):
+                        name = basis[atom.space]
+                elif isinstance(atom, Symbol) and atom.is_Indexed:
+                    base = atom.base
+                    if base.space in list(basis.keys()):
+                        name = basis[base.space]
+
+            # terms like dx(..)
+            new = partial_derivative_as_symbol(i, name=name)
+            expr = expr.subs({i: new})
+        # ...
+
+        return expr
+
+    elif isinstance(expr, (TestFunction, VectorTestFunction)):
+        if expr.space in list(basis.keys()):
+            name = basis[expr.space]
+            return Symbol(name)
+
+    elif isinstance(expr, Symbol) and expr.is_Indexed:
+        base = expr.base
+        if base.space in list(basis.keys()):
+            name = basis[base.space]
+            return Symbol(name)
+
+    elif isinstance(expr, (BilinearForm, LinearForm)):
+        e = normalize(expr.expr, basis=basis)
+
+        return BilinearForm(e,
+                            trial_space=expr.trial_space,
+                            test_space=expr.test_space)
+
+    return expr
+# ...
+
+

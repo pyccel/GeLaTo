@@ -1,5 +1,7 @@
 # coding: utf-8
 
+# TODO split the asserts between algebraic and weak formulations ones
+
 from sympy import Symbol
 from sympy.core.containers import Tuple
 from sympy import symbols

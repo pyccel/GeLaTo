@@ -1,5 +1,7 @@
 # coding: utf-8
 
+# TODO split the asserts between algebraic and weak formulations ones
+
 from sympy import Symbol
 from sympy.core.containers import Tuple
 from sympy import symbols
@@ -15,12 +17,73 @@ from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import BilinearForm
-from gelato.fem.expr import gelatize, normalize_weak_from
+from gelato.fem.expr import gelatize, normalize
+from gelato.fem.expr import normalize_weak_from
 
 
 # ...
 def test_gelatize_2d_1():
     print('============ test_gelatize_2d_1 =============')
+
+    V = FemSpace('V', ldim=2)
+
+    v = TestFunction(V, name='v')
+    w = TestFunction(V, name='w')
+    c = Constant('c')
+    F = Field('F')
+
+    # ... expressions that can be normalized (valid for a weak formulation)
+    assert(gelatize(grad(v)) == Tuple(dx(v), dy(v)))
+    assert(gelatize(grad(c*v)) == Tuple(c*dx(v), c*dy(v)))
+    assert(gelatize(grad(F*v)) == Tuple(F*dx(v) + v*dx(F), F*dy(v) + v*dy(F)))
+
+    assert(gelatize(dot(grad(v), grad(w))) == dx(v)*dx(w) + dy(v)*dy(w))
+    # ...
+
+#    expr = grad(F*v)
+#    print('> input         >>> {0}'.format(expr))
+#    print('> gelatized     >>> {0}'.format(gelatize(expr)))
+# ...
+
+# ...
+def test_normalize_2d_1():
+    print('============ test_normalize_2d_1 =============')
+
+    V = FemSpace('V', ldim=2)
+    W = FemSpace('W', ldim=2)
+
+    v = TestFunction(V, name='v')
+    u = TrialFunction(W, name='u')
+    c = Constant('c')
+    F = Field('F')
+
+    Ni, Ni_x, Ni_y = symbols('Ni Ni_x Ni_y')
+    Nj, Nj_x, Nj_y = symbols('Nj Nj_x Nj_y')
+
+    bx, by = symbols('bx by')
+    b = Tuple(bx, by)
+
+    # ...
+    assert(normalize(grad(v), basis={V: 'Ni'}) == Tuple(Ni_x, Ni_y))
+    assert(normalize(grad(c*v), basis={V: 'Ni'}) == Tuple(c*Ni_x, c*Ni_y))
+    assert(normalize(dot(b, grad(v)), basis={V: 'Ni'}) == Ni_x*bx + Ni_y*by)
+    assert(normalize(dot(b, grad(v)) + c*v, basis={V: 'Ni'}) == Ni_x*bx + Ni_y*by + c*Ni)
+    assert(normalize(dot(grad(v), grad(u)), basis={V: 'Ni', W: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y)
+    assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', W: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + c*Ni*Nj)
+    # ...
+
+#    expr = dot(grad(v), b)
+#    print('> input         >>> {0}'.format(expr))
+#
+#    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
+#    print('> normal form   >>> {0}'.format(normalize(dot(grad(v), grad(u)),
+#                                                     basis={V: 'Ni', W: 'Nj'})))
+# ...
+
+
+# ...
+def test_gelatize_2d_2():
+    print('============ test_gelatize_2d_2 =============')
 
     V = FemSpace('V', ldim=2, is_vector=True, shape=2)
 
@@ -35,8 +98,8 @@ def test_gelatize_2d_1():
 # ...
 
 # ...
-def test_normalize_2d_1():
-    print('============ test_normalize_2d_1 =============')
+def test_normalize_2d_2():
+    print('============ test_normalize_2d_2 =============')
 
     V = FemSpace('V', ldim=2, is_vector=True, shape=2)
 
@@ -53,36 +116,6 @@ def test_normalize_2d_1():
 #    expr = div(v)
 #    print('> input         >>> {0}'.format(expr))
 #    print('> normal form   >>> {0}'.format(normalize_weak_from(expr)))
-# ...
-
-# ...
-def test_gelatize_2d_2():
-    print('============ test_gelatize_2d_2 =============')
-
-    V = FemSpace('V', ldim=2, is_vector=True, shape=2)
-
-    v = VectorTestFunction(V, name='v')
-    w = VectorTrialFunction(V, name='w')
-
-#    expr = dot(w, v)
-    expr = w[0] * v[0]
-    print('> input         >>> {0}'.format(expr))
-    print('> gelatized     >>> {0}'.format(gelatize(expr)))
-# ...
-
-# ...
-def test_normalize_2d_2():
-    print('============ test_normalize_2d_2 =============')
-
-    V = FemSpace('V', ldim=2, is_vector=True, shape=2)
-
-    v = VectorTestFunction(V, name='v')
-    w = VectorTrialFunction(V, name='w')
-
-#    expr = dot(w, v)
-    expr = w[0] * v[0]
-    print('> input         >>> {0}'.format(expr))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(expr)))
 # ...
 
 # ...

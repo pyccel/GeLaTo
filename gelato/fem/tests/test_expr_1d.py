@@ -1,5 +1,7 @@
 # coding: utf-8
 
+# TODO split the asserts between algebraic and weak formulations ones
+
 from sympy.core.containers import Tuple
 from sympy import symbols
 
@@ -14,7 +16,8 @@ from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import BilinearForm
-from gelato.fem.expr import gelatize, normalize_weak_from
+from gelato.fem.expr import gelatize, normalize
+from gelato.fem.expr import normalize_weak_from
 
 
 # ...
@@ -25,12 +28,23 @@ def test_gelatize_1d_1():
 
     v = TestFunction(V, name='v')
     w = TestFunction(V, name='w')
+    c = Constant('c')
+    F = Field('F')
 
+    # ...
     assert(gelatize(grad(v)) == dx(v))
+    assert(gelatize(grad(c*v)) == c*dx(v))
+    assert(gelatize(grad(F*v)) == F*dx(v) + v*dx(F))
+
+    assert(gelatize(dot(grad(v), grad(w))) == dx(v)*dx(w))
+    # ...
+
+    # ...
     assert(gelatize(grad(v*w)) == w*dx(v) + v*dx(w))
     assert(gelatize(div(grad(v*w))) == v*dx(dx(w)) + 2*dx(v)*dx(w) + dx(dx(v))*w)
+    # ...
 
-#    expr = grad(v*w)
+#    expr = dot(grad(v), grad(w))
 #    print('> input         >>> {0}'.format(expr))
 #    print('> gelatized     >>> {0}'.format(gelatize(expr)))
 # ...
@@ -40,18 +54,30 @@ def test_normalize_1d_1():
     print('============ test_normalize_1d_1 =============')
 
     V = FemSpace('V', ldim=1)
+    W = FemSpace('W', ldim=1)
 
     v = TestFunction(V, name='v')
-    w = TestFunction(V, name='w')
+    u = TrialFunction(W, name='u')
+    c = Constant('c')
+    F = Field('F')
 
-#    assert(normalize_weak_from(rot(v)) == -v1_x + v0_y)
-#    assert(normalize_weak_from(div(v)) == v0_x + v1_y)
+    Ni, Ni_x = symbols('Ni Ni_x')
+    Nj, Nj_x = symbols('Nj Nj_x')
 
-#    expr = grad(v*w)
+    # ...
+    assert(normalize(grad(v), basis={V: 'Ni'}) == Ni_x)
+    assert(normalize(grad(c*v), basis={V: 'Ni'}) == c*Ni_x)
+    assert(normalize(grad(v) + c*v, basis={V: 'Ni'}) == Ni_x + c*Ni)
+    assert(normalize(dot(grad(v), grad(u)), basis={V: 'Ni', W: 'Nj'}) == Ni_x*Nj_x)
+    assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', W: 'Nj'}) == Ni_x*Nj_x + c*Ni*Nj)
+    # ...
+
+#    expr = dot(grad(v), grad(u))
 #    print('> input         >>> {0}'.format(expr))
-#    print('> gelatized     >>> {0}'.format(gelatize(expr)))
 
-#    print('> normal form   >>> {0}'.format(normalize_weak_from(expr)))
+#    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
+#    print('> normal form   >>> {0}'.format(normalize(dot(grad(v), grad(u)),
+#                                                     basis={V: 'Ni', W: 'Nj'})))
 # ...
 
 # ...
