@@ -17,12 +17,78 @@ from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import BilinearForm
-from gelato.fem.expr import gelatize, normalize_weak_from
+from gelato.fem.expr import gelatize, normalize
+from gelato.fem.expr import normalize_weak_from
 
 
 # ...
 def test_gelatize_3d_1():
     print('============ test_gelatize_3d_1 =============')
+
+    V = FemSpace('V', ldim=3)
+
+    v = TestFunction(V, name='v')
+    w = TestFunction(V, name='w')
+    c = Constant('c')
+    F = Field('F')
+
+    # ... expressions that can be normalized (valid for a weak formulation)
+    assert(gelatize(grad(v)) == Tuple(dx(v),
+                                      dy(v),
+                                      dz(v)))
+    assert(gelatize(grad(c*v)) == Tuple(c*dx(v),
+                                        c*dy(v),
+                                        c*dz(v)))
+    assert(gelatize(grad(F*v)) == Tuple(F*dx(v) + v*dx(F),
+                                        F*dy(v) + v*dy(F),
+                                        F*dz(v) + v*dz(F)))
+
+    assert(gelatize(dot(grad(v), grad(w))) == dx(v)*dx(w) + dy(v)*dy(w) + dz(v)*dz(w))
+    # ...
+
+#    expr = grad(F*v)
+#    print('> input         >>> {0}'.format(expr))
+#    print('> gelatized     >>> {0}'.format(gelatize(expr)))
+# ...
+
+# ...
+def test_normalize_3d_1():
+    print('============ test_normalize_3d_1 =============')
+
+    V = FemSpace('V', ldim=3)
+    W = FemSpace('W', ldim=3)
+
+    v = TestFunction(V, name='v')
+    u = TrialFunction(W, name='u')
+    c = Constant('c')
+    F = Field('F')
+
+    Ni, Ni_x, Ni_y, Ni_z = symbols('Ni Ni_x Ni_y Ni_z')
+    Nj, Nj_x, Nj_y, Nj_z = symbols('Nj Nj_x Nj_y Nj_z')
+
+    bx, by, bz = symbols('bx by bz')
+    b = Tuple(bx, by, bz)
+
+    # ...
+    assert(normalize(grad(v), basis={V: 'Ni'}) == Tuple(Ni_x, Ni_y, Ni_z))
+    assert(normalize(grad(c*v), basis={V: 'Ni'}) == Tuple(c*Ni_x, c*Ni_y, c*Ni_z))
+    assert(normalize(dot(b, grad(v)), basis={V: 'Ni'}) == Ni_x*bx + Ni_y*by + Ni_z*bz)
+    assert(normalize(dot(b, grad(v)) + c*v, basis={V: 'Ni'}) == Ni_x*bx + Ni_y*by + Ni_z*bz + c*Ni)
+    assert(normalize(dot(grad(v), grad(u)), basis={V: 'Ni', W: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + Ni_z*Nj_z)
+    assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', W: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + Ni_z*Nj_z + c*Ni*Nj)
+    # ...
+
+#    expr = dot(grad(v), b)
+#    print('> input         >>> {0}'.format(expr))
+#
+#    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
+#    print('> normal form   >>> {0}'.format(normalize(dot(grad(v), grad(u)),
+#                                                     basis={V: 'Ni', W: 'Nj'})))
+# ...
+
+# ...
+def test_gelatize_3d_2():
+    print('============ test_gelatize_3d_2 =============')
 
     V = FemSpace('V', ldim=3, is_vector=True, shape=3)
 
@@ -39,8 +105,8 @@ def test_gelatize_3d_1():
 # ...
 
 # ...
-def test_normalize_3d_1():
-    print('============ test_normalize_3d_1 =============')
+def test_normalize_3d_2():
+    print('============ test_normalize_3d_2 =============')
 
     V = FemSpace('V', ldim=3, is_vector=True, shape=3)
 
@@ -200,6 +266,9 @@ def test_bilinear_form_3d_10():
 if __name__ == '__main__':
     test_gelatize_3d_1()
     test_normalize_3d_1()
+
+#    test_gelatize_3d_2()
+#    test_normalize_3d_2()
 
 #    test_bilinear_form_3d_1()
 #    test_bilinear_form_3d_2()

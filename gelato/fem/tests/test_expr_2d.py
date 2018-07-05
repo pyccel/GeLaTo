@@ -33,9 +33,12 @@ def test_gelatize_2d_1():
     F = Field('F')
 
     # ... expressions that can be normalized (valid for a weak formulation)
-    assert(gelatize(grad(v)) == Tuple(dx(v), dy(v)))
-    assert(gelatize(grad(c*v)) == Tuple(c*dx(v), c*dy(v)))
-    assert(gelatize(grad(F*v)) == Tuple(F*dx(v) + v*dx(F), F*dy(v) + v*dy(F)))
+    assert(gelatize(grad(v)) == Tuple(dx(v),
+                                      dy(v)))
+    assert(gelatize(grad(c*v)) == Tuple(c*dx(v),
+                                        c*dy(v)))
+    assert(gelatize(grad(F*v)) == Tuple(F*dx(v) + v*dx(F),
+                                        F*dy(v) + v*dy(F)))
 
     assert(gelatize(dot(grad(v), grad(w))) == dx(v)*dx(w) + dy(v)*dy(w))
     # ...
