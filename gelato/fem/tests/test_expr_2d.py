@@ -6,6 +6,7 @@ from sympy import Symbol
 from sympy.core.containers import Tuple
 from sympy import symbols
 from sympy import IndexedBase
+from sympy import Matrix
 
 from gelato.calculus import dx, dy, dz
 from gelato.calculus import Constant
@@ -18,7 +19,7 @@ from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import BilinearForm
-from gelato.fem.expr import gelatize, normalize
+from gelato.fem.expr import gelatize, normalize, matrix_form
 
 
 # ...
@@ -110,13 +111,13 @@ def test_normalize_2d_2():
     v = VectorTestFunction(V, name='v')
     u = VectorTestFunction(W, name='u')
 
-    Ni = IndexedBase('Ni')
-    Ni_x = IndexedBase('Ni_x')
-    Ni_y = IndexedBase('Ni_y')
+    Ni = IndexedBase('Ni', shape=2)
+    Ni_x = IndexedBase('Ni_x', shape=2)
+    Ni_y = IndexedBase('Ni_y', shape=2)
 
-    Nj = IndexedBase('Nj')
-    Nj_x = IndexedBase('Nj_x')
-    Nj_y = IndexedBase('Nj_y')
+    Nj = IndexedBase('Nj', shape=2)
+    Nj_x = IndexedBase('Nj_x', shape=2)
+    Nj_y = IndexedBase('Nj_y', shape=2)
 
     assert(normalize(v[0], basis={V: 'Ni'}) == Ni[0])
     assert(normalize(dx(v[0]), basis={V: 'Ni'}) == Ni_x[0])
@@ -137,6 +138,30 @@ def test_normalize_2d_2():
 #    expr = dx(v[0])
 #    print('> input         >>> {0}'.format(expr))
 #    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
+# ...
+
+# ...
+def test_matrix_form_2d_2():
+    print('============ test_matrix_form_2d_2 =============')
+
+    V = FemSpace('V', ldim=2, is_block=True, shape=2)
+    W = FemSpace('W', ldim=2, is_block=True, shape=2)
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(W, name='u')
+
+    Ni, Ni_x, Ni_y = symbols('Ni Ni_x Ni_y')
+    Nj, Nj_x, Nj_y = symbols('Nj Nj_x Nj_y')
+
+    expr = v[0]*u[0]
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[Ni*Nj, 0], [0, 0]])
+    assert(matrix_form(expr) == expected)
+
+#    expr = v[0]*u[0]
+#    print('> input         >>> {0}'.format(expr))
+#    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+#    print('> matrix_form     >>> {0}'.format(matrix_form(expr)))
 # ...
 
 # ...
@@ -260,11 +285,12 @@ def test_bilinear_form_2d_10():
 
 # .....................................................
 if __name__ == '__main__':
-#    test_gelatize_2d_1()
-#    test_normalize_2d_1()
-#
-#    test_gelatize_2d_2()
+    test_gelatize_2d_1()
+    test_normalize_2d_1()
+
+    test_gelatize_2d_2()
     test_normalize_2d_2()
+    test_matrix_form_2d_2()
 
 #    test_bilinear_form_2d_1()
 #    test_bilinear_form_2d_2()

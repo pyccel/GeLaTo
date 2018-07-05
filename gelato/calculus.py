@@ -874,7 +874,7 @@ _calculus_operators = (Grad, Dot, Inner, Cross, Rot, Curl, Div)
 # ...
 
 # ...
-def partial_derivative_as_symbol(expr, name=None):
+def partial_derivative_as_symbol(expr, name=None, dim=None):
     """Returns a Symbol from a partial derivative expression."""
     if not isinstance(expr, _partial_derivatives):
         raise TypeError('Expecting a partial derivative expression')
@@ -896,7 +896,10 @@ def partial_derivative_as_symbol(expr, name=None):
 
         indices = ''.join('{}'.format(i) for i in var.indices)
         name = '{name}_{code}'.format(name=name, code=code)
-        return IndexedBase(name)[indices]
+        shape = None
+        if dim:
+            shape = [dim]
+        return IndexedBase(name, shape=shape)[indices]
 
     else:
         if name is None:
