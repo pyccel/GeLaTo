@@ -1,10 +1,13 @@
 # coding: utf-8
 
-# TODO split the asserts between algebraic and weak formulations ones
+# TODO - split the asserts between algebraic and weak formulations ones
+#      - add assert for grad in vector case
 
 from sympy import Symbol
 from sympy.core.containers import Tuple
 from sympy import symbols
+from sympy import IndexedBase
+from sympy import Matrix
 
 from gelato.calculus import dx, dy, dz
 from gelato.calculus import Constant
@@ -17,7 +20,7 @@ from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import BilinearForm
-from gelato.fem.expr import gelatize, normalize
+from gelato.fem.expr import gelatize, normalize, matrix_form
 
 
 # ...
@@ -107,28 +110,155 @@ def test_gelatize_3d_2():
 def test_normalize_3d_2():
     print('============ test_normalize_3d_2 =============')
 
-    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
+    V = FemSpace('V', ldim=3, is_block=True, shape=3)
+    W = FemSpace('W', ldim=3, is_block=True, shape=3)
 
     v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(W, name='u')
 
-    v0_x = Symbol('v_x[0]')
-    v1_x = Symbol('v_x[1]')
-    v2_x = Symbol('v_x[2]')
-    v0_y = Symbol('v_y[0]')
-    v1_y = Symbol('v_y[1]')
-    v2_y = Symbol('v_y[2]')
-    v0_z = Symbol('v_z[0]')
-    v1_z = Symbol('v_z[1]')
-    v2_z = Symbol('v_z[2]')
+    Ni = IndexedBase('Ni', shape=3)
+    Ni_x = IndexedBase('Ni_x', shape=3)
+    Ni_y = IndexedBase('Ni_y', shape=3)
+    Ni_z = IndexedBase('Ni_z', shape=3)
 
-#    assert(normalize_weak_from(curl(v)) == Tuple( v2_y - v1_z,
-#                                                 -v2_x + v0_z,
-#                                                  v1_x - v0_y))
-#    assert(normalize_weak_from(div(v)) == v0_x + v1_y + v2_z)
+    Nj = IndexedBase('Nj', shape=3)
+    Nj_x = IndexedBase('Nj_x', shape=3)
+    Nj_y = IndexedBase('Nj_y', shape=3)
+    Nj_z = IndexedBase('Nj_z', shape=3)
 
-#    expr = curl(v)
+    assert(normalize(v[0], basis={V: 'Ni'}) == Ni[0])
+    assert(normalize(dx(v[0]), basis={V: 'Ni'}) == Ni_x[0])
+    assert(normalize(div(v), basis={V: 'Ni'}) == Ni_x[0] + Ni_y[1] + Ni_z[2])
+    assert(normalize(curl(v), basis={V: 'Ni'}) == Tuple( Ni_y[2] - Ni_z[1],
+                                                        -Ni_x[2] + Ni_z[0],
+                                                         Ni_x[1] - Ni_y[0]))
+
+    assert(normalize(v[0]*u[0], basis={V: 'Ni', W: 'Nj'}) == Ni[0]*Nj[0])
+    assert(normalize(v[1]*dx(u[0]), basis={V: 'Ni', W: 'Nj'}) == Ni[1]*Nj_x[0])
+    assert(normalize(dy(v[0])*u[1], basis={V: 'Ni', W: 'Nj'}) == Ni_y[0]*Nj[1])
+    assert(normalize(dx(v[1])*dy(u[1]), basis={V: 'Ni', W: 'Nj'}) == Ni_x[1]*Nj_y[1])
+    assert(normalize(dx(v[1])*dz(u[2]), basis={V: 'Ni', W: 'Nj'}) == Ni_x[1]*Nj_z[2])
+
+    expected = (Ni_x[0] + Ni_y[1] + Ni_z[2])*(Nj_x[0] + Nj_y[1] + Nj_z[2])
+    assert(normalize(div(v) * div(u), basis={V: 'Ni', W: 'Nj'}) == expected)
+
+    expected = ((Ni_x[1] - Ni_y[0])*(Nj_x[1] - Nj_y[0])
+             + (-Ni_x[2] + Ni_z[0])*(-Nj_x[2] + Nj_z[0])
+             + (Ni_y[2] - Ni_z[1])*(Nj_y[2] - Nj_z[1]))
+    assert(normalize(dot(curl(v), curl(u)), basis={V: 'Ni', W: 'Nj'}) == expected)
+
+#    expr = dot(curl(v), curl(u))
 #    print('> input         >>> {0}'.format(expr))
-#    print('> normal form   >>> {0}'.format(normalize_weak_from(expr)))
+#
+##    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
+#    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni', W: 'Nj'})))
+# ...
+
+# ...
+def test_matrix_form_3d_2():
+    print('============ test_matrix_form_3d_2 =============')
+
+    V = FemSpace('V', ldim=3, is_block=True, shape=3)
+    W = FemSpace('W', ldim=3, is_block=True, shape=3)
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(W, name='u')
+
+    Ni, Ni_x, Ni_y, Ni_z = symbols('Ni Ni_x Ni_y Ni_z')
+    Nj, Nj_x, Nj_y, Nj_z = symbols('Nj Nj_x Nj_y Nj_z')
+
+    c1 = Symbol('c1')
+    c2 = Symbol('c2')
+
+    # ...
+    expr = v[0]*u[0]
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[Ni*Nj, 0, 0], [0, 0, 0], [0, 0, 0]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = v[1]*dx(u[0])
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[0, Ni*Nj_x, 0], [0, 0, 0], [0, 0, 0]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = dy(v[0])*u[1]
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[0, 0, 0], [Ni_y*Nj, 0, 0], [0, 0, 0]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = dx(v[1])*dy(u[1])
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[0, 0, 0], [0, Ni_x*Nj_y, 0], [0, 0, 0]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = div(v) * div(u)
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[Ni_x*Nj_x, Ni_y*Nj_x, Ni_z*Nj_x],
+                       [Ni_x*Nj_y, Ni_y*Nj_y, Ni_z*Nj_y],
+                       [Ni_x*Nj_z, Ni_y*Nj_z, Ni_z*Nj_z]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = dot(curl(v), curl(u))
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[Ni_y*Nj_y + Ni_z*Nj_z, -Ni_x*Nj_y, -Ni_x*Nj_z],
+                       [-Ni_y*Nj_x, Ni_x*Nj_x + Ni_z*Nj_z, -Ni_y*Nj_z],
+                       [-Ni_z*Nj_x, -Ni_z*Nj_y, Ni_x*Nj_x + Ni_y*Nj_y]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = div(v) * div(u) + dot(curl(v), curl(u))
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[Ni_x*Nj_x + Ni_y*Nj_y + Ni_z*Nj_z, -Ni_x*Nj_y + Ni_y*Nj_x, -Ni_x*Nj_z + Ni_z*Nj_x],
+                       [Ni_x*Nj_y - Ni_y*Nj_x, Ni_x*Nj_x + Ni_y*Nj_y + Ni_z*Nj_z, -Ni_y*Nj_z + Ni_z*Nj_y],
+                       [Ni_x*Nj_z - Ni_z*Nj_x, Ni_y*Nj_z - Ni_z*Nj_y, Ni_x*Nj_x + Ni_y*Nj_y + Ni_z*Nj_z]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = c1 * div(v) * div(u) + dot(curl(v), curl(u))
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected =  Matrix([[Ni_x*Nj_x*c1 + Ni_y*Nj_y + Ni_z*Nj_z,
+                         -Ni_x*Nj_y + Ni_y*Nj_x*c1,
+                         -Ni_x*Nj_z + Ni_z*Nj_x*c1],
+                        [Ni_x*Nj_y*c1 - Ni_y*Nj_x,
+                         Ni_x*Nj_x + Ni_y*Nj_y*c1 + Ni_z*Nj_z,
+                         -Ni_y*Nj_z + Ni_z*Nj_y*c1],
+                        [Ni_x*Nj_z*c1 - Ni_z*Nj_x,
+                         Ni_y*Nj_z*c1 - Ni_z*Nj_y,
+                         Ni_x*Nj_x + Ni_y*Nj_y + Ni_z*Nj_z*c1]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+    # ...
+    expr = c1 * div(v) * div(u) + c2 * dot(curl(v), curl(u))
+    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expected = Matrix([[Ni_x*Nj_x*c1 + Ni_y*Nj_y*c2 + Ni_z*Nj_z*c2,
+                        -Ni_x*Nj_y*c2 + Ni_y*Nj_x*c1,
+                        -Ni_x*Nj_z*c2 + Ni_z*Nj_x*c1],
+                       [Ni_x*Nj_y*c1 - Ni_y*Nj_x*c2,
+                        Ni_x*Nj_x*c2 + Ni_y*Nj_y*c1 + Ni_z*Nj_z*c2,
+                        -Ni_y*Nj_z*c2 + Ni_z*Nj_y*c1],
+                       [Ni_x*Nj_z*c1 - Ni_z*Nj_x*c2,
+                        Ni_y*Nj_z*c1 - Ni_z*Nj_y*c2,
+                        Ni_x*Nj_x*c2 + Ni_y*Nj_y*c2 + Ni_z*Nj_z*c1]])
+    assert(matrix_form(expr) == expected)
+    # ...
+
+#    expr = c1 * div(v) * div(u) + c2 * dot(curl(v), curl(u))
+#    print('> input         >>> {0}'.format(expr))
+#    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+#    print('> matrix_form     >>> {0}'.format(matrix_form(expr)))
 # ...
 
 # ...
@@ -146,9 +276,9 @@ def test_bilinear_form_3d_1():
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('> normal form   >>> {0}'.format(normalize(a)))
 
-    a_expr = normalize_weak_from(a, basis={V: 'Nj', W: 'Ni'})
+    a_expr = normalize(a, basis={V: 'Nj', W: 'Ni'})
     print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
@@ -168,7 +298,7 @@ def test_bilinear_form_3d_2():
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('> normal form   >>> {0}'.format(normalize(a)))
     print('')
 # ...
 
@@ -187,7 +317,7 @@ def test_bilinear_form_3d_3():
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('> normal form   >>> {0}'.format(normalize(a)))
     print('')
 # ...
 
@@ -211,7 +341,7 @@ def test_bilinear_form_3d_4():
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('> normal form   >>> {0}'.format(normalize(a)))
     print('')
 # ...
 
@@ -237,7 +367,7 @@ def test_bilinear_form_3d_5():
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('> normal form   >>> {0}'.format(normalize(a)))
     print('')
 # ...
 
@@ -256,7 +386,7 @@ def test_bilinear_form_3d_10():
     c = a + b
     print('> input         >>> {0}'.format(c))
     print('> gelatized     >>> {0}'.format(gelatize(c)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
+    print('> normal form   >>> {0}'.format(normalize(c)))
     print('')
 # ...
 
@@ -266,8 +396,9 @@ if __name__ == '__main__':
     test_gelatize_3d_1()
     test_normalize_3d_1()
 
-#    test_gelatize_3d_2()
-#    test_normalize_3d_2()
+    test_gelatize_3d_2()
+    test_normalize_3d_2()
+    test_matrix_form_3d_2()
 
 #    test_bilinear_form_3d_1()
 #    test_bilinear_form_3d_2()

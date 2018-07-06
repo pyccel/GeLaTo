@@ -1,6 +1,7 @@
 # coding: utf-8
 
-# TODO split the asserts between algebraic and weak formulations ones
+# TODO - split the asserts between algebraic and weak formulations ones
+#      - add assert for grad in vector case
 
 from sympy import Symbol
 from sympy.core.containers import Tuple
@@ -137,7 +138,9 @@ def test_normalize_2d_2():
 
 #    expr = dx(v[0])
 #    print('> input         >>> {0}'.format(expr))
+
 #    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
+##    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni', W: 'Nj'})))
 # ...
 
 # ...
@@ -243,9 +246,9 @@ def test_bilinear_form_2d_1():
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('> normal form   >>> {0}'.format(normalize(a)))
 
-    a_expr = normalize_weak_from(a, basis={V: 'Nj', W: 'Ni'})
+    a_expr = normalize(a, basis={V: 'Nj', W: 'Ni'})
     print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
@@ -265,9 +268,9 @@ def test_bilinear_form_2d_2():
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('> normal form   >>> {0}'.format(normalize(a)))
 
-    a_expr = normalize_weak_from(a, basis={V: 'Nj', W: 'Ni'})
+    a_expr = normalize(a, basis={V: 'Nj', W: 'Ni'})
     print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
@@ -291,9 +294,9 @@ def test_bilinear_form_2d_3():
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('> normal form   >>> {0}'.format(normalize(a)))
 
-    a_expr = normalize_weak_from(a, basis={V: 'Nj', W: 'Ni'})
+    a_expr = normalize(a, basis={V: 'Nj', W: 'Ni'})
     print('> basis  form   >>> {0}'.format(a_expr))
     print('')
 # ...
@@ -313,7 +316,7 @@ def test_bilinear_form_2d_4():
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
     print('> gelatized     >>> {0}'.format(gelatize(a)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
+    print('> normal form   >>> {0}'.format(normalize(a)))
     print('')
 # ...
 
@@ -333,7 +336,7 @@ def test_bilinear_form_2d_10():
     c = a + b
     print('> input         >>> {0}'.format(c))
     print('> gelatized     >>> {0}'.format(gelatize(c)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
+    print('> normal form   >>> {0}'.format(normalize(c)))
     print('')
 
     v1 = TestFunction(V, name='v1')
@@ -342,7 +345,7 @@ def test_bilinear_form_2d_10():
     d = a(v1, u1) + b
     print('> input         >>> {0}'.format(d))
     print('> gelatized     >>> {0}'.format(gelatize(d)))
-    print('> normal form   >>> {0}'.format(normalize_weak_from(d)))
+    print('> normal form   >>> {0}'.format(normalize(d)))
     print('')
 # ...
 
