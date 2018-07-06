@@ -265,10 +265,6 @@ class TestFunction(Symbol):
         sstr = printer.doprint
         return sstr(self.name)
 
-#TrialFunction = TestFunction
-class TrialFunction(TestFunction):
-    pass
-
 
 # this class is needed, otherwise sympy will convert VectorTestFunction to
 # IndexedBase
@@ -349,8 +345,4 @@ class VectorTestFunction(Symbol, IndexedBase):
         assumptions ={}
         obj = IndexedTestTrial(self, *args)
         return obj
-
-#VectorTrialFunction = VectorTestFunction
-class VectorTrialFunction(VectorTestFunction):
-    pass
 

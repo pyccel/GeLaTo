@@ -16,9 +16,7 @@ from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 
 from gelato.fem.core import FemSpace
 from gelato.fem.core import TestFunction
-from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
-from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import BilinearForm
 from gelato.fem.expr import atomize, normalize, matricize
 from gelato.fem.expr import gelatize

@@ -7,9 +7,7 @@ from gelato.fem.core import SplineFemSpace
 from gelato.fem.core import TensorFemSpace
 from gelato.fem.core import VectorFemSpace
 from gelato.fem.core import TestFunction
-from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
-from gelato.fem.core import VectorTrialFunction
 
 from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 from gelato.calculus import dx, dy, dz
@@ -26,7 +24,7 @@ def test_fem_space_spline():
     print('> n_elements :: ', V.n_elements)
 
     v = TestFunction(V, name='v')
-    u = TrialFunction(V, name='u')
+    u = TestFunction(V, name='u')
 
     print('> test function  :: ', v)
     print('> trial function :: ', u)
@@ -46,7 +44,7 @@ def test_fem_space_tensor():
     print('> n_elements :: ', V.n_elements)
 
     v = TestFunction(V, name='v')
-    u = TrialFunction(V, name='u')
+    u = TestFunction(V, name='u')
 
     print('> test function  :: ', v)
     print('> trial function :: ', u)
@@ -75,7 +73,7 @@ def test_fem_space_vector():
     print('> n_elements :: ', V.n_elements)
 
     v = TestFunction(V, name='v')
-    u = TrialFunction(V, name='u')
+    u = TestFunction(V, name='u')
 
     print('> test function  :: ', v)
     print('> trial function :: ', u)

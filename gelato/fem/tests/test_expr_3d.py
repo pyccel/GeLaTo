@@ -16,9 +16,7 @@ from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 
 from gelato.fem.core import FemSpace
 from gelato.fem.core import TestFunction
-from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
-from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import BilinearForm
 from gelato.fem.expr import atomize, normalize, matricize
 from gelato.fem.expr import gelatize
@@ -62,7 +60,7 @@ def test_normalize_3d_1():
     U = FemSpace('U', ldim=3)
 
     v = TestFunction(V, name='v')
-    u = TrialFunction(U, name='u')
+    u = TestFunction(U, name='u')
     c = Constant('c')
     F = Field('F')
 
@@ -270,7 +268,7 @@ def test_bilinear_form_3d_1():
     V = FemSpace('V', ldim=3)
 
     u = TestFunction(U, name='u')
-    v = TrialFunction(V, name='v')
+    v = TestFunction(V, name='v')
 
     expr = inner(grad(u), grad(v))
 
@@ -290,7 +288,7 @@ def test_bilinear_form_3d_2():
     V = FemSpace('V', ldim=3, is_vector=True, shape=3)
 
     u = VectorTestFunction(U, name='u')
-    v = VectorTrialFunction(V, name='v')
+    v = VectorTestFunction(V, name='v')
 
     expr = div(u) * div(v) + 0.2 * dot(u, v)
 
@@ -310,7 +308,7 @@ def test_bilinear_form_3d_3():
     V = FemSpace('V', ldim=3, is_vector=True, shape=3)
 
     u = VectorTestFunction(U, name='u')
-    v = VectorTrialFunction(V, name='v')
+    v = VectorTestFunction(V, name='v')
 
     expr = dot(curl(u), curl(v)) + 0.2 * dot(u, v)
 
@@ -330,7 +328,7 @@ def test_bilinear_form_3d_3():
 #    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
 #
 #    u = VectorTestFunction(U, name='u')
-#    v = VectorTrialFunction(V, name='v')
+#    v = VectorTestFunction(V, name='v')
 #
 #    bx = Constant('bx')
 #    by = Constant('by')
@@ -355,7 +353,7 @@ def test_bilinear_form_3d_3():
 #    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
 #
 #    u = VectorTestFunction(U, name='u')
-#    v = VectorTrialFunction(V, name='v')
+#    v = VectorTestFunction(V, name='v')
 #
 #    bx = Constant('bx')
 #    by = Constant('by')
@@ -382,7 +380,7 @@ def test_bilinear_form_3d_3():
 #    V = FemSpace('V', ldim=3)
 #
 #    w = TestFunction(U, name='w')
-#    v = TrialFunction(V, name='v')
+#    v = TestFunction(V, name='v')
 #
 #    a = BilinearForm(inner(grad(w), grad(v)), trial_space=V, test_space=U)
 #    b = BilinearForm(w*v, trial_space=V, test_space=U)

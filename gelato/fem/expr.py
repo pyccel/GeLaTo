@@ -36,9 +36,7 @@ from gelato.calculus import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
 
 from gelato.fem.core import FemSpace
 from gelato.fem.core import TestFunction
-from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
-from gelato.fem.core import VectorTrialFunction
 
 
 
@@ -60,11 +58,15 @@ class BilinearForm(Expr):
         if not(len(spaces) == 2):
             raise ValueError('Expecting two spaces')
 
-        test_space = spaces[0]
-        trial_space = spaces[0]
+        test_space = [spaces[0]]
+        test_space = Tuple(*test_space)
 
-        if not(trial_space.ldim == test_space.ldim):
-            raise ValueError('Incompatible logical dimension between test and trial spaces')
+        trial_space = [spaces[1]]
+        trial_space = Tuple(*trial_space)
+
+        # TODO we must check the compatibility between the trial/test spaces
+#        if not(trial_space.ldim == test_space.ldim):
+#            raise ValueError('Incompatible logical dimension between test and trial spaces')
 
         return Basic.__new__(cls, expr, trial_space, test_space)
 
@@ -81,8 +83,12 @@ class BilinearForm(Expr):
         return self._args[2]
 
     @property
+    def ldim(self):
+        return self.test_space[0].ldim
+
+    @property
     def trial_functions(self):
-        ls = [a for a in self.expr.free_symbols if isinstance(a, TrialFunction)]
+        ls = [a for a in self.expr.free_symbols if isinstance(a, TestFunction) and a.space in self.trial_space]
         # no redanduncy
         ls = list(set(ls))
 
@@ -144,7 +150,7 @@ class BilinearForm(Expr):
 
         # ...
         trials = args[1]
-        if isinstance(trials, TrialFunction):
+        if isinstance(trials, TestFunction):
             trials = [trials]
             trials = Tuple(*trials)
         elif isinstance(trials, (tuple, list, Tuple)):
@@ -417,7 +423,7 @@ def gelatize(a, basis=None, verbose=True):
     if not isinstance(a, (BilinearForm, LinearForm)):
         raise TypeError('Expecting a BilinearForm or LinearForm')
 
-    dim = a.test_space.ldim
+    dim = a.ldim
     expr = a.expr
 
     expr = atomize(expr, dim=dim)
