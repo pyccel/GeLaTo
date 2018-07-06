@@ -92,7 +92,7 @@ def test_bilinear_form_1d_1():
 
     expr = inner(grad(v), grad(u))
 
-    a = BilinearForm((V, U), expr)
+    a = BilinearForm((v,u), expr)
     print('> input      >>> {0}'.format(a))
 
     a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -114,7 +114,7 @@ def test_bilinear_form_1d_2():
 
     expr = inner(grad(b*u), grad(v))
 
-    a = BilinearForm((V, U), expr)
+    a = BilinearForm((v,u), expr)
     print('> input         >>> {0}'.format(a))
 
     a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -135,7 +135,7 @@ def test_bilinear_form_1d_3():
     F = Field('F')
     expr = inner(grad(u), grad(v)) + F*u*v
 
-    a = BilinearForm((V, U), expr)
+    a = BilinearForm((v,u), expr)
     print('> input         >>> {0}'.format(a))
 
     a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -157,7 +157,7 @@ def test_bilinear_form_1d_3():
 #
 #    expr = inner(grad(F*u), grad(v))
 #
-#    a = BilinearForm((V, U), expr)
+#    a = BilinearForm((v,u), expr)
 #    print('> input         >>> {0}'.format(a))
 #
 #    a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -177,7 +177,7 @@ def test_bilinear_form_1d_3():
 #
 #    expr = dx(dx(v))*dx(dx(dx(u))) + u*v
 #
-#    a = BilinearForm((V, U), expr)
+#    a = BilinearForm((v,u), expr)
 #    print('> input         >>> {0}'.format(a))
 #
 #    a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -199,7 +199,7 @@ def test_bilinear_form_1d_3():
 #
 #    expr = inner(grad(dx(F)*v), grad(u)) + u*v
 #
-#    a = BilinearForm((V, U), expr)
+#    a = BilinearForm((v,u), expr)
 #    print('> input         >>> {0}'.format(a))
 #
 #    a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -272,9 +272,9 @@ def test_bilinear_form_1d_10():
     c1 = Symbol('c1')
     c2 = Symbol('c2')
 
-    a = BilinearForm((V, U), inner(grad(u), grad(v)))
-    b = BilinearForm((V, U), u*v)
-    adv = BilinearForm((V, U), dx(u)*v)
+    a = BilinearForm((v,u), inner(grad(u), grad(v)))
+    b = BilinearForm((v,u), u*v)
+    adv = BilinearForm((v,u), dx(u)*v)
 
     # ...
     expected = Ni*Nj + Ni_x*Nj_x
@@ -312,13 +312,13 @@ if __name__ == '__main__':
     test_atomize_1d_1()
     test_normalize_1d_1()
 
-#    test_bilinear_form_1d_1()
-#    test_bilinear_form_1d_2()
-#    test_bilinear_form_1d_3()
+    test_bilinear_form_1d_1()
+    test_bilinear_form_1d_2()
+    test_bilinear_form_1d_3()
 
-#    test_bilinear_form_1d_4()
-#    test_bilinear_form_1d_5()
-#    test_bilinear_form_1d_6()
+##    test_bilinear_form_1d_4()
+##    test_bilinear_form_1d_5()
+##    test_bilinear_form_1d_6()
 ##    test_bilinear_form_1d_7()
 ##    test_bilinear_form_1d_8()
     test_bilinear_form_1d_10()

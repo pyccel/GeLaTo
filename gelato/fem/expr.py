@@ -54,76 +54,52 @@ class BilinearForm(Expr):
     Examples
 
     """
-    def __new__(cls, spaces, expr):
-        if not isinstance(spaces, (tuple, list, Tuple)):
-            raise NotImplementedError('dual space not yet available')
+    def __new__(cls, test_trial, expr):
+        if not isinstance(test_trial, (tuple, list, Tuple)):
+            raise TypeError('(test, trial) must be a tuple, list or Tuple')
 
-        if not(len(spaces) == 2):
-            raise ValueError('Expecting two spaces')
+        if not(len(test_trial) == 2):
+            raise ValueError('Expecting a couple (test, trial)')
 
-        test_space = [spaces[0]]
-        test_space = Tuple(*test_space)
+        test_functions = test_trial[0]
+        if isinstance(test_functions, (TestFunction, VectorTestFunction)):
+            test_functions = [test_functions]
+            test_functions = Tuple(*test_functions)
+        elif not isinstance(test_functions, (tuple, list, Tuple)):
+            raise TypeError('Wrong type for test function(s)')
 
-        trial_space = [spaces[1]]
-        trial_space = Tuple(*trial_space)
+        trial_functions = test_trial[1]
+        if isinstance(trial_functions, (TestFunction, VectorTestFunction)):
+            trial_functions = [trial_functions]
+            trial_functions = Tuple(*trial_functions)
+        elif not isinstance(trial_functions, (tuple, list, Tuple)):
+            raise TypeError('Wrong type for trial function(s)')
 
-        # TODO we must check the compatibility between the trial/test spaces
-#        if not(trial_space.ldim == test_space.ldim):
-#            raise ValueError('Incompatible logical dimension between test and trial spaces')
-
-        return Basic.__new__(cls, expr, trial_space, test_space)
+        return Basic.__new__(cls, expr, test_functions, trial_functions)
 
     @property
     def expr(self):
         return self._args[0]
 
     @property
-    def trial_space(self):
+    def test_functions(self):
         return self._args[1]
 
     @property
-    def test_space(self):
+    def trial_functions(self):
         return self._args[2]
 
     @property
     def ldim(self):
-        return self.test_space[0].ldim
+        return self.test_spaces[0].ldim
 
     @property
-    def trial_functions(self):
-        ls = [a for a in self.expr.free_symbols if isinstance(a, TestFunction) and a.space in self.trial_space]
-        # no redanduncy
-        ls = list(set(ls))
-
-        # ... reorder symbols by name
-        # TODO can we do better?
-        d = {}
-        for i in ls:
-            d[i.name] = i
-        names = [i.name for i in ls]
-        names.sort()
-        ls = [d[name] for name in names]
-        # ...
-
-        return ls
+    def test_spaces(self):
+        return [u.space for u in self.test_functions]
 
     @property
-    def test_functions(self):
-        ls = [a for a in self.expr.free_symbols if isinstance(a, TestFunction)]
-        # no redanduncy
-        ls = list(set(ls))
-
-        # ... reorder symbols by name
-        # TODO can we do better?
-        d = {}
-        for i in ls:
-            d[i.name] = i
-        names = [i.name for i in ls]
-        names.sort()
-        ls = [d[name] for name in names]
-        # ...
-
-        return ls
+    def trial_spaces(self):
+        return [u.space for u in self.trial_functions]
 
     @property
     def fields(self):
@@ -137,50 +113,51 @@ class BilinearForm(Expr):
         return sstr(expr)
 
     def __call__(self, *args):
-        if not(len(args) == 2):
-            raise ValueError('Expecting exactly two arguments')
-
-        # ...
-        tests = args[0]
-        if isinstance(tests, TestFunction):
-            tests = [tests]
-            tests = Tuple(*tests)
-        elif isinstance(tests, (tuple, list, Tuple)):
-            tests = Tuple(*tests)
-        else:
-            raise TypeError('Wrong type for test functions')
-        # ...
-
-        # ...
-        trials = args[1]
-        if isinstance(trials, TestFunction):
-            trials = [trials]
-            trials = Tuple(*trials)
-        elif isinstance(trials, (tuple, list, Tuple)):
-            trials = Tuple(*trials)
-        else:
-            raise TypeError('Wrong type for trial functions')
-        # ...
-
-        expr = self.expr
-
-        # ... replacing test functions
-        d = {}
-        for k,v in zip(self.test_functions, tests):
-            d[k] = v
-        expr = expr.subs(d)
-        # ...
-
-        # ... replacing trial functions
-        d = {}
-        for k,v in zip(self.trial_functions, trials):
-            d[k] = v
-        expr = expr.subs(d)
-        # ...
-
-        return BilinearForm(expr,
-                            trial_space=self.trial_space,
-                            test_space=self.test_space)
+        raise NotImplementedError()
+#        if not(len(args) == 2):
+#            raise ValueError('Expecting exactly two arguments')
+#
+#        # ...
+#        tests = args[0]
+#        if isinstance(tests, TestFunction):
+#            tests = [tests]
+#            tests = Tuple(*tests)
+#        elif isinstance(tests, (tuple, list, Tuple)):
+#            tests = Tuple(*tests)
+#        else:
+#            raise TypeError('Wrong type for test functions')
+#        # ...
+#
+#        # ...
+#        trials = args[1]
+#        if isinstance(trials, TestFunction):
+#            trials = [trials]
+#            trials = Tuple(*trials)
+#        elif isinstance(trials, (tuple, list, Tuple)):
+#            trials = Tuple(*trials)
+#        else:
+#            raise TypeError('Wrong type for trial functions')
+#        # ...
+#
+#        expr = self.expr
+#
+#        # ... replacing test functions
+#        d = {}
+#        for k,v in zip(self.test_functions, tests):
+#            d[k] = v
+#        expr = expr.subs(d)
+#        # ...
+#
+#        # ... replacing trial functions
+#        d = {}
+#        for k,v in zip(self.trial_functions, trials):
+#            d[k] = v
+#        expr = expr.subs(d)
+#        # ...
+#
+#        return BilinearForm(expr,
+#                            trial_space=self.trial_space,
+#                            test_space=self.test_space)
 
 
 # ...
