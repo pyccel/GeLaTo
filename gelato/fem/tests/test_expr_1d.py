@@ -16,13 +16,13 @@ from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import BilinearForm
-from gelato.fem.expr import gelatize, normalize
+from gelato.fem.expr import atomize, normalize
 from gelato.fem.expr import normalize_weak_from
 
 
 # ...
-def test_gelatize_1d_1():
-    print('============ test_gelatize_1d_1 =============')
+def test_atomize_1d_1():
+    print('============ test_atomize_1d_1 =============')
 
     V = FemSpace('V', ldim=1)
 
@@ -32,21 +32,21 @@ def test_gelatize_1d_1():
     F = Field('F')
 
     # ...
-    assert(gelatize(grad(v)) == dx(v))
-    assert(gelatize(grad(c*v)) == c*dx(v))
-    assert(gelatize(grad(F*v)) == F*dx(v) + v*dx(F))
+    assert(atomize(grad(v)) == dx(v))
+    assert(atomize(grad(c*v)) == c*dx(v))
+    assert(atomize(grad(F*v)) == F*dx(v) + v*dx(F))
 
-    assert(gelatize(dot(grad(v), grad(w))) == dx(v)*dx(w))
+    assert(atomize(dot(grad(v), grad(w))) == dx(v)*dx(w))
     # ...
 
     # ...
-    assert(gelatize(grad(v*w)) == w*dx(v) + v*dx(w))
-    assert(gelatize(div(grad(v*w))) == v*dx(dx(w)) + 2*dx(v)*dx(w) + dx(dx(v))*w)
+    assert(atomize(grad(v*w)) == w*dx(v) + v*dx(w))
+    assert(atomize(div(grad(v*w))) == v*dx(dx(w)) + 2*dx(v)*dx(w) + dx(dx(v))*w)
     # ...
 
 #    expr = dot(grad(v), grad(w))
 #    print('> input         >>> {0}'.format(expr))
-#    print('> gelatized     >>> {0}'.format(gelatize(expr)))
+#    print('> atomized     >>> {0}'.format(atomize(expr)))
 # ...
 
 # ...
@@ -94,7 +94,7 @@ def test_bilinear_form_1d_1():
 
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
-    print('> gelatized     >>> {0}'.format(gelatize(a)))
+    print('> atomized     >>> {0}'.format(atomize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
 
     a_expr = normalize_weak_from(a, basis={V: 'Nj', W: 'Ni'})
@@ -118,7 +118,7 @@ def test_bilinear_form_1d_2():
 
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
-    print('> gelatized     >>> {0}'.format(gelatize(a)))
+    print('> atomized     >>> {0}'.format(atomize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
 
     a_expr = normalize_weak_from(a, basis={V: 'Nj', W: 'Ni'})
@@ -141,7 +141,7 @@ def test_bilinear_form_1d_3():
 
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
-    print('> gelatized     >>> {0}'.format(gelatize(a)))
+    print('> atomized     >>> {0}'.format(atomize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
 
     a_expr = normalize_weak_from(a, basis={V: 'Nj', W: 'Ni'})
@@ -165,7 +165,7 @@ def test_bilinear_form_1d_4():
 
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
-    print('> gelatized     >>> {0}'.format(gelatize(a)))
+    print('> atomized     >>> {0}'.format(atomize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
 
     a_expr = normalize_weak_from(a, basis={V: 'Nj', W: 'Ni'})
@@ -187,7 +187,7 @@ def test_bilinear_form_1d_5():
 
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
-    print('> gelatized     >>> {0}'.format(gelatize(a)))
+    print('> atomized     >>> {0}'.format(atomize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
 
     a_expr = normalize_weak_from(a, basis={V: 'Nj', W: 'Ni'})
@@ -211,7 +211,7 @@ def test_bilinear_form_1d_6():
 
     a = BilinearForm(expr, trial_space=V, test_space=W)
     print('> input         >>> {0}'.format(a))
-    print('> gelatized     >>> {0}'.format(gelatize(a)))
+    print('> atomized     >>> {0}'.format(atomize(a)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(a)))
 
     a_expr = normalize_weak_from(a, basis={V: 'Nj', W: 'Ni'})
@@ -239,7 +239,7 @@ def test_bilinear_form_1d_7():
     ls = [a + b, a((t1,t2), (v1,v2)) + b(t1, v2)]
     for c in ls:
         print('> input         >>> {0}'.format(c))
-        print('> gelatized     >>> {0}'.format(gelatize(c)))
+        print('> atomized     >>> {0}'.format(atomize(c)))
         print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
         print('')
 # ...
@@ -263,7 +263,7 @@ def test_bilinear_form_1d_8():
     ls = [a(t1, v2), a(v2, t1)]
     for c in ls:
         print('> input         >>> {0}'.format(c))
-        print('> gelatized     >>> {0}'.format(gelatize(c)))
+        print('> atomized     >>> {0}'.format(atomize(c)))
         print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
         print('')
 # ...
@@ -282,14 +282,14 @@ def test_bilinear_form_1d_10():
     b = BilinearForm(w*v, trial_space=V, test_space=W)
     c = a + b
     print('> input         >>> {0}'.format(c))
-    print('> gelatized     >>> {0}'.format(gelatize(c)))
+    print('> atomized     >>> {0}'.format(atomize(c)))
     print('> normal form   >>> {0}'.format(normalize_weak_from(c)))
     print('')
 # ...
 
 # .....................................................
 if __name__ == '__main__':
-    test_gelatize_1d_1()
+    test_atomize_1d_1()
     test_normalize_1d_1()
 
 #    test_bilinear_form_1d_1()

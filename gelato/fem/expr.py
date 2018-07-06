@@ -4,7 +4,7 @@
 #      - check that a BilinearForm is bilinear (using Constant)
 #      - check that a LinearForm is linear
 #      - add is_symmetric property for BilinearForm
-#      - treat Function atom in gelatize, normalize, matrix_form
+#      - treat Function atom in atomize, normalize, matricize
 
 from numpy import zeros
 
@@ -166,7 +166,7 @@ class BilinearForm(Expr):
 
 
 # ...
-def gelatize(expr, dim=None):
+def atomize(expr, dim=None):
     """
     """
     if not isinstance(expr, (BilinearForm, LinearForm, Add, Mul,
@@ -193,11 +193,11 @@ def gelatize(expr, dim=None):
     # ...
 
     if isinstance(expr, (list, tuple, Tuple)):
-        args = [gelatize(i, dim=dim) for i in expr]
+        args = [atomize(i, dim=dim) for i in expr]
         return Tuple(*args)
 
     elif isinstance(expr, Add):
-        args = [gelatize(i, dim=dim) for i in expr.args]
+        args = [atomize(i, dim=dim) for i in expr.args]
         return Add(*args)
 
     elif isinstance(expr, Mul):
@@ -210,7 +210,7 @@ def gelatize(expr, dim=None):
 
         j = S.One
         if vectors:
-            args = [gelatize(i, dim=dim) for i in vectors]
+            args = [atomize(i, dim=dim) for i in vectors]
             j = Mul(*args)
 
         return Mul(i, j)
@@ -220,11 +220,11 @@ def gelatize(expr, dim=None):
         op = type(expr)
         new  = eval('{0}_{1}d'.format(op, dim))
 
-        args = [gelatize(i, dim=dim) for i in expr.args]
+        args = [atomize(i, dim=dim) for i in expr.args]
         return new(*args)
 
     elif isinstance(expr, (BilinearForm, LinearForm)):
-        e = gelatize(expr.expr, dim=dim)
+        e = atomize(expr.expr, dim=dim)
 
         return BilinearForm(e,
                             trial_space=expr.trial_space,
@@ -239,10 +239,10 @@ def normalize_weak_from(a, basis=None):
 # ...
 
 
-# ... TODO remove call to gelatize, must be done before calling normalize
+# ... TODO remove call to atomize, must be done before calling normalize
 def normalize(expr, basis=None):
     """
-    must be applied after calling gelatize
+    must be applied after calling atomize
 
     basis: dict
         for every space we give the name of the basis function symbol
@@ -259,7 +259,7 @@ def normalize(expr, basis=None):
     # ...
 
     # ...
-    expr = gelatize(expr)
+    expr = atomize(expr)
     # ...
 
 #    print('> expr = ', expr, type(expr))
@@ -349,7 +349,7 @@ def normalize(expr, basis=None):
 # ...
 
 # ...
-def matrix_form(expr):
+def matricize(expr):
     """
     must be applied after calling normalize
     """
@@ -361,11 +361,11 @@ def matrix_form(expr):
 #    print('> expr = ', expr, type(expr))
 
     if isinstance(expr, (list, tuple, Tuple)):
-        args = [matrix_form(i) for i in expr]
+        args = [matricize(i) for i in expr]
         return Tuple(*args)
 
     elif isinstance(expr, Add):
-        args = [matrix_form(i) for i in expr.args]
+        args = [matricize(i) for i in expr.args]
         # we cannot return Add(*args)
         # since it gives the error:
         # TypeError: cannot add <class 'sympy.matrices.immutable.ImmutableDenseMatrix'> and <class 'sympy.core.numbers.Zero'>
@@ -387,7 +387,7 @@ def matrix_form(expr):
 
         j = S.One
         if vectors:
-            args = [matrix_form(i) for i in vectors]
+            args = [matricize(i) for i in vectors]
             if not(len(args) == 2):
                 print(args)
                 raise ValueError('Expecting exactly 2 arguments')

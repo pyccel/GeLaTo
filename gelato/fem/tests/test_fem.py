@@ -10,8 +10,6 @@ from gelato.fem.core import TestFunction
 from gelato.fem.core import TrialFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
-from gelato.fem.expr import gelatize
-from gelato.fem.expr import normalize_weak_from
 
 from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 from gelato.calculus import dx, dy, dz
