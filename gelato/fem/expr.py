@@ -1,10 +1,13 @@
 # coding: utf-8
 
 # TODO - transpose of BilinearForm
+#      - add unknown status if only one space is given to the BilinearForm
+#        => can not be gelatized except if it is called on a couple test/trial
 #      - check that a BilinearForm is bilinear (using Constant)
 #      - check that a LinearForm is linear
 #      - add is_symmetric property for BilinearForm
 #      - treat Function atom in atomize, normalize, matricize
+#      - treat Field atom in atomize, normalize, matricize
 
 from numpy import zeros
 
