@@ -54,10 +54,10 @@ def test_normalize_1d_1():
     print('============ test_normalize_1d_1 =============')
 
     V = FemSpace('V', ldim=1)
-    W = FemSpace('W', ldim=1)
+    U = FemSpace('U', ldim=1)
 
     v = TestFunction(V, name='v')
-    u = TestFunction(W, name='u')
+    u = TestFunction(U, name='u')
     c = Constant('c')
     F = Field('F')
 
@@ -68,8 +68,9 @@ def test_normalize_1d_1():
     assert(normalize(grad(v), basis={V: 'Ni'}) == Ni_x)
     assert(normalize(grad(c*v), basis={V: 'Ni'}) == c*Ni_x)
     assert(normalize(grad(v) + c*v, basis={V: 'Ni'}) == Ni_x + c*Ni)
-    assert(normalize(dot(grad(v), grad(u)), basis={V: 'Ni', W: 'Nj'}) == Ni_x*Nj_x)
-    assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', W: 'Nj'}) == Ni_x*Nj_x + c*Ni*Nj)
+
+    assert(normalize(dot(grad(v), grad(u)), basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x)
+    assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + c*Ni*Nj)
     # ...
 
 #    expr = dot(grad(v), grad(u))
@@ -77,7 +78,7 @@ def test_normalize_1d_1():
 
 #    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
 #    print('> normal form   >>> {0}'.format(normalize(dot(grad(v), grad(u)),
-#                                                     basis={V: 'Ni', W: 'Nj'})))
+#                                                     basis={V: 'Ni', U: 'Nj'})))
 # ...
 
 # ...
@@ -90,7 +91,7 @@ def test_bilinear_form_1d_1():
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
 
-    expr = inner(grad(u), grad(v))
+    expr = inner(grad(v), grad(u))
 
     a = BilinearForm(expr, trial_space=V, test_space=U)
     print('> input      >>> {0}'.format(a))
@@ -283,6 +284,7 @@ if __name__ == '__main__':
     test_bilinear_form_1d_1()
     test_bilinear_form_1d_2()
     test_bilinear_form_1d_3()
+
 #    test_bilinear_form_1d_4()
 #    test_bilinear_form_1d_5()
 #    test_bilinear_form_1d_6()
