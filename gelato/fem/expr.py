@@ -169,7 +169,7 @@ class BilinearForm(Expr):
 def atomize(expr, dim=None):
     """
     """
-    if not isinstance(expr, (BilinearForm, LinearForm, Add, Mul,
+    if not isinstance(expr, (Add, Mul,
                              _partial_derivatives, _calculus_operators,
                              TestFunction, VectorTestFunction, Indexed,
                              Field, Constant, Symbol,
@@ -182,14 +182,11 @@ def atomize(expr, dim=None):
 
     # ... compute dim if None
     if dim is None:
-        if isinstance(expr, (BilinearForm, LinearForm)):
-            dim = expr.test_space.ldim
-        else:
-            ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction, VectorTestFunction))]
+        ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction, VectorTestFunction))]
 
-            if ls:
-                atom = ls[0]
-                dim = atom.space.ldim
+        if ls:
+            atom = ls[0]
+            dim = atom.space.ldim
     # ...
 
     if isinstance(expr, (list, tuple, Tuple)):
@@ -223,13 +220,6 @@ def atomize(expr, dim=None):
         args = [atomize(i, dim=dim) for i in expr.args]
         return new(*args)
 
-    elif isinstance(expr, (BilinearForm, LinearForm)):
-        e = atomize(expr.expr, dim=dim)
-
-        return BilinearForm(e,
-                            trial_space=expr.trial_space,
-                            test_space=expr.test_space)
-
     return expr
 # ...
 
@@ -239,7 +229,7 @@ def normalize_weak_from(a, basis=None):
 # ...
 
 
-# ... TODO remove call to atomize, must be done before calling normalize
+# ...
 def normalize(expr, basis=None):
     """
     must be applied after calling atomize
@@ -248,14 +238,11 @@ def normalize(expr, basis=None):
         for every space we give the name of the basis function symbol
     """
     # ... compute dim
-    if isinstance(expr, (BilinearForm, LinearForm)):
-        dim = expr.test_space.ldim
-    else:
-        ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction, VectorTestFunction))]
+    ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction, VectorTestFunction))]
 
-        if ls:
-            atom = ls[0]
-            dim = atom.space.ldim
+    if ls:
+        atom = ls[0]
+        dim = atom.space.ldim
     # ...
 
     # ...
@@ -289,9 +276,6 @@ def normalize(expr, basis=None):
 
     elif isinstance(expr, _partial_derivatives):
         ops = sort_partial_derivatives(expr)
-
-        trials = [i for i in expr.free_symbols if isinstance(expr, TrialFunction)]
-        tests = [i for i in expr.free_symbols if isinstance(expr, TestFunction)]
 
         # ...
         for i in ops:
@@ -337,13 +321,6 @@ def normalize(expr, basis=None):
             name = basis[base.space]
             indices = expr.indices
             return IndexedBase(name, shape=dim)[indices]
-
-    elif isinstance(expr, (BilinearForm, LinearForm)):
-        e = normalize(expr.expr, basis=basis)
-
-        return BilinearForm(e,
-                            trial_space=expr.trial_space,
-                            test_space=expr.test_space)
 
     return expr
 # ...
@@ -425,3 +402,33 @@ def matricize(expr):
     return expr
 # ...
 
+# ... TODO compute basis if not given
+def gelatize(a, basis=None, verbose=True):
+
+    if not isinstance(a, (BilinearForm, LinearForm)):
+        raise TypeError('Expecting a BilinearForm or LinearForm')
+
+    dim = a.test_space.ldim
+    expr = a.expr
+
+    expr = atomize(expr, dim=dim)
+    if verbose:
+        print('> atomized   >>> {0}'.format(expr))
+
+    expr = normalize(expr, basis=basis)
+    if verbose:
+        print('> normalized >>> {0}'.format(expr))
+
+    expr = matricize(expr)
+    if verbose:
+        print('> matricized >>> {0}'.format(expr))
+
+    return expr
+
+#    if isinstance(a, BilinearForm):
+#        return BilinearForm(expr, trial_space=a.trial_space, test_space=a.test_space)
+#
+#    elif isinstance(a, LinearForm):
+#        raise NotImplementedError('not implemented yet for LinearForm')
+##        return LinearForm(expr, test_space=a.test_space)
+# ...

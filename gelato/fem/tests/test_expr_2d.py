@@ -21,6 +21,7 @@ from gelato.fem.core import VectorTestFunction
 from gelato.fem.core import VectorTrialFunction
 from gelato.fem.expr import BilinearForm
 from gelato.fem.expr import atomize, normalize, matricize
+from gelato.fem.expr import gelatize
 
 
 # ...
@@ -55,10 +56,10 @@ def test_normalize_2d_1():
     print('============ test_normalize_2d_1 =============')
 
     V = FemSpace('V', ldim=2)
-    W = FemSpace('W', ldim=2)
+    U = FemSpace('U', ldim=2)
 
     v = TestFunction(V, name='v')
-    u = TrialFunction(W, name='u')
+    u = TestFunction(U, name='u')
     c = Constant('c')
     F = Field('F')
 
@@ -73,8 +74,8 @@ def test_normalize_2d_1():
     assert(normalize(grad(c*v), basis={V: 'Ni'}) == Tuple(c*Ni_x, c*Ni_y))
     assert(normalize(dot(b, grad(v)), basis={V: 'Ni'}) == Ni_x*bx + Ni_y*by)
     assert(normalize(dot(b, grad(v)) + c*v, basis={V: 'Ni'}) == Ni_x*bx + Ni_y*by + c*Ni)
-    assert(normalize(dot(grad(v), grad(u)), basis={V: 'Ni', W: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y)
-    assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', W: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + c*Ni*Nj)
+    assert(normalize(dot(grad(v), grad(u)), basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y)
+    assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + c*Ni*Nj)
     # ...
 
 #    expr = dot(grad(v), b)
@@ -82,7 +83,7 @@ def test_normalize_2d_1():
 #
 #    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
 #    print('> normal form   >>> {0}'.format(normalize(dot(grad(v), grad(u)),
-#                                                     basis={V: 'Ni', W: 'Nj'})))
+#                                                     basis={V: 'Ni', U: 'Nj'})))
 # ...
 
 
@@ -107,10 +108,10 @@ def test_normalize_2d_2():
     print('============ test_normalize_2d_2 =============')
 
     V = FemSpace('V', ldim=2, is_block=True, shape=2)
-    W = FemSpace('W', ldim=2, is_block=True, shape=2)
+    U = FemSpace('U', ldim=2, is_block=True, shape=2)
 
     v = VectorTestFunction(V, name='v')
-    u = VectorTestFunction(W, name='u')
+    u = VectorTestFunction(U, name='u')
 
     Ni = IndexedBase('Ni', shape=2)
     Ni_x = IndexedBase('Ni_x', shape=2)
@@ -125,22 +126,22 @@ def test_normalize_2d_2():
     assert(normalize(div(v), basis={V: 'Ni'}) == Ni_x[0] + Ni_y[1])
     assert(normalize(rot(v), basis={V: 'Ni'}) == -Ni_x[1] + Ni_y[0])
 
-    assert(normalize(v[0]*u[0], basis={V: 'Ni', W: 'Nj'}) == Ni[0]*Nj[0])
-    assert(normalize(v[1]*dx(u[0]), basis={V: 'Ni', W: 'Nj'}) == Ni[1]*Nj_x[0])
-    assert(normalize(dy(v[0])*u[1], basis={V: 'Ni', W: 'Nj'}) == Ni_y[0]*Nj[1])
-    assert(normalize(dx(v[1])*dy(u[1]), basis={V: 'Ni', W: 'Nj'}) == Ni_x[1]*Nj_y[1])
+    assert(normalize(v[0]*u[0], basis={V: 'Ni', U: 'Nj'}) == Ni[0]*Nj[0])
+    assert(normalize(v[1]*dx(u[0]), basis={V: 'Ni', U: 'Nj'}) == Ni[1]*Nj_x[0])
+    assert(normalize(dy(v[0])*u[1], basis={V: 'Ni', U: 'Nj'}) == Ni_y[0]*Nj[1])
+    assert(normalize(dx(v[1])*dy(u[1]), basis={V: 'Ni', U: 'Nj'}) == Ni_x[1]*Nj_y[1])
 
     expected = (Ni_x[0] + Ni_y[1]) * (Nj_x[0] + Nj_y[1])
-    assert(normalize(div(v) * div(u), basis={V: 'Ni', W: 'Nj'}) == expected)
+    assert(normalize(div(v) * div(u), basis={V: 'Ni', U: 'Nj'}) == expected)
 
     expected = (-Ni_x[1] + Ni_y[0]) * (-Nj_x[1] + Nj_y[0])
-    assert(normalize(rot(v) * rot(u), basis={V: 'Ni', W: 'Nj'}) == expected)
+    assert(normalize(rot(v) * rot(u), basis={V: 'Ni', U: 'Nj'}) == expected)
 
 #    expr = dx(v[0])
 #    print('> input         >>> {0}'.format(expr))
 
 #    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
-##    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni', W: 'Nj'})))
+##    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni', U: 'Nj'})))
 # ...
 
 # ...
@@ -148,10 +149,10 @@ def test_matricize_2d_2():
     print('============ test_matricize_2d_2 =============')
 
     V = FemSpace('V', ldim=2, is_block=True, shape=2)
-    W = FemSpace('W', ldim=2, is_block=True, shape=2)
+    U = FemSpace('U', ldim=2, is_block=True, shape=2)
 
     v = VectorTestFunction(V, name='v')
-    u = VectorTestFunction(W, name='u')
+    u = VectorTestFunction(U, name='u')
 
     Ni, Ni_x, Ni_y = symbols('Ni Ni_x Ni_y')
     Nj, Nj_x, Nj_y = symbols('Nj Nj_x Nj_y')
@@ -161,49 +162,49 @@ def test_matricize_2d_2():
 
     # ...
     expr = v[0]*u[0]
-    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
     expected = Matrix([[Ni*Nj, 0], [0, 0]])
     assert(matricize(expr) == expected)
     # ...
 
     # ...
     expr = v[1]*dx(u[0])
-    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
     expected = Matrix([[0, Ni*Nj_x], [0, 0]])
     assert(matricize(expr) == expected)
     # ...
 
     # ...
     expr = dy(v[0])*u[1]
-    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
     expected = Matrix([[0, 0], [Ni_y*Nj, 0]])
     assert(matricize(expr) == expected)
     # ...
 
     # ...
     expr = dx(v[1])*dy(u[1])
-    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
     expected = Matrix([[0, 0], [0, Ni_x*Nj_y]])
     assert(matricize(expr) == expected)
     # ...
 
     # ...
     expr = div(v) * div(u)
-    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
     expected = Matrix([[Ni_x*Nj_x, Ni_y*Nj_x], [Ni_x*Nj_y, Ni_y*Nj_y]])
     assert(matricize(expr) == expected)
     # ...
 
     # ...
     expr = rot(v) * rot(u)
-    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
     expected = Matrix([[Ni_y*Nj_y, -Ni_x*Nj_y], [-Ni_y*Nj_x, Ni_x*Nj_x]])
     assert(matricize(expr) == expected)
     # ...
 
     # ...
     expr = div(v) * div(u) + rot(v) * rot(u)
-    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
     expected = Matrix([[Ni_x*Nj_x + Ni_y*Nj_y, -Ni_x*Nj_y + Ni_y*Nj_x],
                        [Ni_x*Nj_y - Ni_y*Nj_x, Ni_x*Nj_x + Ni_y*Nj_y]])
     assert(matricize(expr) == expected)
@@ -211,7 +212,7 @@ def test_matricize_2d_2():
 
     # ...
     expr = c1 * div(v) * div(u) + rot(v) * rot(u)
-    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
     expected = Matrix([[Ni_x*Nj_x*c1 + Ni_y*Nj_y, -Ni_x*Nj_y + Ni_y*Nj_x*c1],
                        [Ni_x*Nj_y*c1 - Ni_y*Nj_x, Ni_x*Nj_x + Ni_y*Nj_y*c1]])
     assert(matricize(expr) == expected)
@@ -219,7 +220,7 @@ def test_matricize_2d_2():
 
     # ...
     expr = c1 * div(v) * div(u) + c2 * rot(v) * rot(u)
-    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
     expected = Matrix([[Ni_x*Nj_x*c1 + Ni_y*Nj_y*c2, -Ni_x*Nj_y*c2 + Ni_y*Nj_x*c1],
                        [Ni_x*Nj_y*c1 - Ni_y*Nj_x*c2, Ni_x*Nj_x*c2 + Ni_y*Nj_y*c1]])
     assert(matricize(expr) == expected)
@@ -227,7 +228,7 @@ def test_matricize_2d_2():
 
 #    expr = c1 * div(v) * div(u) + rot(v) * rot(u)
 #    print('> input         >>> {0}'.format(expr))
-#    expr = normalize(expr, basis={V: 'Ni', W: 'Nj'})
+#    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
 #    print('> matricize     >>> {0}'.format(matricize(expr)))
 # ...
 
@@ -235,21 +236,19 @@ def test_matricize_2d_2():
 def test_bilinear_form_2d_1():
     print('============ test_bilinear_form_2d_1 =============')
 
-    W = FemSpace('W', ldim=2)
+    U = FemSpace('U', ldim=2)
     V = FemSpace('V', ldim=2)
 
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
+    u = TestFunction(U, name='u')
+    v = TestFunction(V, name='v')
 
-    expr = inner(grad(w), grad(v)) + w*v
+    expr = inner(grad(u), grad(v)) + u*v
 
-    a = BilinearForm(expr, trial_space=V, test_space=W)
-    print('> input         >>> {0}'.format(a))
-    print('> atomized     >>> {0}'.format(atomize(a)))
-    print('> normal form   >>> {0}'.format(normalize(a)))
+    a = BilinearForm(expr, trial_space=V, test_space=U)
+    print('> input      >>> {0}'.format(a))
 
-    a_expr = normalize(a, basis={V: 'Nj', W: 'Ni'})
-    print('> basis  form   >>> {0}'.format(a_expr))
+    a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
+    print('> gelatized  >>> {0}'.format(a_expr))
     print('')
 # ...
 
@@ -257,21 +256,19 @@ def test_bilinear_form_2d_1():
 def test_bilinear_form_2d_2():
     print('============ test_bilinear_form_2d_2 =============')
 
-    W = FemSpace('W', ldim=2)
+    U = FemSpace('U', ldim=2)
     V = FemSpace('V', ldim=2)
 
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
+    u = TestFunction(U, name='u')
+    v = TestFunction(V, name='v')
 
-    expr = cross(curl(w), curl(v)) + 0.2 * w * v
+    expr = cross(curl(u), curl(v)) + 0.2 * u * v
 
-    a = BilinearForm(expr, trial_space=V, test_space=W)
-    print('> input         >>> {0}'.format(a))
-    print('> atomized     >>> {0}'.format(atomize(a)))
-    print('> normal form   >>> {0}'.format(normalize(a)))
+    a = BilinearForm(expr, trial_space=V, test_space=U)
+    print('> input      >>> {0}'.format(a))
 
-    a_expr = normalize(a, basis={V: 'Nj', W: 'Ni'})
-    print('> basis  form   >>> {0}'.format(a_expr))
+    a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
+    print('> gelatized  >>> {0}'.format(a_expr))
     print('')
 # ...
 
@@ -279,25 +276,23 @@ def test_bilinear_form_2d_2():
 def test_bilinear_form_2d_3():
     print('============ test_bilinear_form_2d_3 =============')
 
-    W = FemSpace('W', ldim=2)
+    U = FemSpace('U', ldim=2)
     V = FemSpace('V', ldim=2)
 
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
+    u = TestFunction(U, name='u')
+    v = TestFunction(V, name='v')
 
     bx = Constant('bx')
     by = Constant('by')
     b = Tuple(bx, by)
 
-    expr = 0.2 * w * v + dot(b, grad(v)) * w
+    expr = 0.2 * u * v + dot(b, grad(v)) * u
 
-    a = BilinearForm(expr, trial_space=V, test_space=W)
-    print('> input         >>> {0}'.format(a))
-    print('> atomized     >>> {0}'.format(atomize(a)))
-    print('> normal form   >>> {0}'.format(normalize(a)))
+    a = BilinearForm(expr, trial_space=V, test_space=U)
+    print('> input      >>> {0}'.format(a))
 
-    a_expr = normalize(a, basis={V: 'Nj', W: 'Ni'})
-    print('> basis  form   >>> {0}'.format(a_expr))
+    a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
+    print('> gelatized  >>> {0}'.format(a_expr))
     print('')
 # ...
 
@@ -305,49 +300,50 @@ def test_bilinear_form_2d_3():
 def test_bilinear_form_2d_4():
     print('============ test_bilinear_form_2d_4 =============')
 
-    W = FemSpace('W', ldim=2, is_block=True, shape=2)
+    U = FemSpace('U', ldim=2, is_block=True, shape=2)
     V = FemSpace('V', ldim=2, is_block=True, shape=2)
 
-    w = VectorTestFunction(W, name='w')
-    v = VectorTrialFunction(V, name='v')
+    u = VectorTestFunction(U, name='u')
+    v = VectorTestFunction(V, name='v')
 
-    expr = rot(w) * rot(v) + div(w) * div(v) + 0.2 * dot(w, v)
+    expr = rot(u) * rot(v) + div(u) * div(v) + 0.2 * dot(u, v)
 
-    a = BilinearForm(expr, trial_space=V, test_space=W)
-    print('> input         >>> {0}'.format(a))
-    print('> atomized     >>> {0}'.format(atomize(a)))
-    print('> normal form   >>> {0}'.format(normalize(a)))
+    a = BilinearForm(expr, trial_space=V, test_space=U)
+    print('> input      >>> {0}'.format(a))
+
+    a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
+    print('> gelatized  >>> {0}'.format(a_expr))
     print('')
 # ...
 
-# ... TODO debug
-def test_bilinear_form_2d_10():
-    print('============ test_bilinear_form_2d_10 =============')
-
-    W = FemSpace('W', ldim=2)
-    V = FemSpace('V', ldim=2)
-
-    w = TestFunction(W, name='w')
-    v = TrialFunction(V, name='v')
-
-    a = BilinearForm(inner(grad(w), grad(v)), trial_space=V, test_space=W)
-    b = BilinearForm(w*v, trial_space=V, test_space=W)
-
-    c = a + b
-    print('> input         >>> {0}'.format(c))
-    print('> atomized     >>> {0}'.format(atomize(c)))
-    print('> normal form   >>> {0}'.format(normalize(c)))
-    print('')
-
-    v1 = TestFunction(V, name='v1')
-    u1 = TrialFunction(W, name='u1')
-
-    d = a(v1, u1) + b
-    print('> input         >>> {0}'.format(d))
-    print('> atomized     >>> {0}'.format(atomize(d)))
-    print('> normal form   >>> {0}'.format(normalize(d)))
-    print('')
-# ...
+## ... TODO debug
+#def test_bilinear_form_2d_10():
+#    print('============ test_bilinear_form_2d_10 =============')
+#
+#    U = FemSpace('U', ldim=2)
+#    V = FemSpace('V', ldim=2)
+#
+#    u = TestFunction(U, name='u')
+#    v = TestFunction(V, name='v')
+#
+#    a = BilinearForm(inner(grad(u), grad(v)), trial_space=V, test_space=U)
+#    b = BilinearForm(u*v, trial_space=V, test_space=U)
+#
+#    c = a + b
+#    print('> input         >>> {0}'.format(c))
+#    print('> atomized     >>> {0}'.format(atomize(c)))
+#    print('> normal form   >>> {0}'.format(normalize(c)))
+#    print('')
+#
+#    v1 = TestFunction(V, name='v1')
+#    u1 = TestFunction(U, name='u1')
+#
+#    d = a(v1, u1) + b
+#    print('> input         >>> {0}'.format(d))
+#    print('> atomized     >>> {0}'.format(atomize(d)))
+#    print('> normal form   >>> {0}'.format(normalize(d)))
+#    print('')
+## ...
 
 
 # .....................................................
@@ -359,8 +355,8 @@ if __name__ == '__main__':
     test_normalize_2d_2()
     test_matricize_2d_2()
 
-#    test_bilinear_form_2d_1()
-#    test_bilinear_form_2d_2()
-#    test_bilinear_form_2d_3()
-#    test_bilinear_form_2d_4()
+    test_bilinear_form_2d_1()
+    test_bilinear_form_2d_2()
+    test_bilinear_form_2d_3()
+    test_bilinear_form_2d_4()
 ##    test_bilinear_form_2d_10()
