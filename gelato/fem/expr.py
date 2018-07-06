@@ -156,7 +156,6 @@ class BilinearForm(Expr):
 
         # ...
         d_tmp = {}
-        # TODO add Indexed/IndexedBase case
         for x in trial_functions:
             name = '{name}_{hash}'.format(name=x.name, hash=abs(hash(x)))
             if isinstance(x, TestFunction):
