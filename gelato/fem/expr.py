@@ -53,9 +53,18 @@ class BilinearForm(Expr):
     Examples
 
     """
-    def __new__(cls, expr, trial_space=None, test_space=None):
-        if not(trial_space is None) and not(test_space is None):
-            assert(trial_space.ldim == test_space.ldim)
+    def __new__(cls, spaces, expr):
+        if not isinstance(spaces, (tuple, list, Tuple)):
+            raise NotImplementedError('dual space not yet available')
+
+        if not(len(spaces) == 2):
+            raise ValueError('Expecting two spaces')
+
+        test_space = spaces[0]
+        trial_space = spaces[0]
+
+        if not(trial_space.ldim == test_space.ldim):
+            raise ValueError('Incompatible logical dimension between test and trial spaces')
 
         return Basic.__new__(cls, expr, trial_space, test_space)
 

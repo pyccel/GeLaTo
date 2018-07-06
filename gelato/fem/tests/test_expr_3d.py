@@ -274,7 +274,7 @@ def test_bilinear_form_3d_1():
 
     expr = inner(grad(u), grad(v))
 
-    a = BilinearForm(expr, trial_space=V, test_space=U)
+    a = BilinearForm((V, U), expr)
     print('> input      >>> {0}'.format(a))
 
     a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -294,7 +294,7 @@ def test_bilinear_form_3d_2():
 
     expr = div(u) * div(v) + 0.2 * dot(u, v)
 
-    a = BilinearForm(expr, trial_space=V, test_space=U)
+    a = BilinearForm((V, U), expr)
     print('> input      >>> {0}'.format(a))
 
     a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -314,7 +314,7 @@ def test_bilinear_form_3d_3():
 
     expr = dot(curl(u), curl(v)) + 0.2 * dot(u, v)
 
-    a = BilinearForm(expr, trial_space=V, test_space=U)
+    a = BilinearForm((V, U), expr)
     print('> input      >>> {0}'.format(a))
 
     a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -339,7 +339,7 @@ def test_bilinear_form_3d_3():
 #
 #    expr = dot(curl(cross(b,u)), curl(cross(b,v))) + 0.2 * dot(u, v)
 #
-#    a = BilinearForm(expr, trial_space=V, test_space=U)
+#    a = BilinearForm((V, U), expr)
 #    print('> input      >>> {0}'.format(a))
 #
 #    a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -366,7 +366,7 @@ def test_bilinear_form_3d_3():
 #
 #    expr = c0 * dot(u, v) - c1 * div(u) * div(v) + c2 *dot(curl(cross(b,u)), curl(cross(b,v)))
 #
-#    a = BilinearForm(expr, trial_space=V, test_space=U)
+#    a = BilinearForm((V, U), expr)
 #    print('> input      >>> {0}'.format(a))
 #
 #    a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})

@@ -244,7 +244,7 @@ def test_bilinear_form_2d_1():
 
     expr = inner(grad(u), grad(v)) + u*v
 
-    a = BilinearForm(expr, trial_space=V, test_space=U)
+    a = BilinearForm((V, U), expr)
     print('> input      >>> {0}'.format(a))
 
     a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -264,7 +264,7 @@ def test_bilinear_form_2d_2():
 
     expr = cross(curl(u), curl(v)) + 0.2 * u * v
 
-    a = BilinearForm(expr, trial_space=V, test_space=U)
+    a = BilinearForm((V, U), expr)
     print('> input      >>> {0}'.format(a))
 
     a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -288,7 +288,7 @@ def test_bilinear_form_2d_3():
 
     expr = 0.2 * u * v + dot(b, grad(v)) * u
 
-    a = BilinearForm(expr, trial_space=V, test_space=U)
+    a = BilinearForm((V, U), expr)
     print('> input      >>> {0}'.format(a))
 
     a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
@@ -308,7 +308,7 @@ def test_bilinear_form_2d_4():
 
     expr = rot(u) * rot(v) + div(u) * div(v) + 0.2 * dot(u, v)
 
-    a = BilinearForm(expr, trial_space=V, test_space=U)
+    a = BilinearForm((V, U), expr)
     print('> input      >>> {0}'.format(a))
 
     a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
