@@ -266,6 +266,9 @@ def test_bilinear_form_1d_10():
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')
 
+    u1 = TestFunction(U, name='u1')
+    v1 = TestFunction(V, name='v1')
+
     Ni, Ni_x = symbols('Ni Ni_x')
     Nj, Nj_x = symbols('Nj Nj_x')
 
@@ -301,7 +304,19 @@ def test_bilinear_form_1d_10():
     assert(gelatize(c1*a  + c2*(b + adv), basis={V: 'Nj', U: 'Ni'}) == expected)
     # ...
 
-#    expr = c1 * a  + c2*(b + adv)
+    # ...
+    assert(gelatize(a(u1, v1), basis={V: 'Nj', U: 'Ni'}) == gelatize(a(v1, u1), basis={V: 'Nj', U: 'Ni'}))
+    # ...
+
+    # ...
+    expected = Ni_x*Nj
+    assert(gelatize(adv(v1, u1), basis={V: 'Nj', U: 'Ni'}) == expected)
+
+    expected = Nj_x*Ni
+    assert(gelatize(adv(u1, v1), basis={V: 'Nj', U: 'Ni'}) == expected)
+    # ...
+
+#    expr = a(v1, u1)
 #    print('> input      >>> {0}'.format(expr))
 #    print('> gelatized  >>> {0}'.format(gelatize(expr, basis={V: 'Nj', U: 'Ni'}) ))
 #    print('')

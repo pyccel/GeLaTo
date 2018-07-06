@@ -55,6 +55,8 @@ class BilinearForm(Expr):
 
     """
     def __new__(cls, test_trial, expr):
+        # ...
+        # TODO put this in a private function since it is used in __new__ and __call__
         if not isinstance(test_trial, (tuple, list, Tuple)):
             raise TypeError('(test, trial) must be a tuple, list or Tuple')
 
@@ -65,6 +67,7 @@ class BilinearForm(Expr):
         if isinstance(test_functions, (TestFunction, VectorTestFunction)):
             test_functions = [test_functions]
             test_functions = Tuple(*test_functions)
+
         elif not isinstance(test_functions, (tuple, list, Tuple)):
             raise TypeError('Wrong type for test function(s)')
 
@@ -72,8 +75,10 @@ class BilinearForm(Expr):
         if isinstance(trial_functions, (TestFunction, VectorTestFunction)):
             trial_functions = [trial_functions]
             trial_functions = Tuple(*trial_functions)
+
         elif not isinstance(trial_functions, (tuple, list, Tuple)):
             raise TypeError('Wrong type for trial function(s)')
+        # ...
 
         return Basic.__new__(cls, expr, test_functions, trial_functions)
 
@@ -113,51 +118,76 @@ class BilinearForm(Expr):
         return sstr(expr)
 
     def __call__(self, *args):
-        raise NotImplementedError()
-#        if not(len(args) == 2):
-#            raise ValueError('Expecting exactly two arguments')
-#
-#        # ...
-#        tests = args[0]
-#        if isinstance(tests, TestFunction):
-#            tests = [tests]
-#            tests = Tuple(*tests)
-#        elif isinstance(tests, (tuple, list, Tuple)):
-#            tests = Tuple(*tests)
-#        else:
-#            raise TypeError('Wrong type for test functions')
-#        # ...
-#
-#        # ...
-#        trials = args[1]
-#        if isinstance(trials, TestFunction):
-#            trials = [trials]
-#            trials = Tuple(*trials)
-#        elif isinstance(trials, (tuple, list, Tuple)):
-#            trials = Tuple(*trials)
-#        else:
-#            raise TypeError('Wrong type for trial functions')
-#        # ...
-#
-#        expr = self.expr
-#
-#        # ... replacing test functions
-#        d = {}
-#        for k,v in zip(self.test_functions, tests):
-#            d[k] = v
-#        expr = expr.subs(d)
-#        # ...
-#
-#        # ... replacing trial functions
-#        d = {}
-#        for k,v in zip(self.trial_functions, trials):
-#            d[k] = v
-#        expr = expr.subs(d)
-#        # ...
-#
-#        return BilinearForm(expr,
-#                            trial_space=self.trial_space,
-#                            test_space=self.test_space)
+        # ...
+        # TODO put this in a private function since it is used in __new__ and __call__
+        test_trial = args
+        if not isinstance(test_trial, (tuple, list, Tuple)):
+            raise TypeError('(test, trial) must be a tuple, list or Tuple')
+
+        if not(len(test_trial) == 2):
+            raise ValueError('Expecting a couple (test, trial)')
+
+        test_functions = test_trial[0]
+        if isinstance(test_functions, (TestFunction, VectorTestFunction)):
+            test_functions = [test_functions]
+            test_functions = Tuple(*test_functions)
+
+        elif not isinstance(test_functions, (tuple, list, Tuple)):
+            raise TypeError('Wrong type for test function(s)')
+
+        trial_functions = test_trial[1]
+        if isinstance(trial_functions, (TestFunction, VectorTestFunction)):
+            trial_functions = [trial_functions]
+            trial_functions = Tuple(*trial_functions)
+
+        elif not isinstance(trial_functions, (tuple, list, Tuple)):
+            raise TypeError('Wrong type for trial function(s)')
+        # ...
+
+        # ...
+        test_trial = [test_functions, trial_functions]
+        test_trial = Tuple(*test_trial)
+
+        expr = self.expr
+        # ...
+
+        # in order to avoid problems when swapping indices, we need to create
+        # temp symbols
+
+        # ...
+        d_tmp = {}
+        # TODO add Indexed/IndexedBase case
+        for x in trial_functions:
+            name = '{name}_{hash}'.format(name=x.name, hash=abs(hash(x)))
+            if isinstance(x, TestFunction):
+                X = Symbol(name)
+            elif isinstance(x, VectorTestFunction):
+                X = IndexedBase(name, shape=x.shape)
+            else:
+                raise TypeError('Expecting a TestFunction or VectorTestFunction')
+
+            d_tmp[X] = x
+        # ...
+
+        # ... replacing trial functions by tmp symbols
+        d = {}
+        for k,v in zip(self.trial_functions, d_tmp):
+            d[k] = v
+        expr = expr.subs(d)
+        # ...
+
+        # ... replacing test functions
+        d = {}
+        for k,v in zip(self.test_functions, test_functions):
+            d[k] = v
+        expr = expr.subs(d)
+        # ...
+
+        # ... replacing trial functions from tmp symbols
+        expr = expr.subs(d_tmp)
+        # ...
+
+        return BilinearForm(test_trial, expr)
 
 
 # ...
