@@ -254,38 +254,46 @@ def test_bilinear_form_1d_3():
 #        print('> normal form   >>> {0}'.format(gelatize(c)))
 #        print('')
 ## ...
-#
-## ... TODO debug
-#def test_bilinear_form_1d_10():
-#    print('============ test_bilinear_form_1d_10 =============')
-#
-#    U = FemSpace('U', ldim=1)
-#    V = FemSpace('V', ldim=1)
-#
-#    w = TestFunction(U, name='w')
-#    v = TestFunction(V, name='v')
-#
-#    a = BilinearForm(inner(grad(w), grad(v)), trial_space=V, test_space=U)
-#    b = BilinearForm(w*v, trial_space=V, test_space=U)
-#    c = a + b
-#    print('> input         >>> {0}'.format(c))
-#    print('> atomized     >>> {0}'.format(atomize(c)))
-#    print('> normal form   >>> {0}'.format(gelatize(c)))
-#    print('')
-## ...
+
+# ...
+def test_bilinear_form_1d_10():
+    print('============ test_bilinear_form_1d_10 =============')
+
+    U = FemSpace('U', ldim=1)
+    V = FemSpace('V', ldim=1)
+
+    u = TestFunction(U, name='u')
+    v = TestFunction(V, name='v')
+
+    Ni, Ni_x = symbols('Ni Ni_x')
+    Nj, Nj_x = symbols('Nj Nj_x')
+
+    a = BilinearForm((V, U), inner(grad(u), grad(v)))
+    b = BilinearForm((V, U), u*v)
+
+    # ...
+    expected = Ni*Nj + Ni_x*Nj_x
+    assert(gelatize(a + b, basis={V: 'Nj', U: 'Ni'}) == expected)
+    # ...
+
+    expr = a + b
+    print('> input      >>> {0}'.format(expr))
+    print('> gelatized  >>> {0}'.format(gelatize(expr, basis={V: 'Nj', U: 'Ni'}) ))
+    print('')
+# ...
 
 # .....................................................
 if __name__ == '__main__':
     test_atomize_1d_1()
     test_normalize_1d_1()
 
-    test_bilinear_form_1d_1()
-    test_bilinear_form_1d_2()
-    test_bilinear_form_1d_3()
+#    test_bilinear_form_1d_1()
+#    test_bilinear_form_1d_2()
+#    test_bilinear_form_1d_3()
 
 #    test_bilinear_form_1d_4()
 #    test_bilinear_form_1d_5()
 #    test_bilinear_form_1d_6()
 ##    test_bilinear_form_1d_7()
 ##    test_bilinear_form_1d_8()
-##    test_bilinear_form_1d_10()
+    test_bilinear_form_1d_10()

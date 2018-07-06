@@ -420,8 +420,27 @@ def matricize(expr):
 # ... TODO compute basis if not given
 def gelatize(a, basis=None, verbose=True):
 
-    if not isinstance(a, (BilinearForm, LinearForm)):
-        raise TypeError('Expecting a BilinearForm or LinearForm')
+    if not isinstance(a, (BilinearForm, LinearForm, Add, Mul)):
+        raise TypeError('Expecting a BilinearForm, LinearForm, Add or Mul')
+
+    if isinstance(a, Add):
+        args = [gelatize(i, basis=basis, verbose=verbose) for i in a.args]
+        return Add(*args)
+
+    elif isinstance(a, Mul):
+        coeffs  = [i for i in a.args if isinstance(i, _coeffs_registery)]
+        vectors = [i for i in a.args if not(i in coeffs)]
+
+        i = S.One
+        if coeffs:
+            i = Mul(*coeffs)
+
+        j = S.One
+        if vectors:
+            args = [gelatize(i, basis=basis, verbose=verbose) for i in vectors]
+            j = Mul(*args)
+
+        return Mul(i, j)
 
     dim = a.ldim
     expr = a.expr
