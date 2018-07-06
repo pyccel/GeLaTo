@@ -4,6 +4,7 @@
 #      - check that a BilinearForm is bilinear (using Constant)
 #      - check that a LinearForm is linear
 #      - add is_symmetric property for BilinearForm
+#      - treat Function atom in gelatize, normalize, matrix_form
 
 from numpy import zeros
 
@@ -375,7 +376,9 @@ def matrix_form(expr):
         return r
 
     elif isinstance(expr, Mul):
-        coeffs  = [i for i in expr.args if isinstance(i, _coeffs_registery)]
+        # a coeff can be a symbol, otherwise the expression rot(v) * rot(u) + c * div(v) * div(u)
+        # raises an error
+        coeffs  = [i for i in expr.args if isinstance(i, _coeffs_registery) or isinstance(i, Symbol)]
         vectors = [i for i in expr.args if not(i in coeffs)]
 
         i = S.One
@@ -386,6 +389,7 @@ def matrix_form(expr):
         if vectors:
             args = [matrix_form(i) for i in vectors]
             if not(len(args) == 2):
+                print(args)
                 raise ValueError('Expecting exactly 2 arguments')
 
             # TODO how to be sure about who is left/right? test/trial?
