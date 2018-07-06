@@ -4,6 +4,7 @@
 
 from sympy.core.containers import Tuple
 from sympy import symbols
+from sympy import Symbol
 
 from gelato.calculus import dx, dy, dz
 from gelato.calculus import Constant
@@ -268,18 +269,42 @@ def test_bilinear_form_1d_10():
     Ni, Ni_x = symbols('Ni Ni_x')
     Nj, Nj_x = symbols('Nj Nj_x')
 
+    c1 = Symbol('c1')
+    c2 = Symbol('c2')
+
     a = BilinearForm((V, U), inner(grad(u), grad(v)))
     b = BilinearForm((V, U), u*v)
+    adv = BilinearForm((V, U), dx(u)*v)
 
     # ...
     expected = Ni*Nj + Ni_x*Nj_x
     assert(gelatize(a + b, basis={V: 'Nj', U: 'Ni'}) == expected)
     # ...
 
-    expr = a + b
-    print('> input      >>> {0}'.format(expr))
-    print('> gelatized  >>> {0}'.format(gelatize(expr, basis={V: 'Nj', U: 'Ni'}) ))
-    print('')
+    # ...
+    expected = 2*Ni_x*Nj_x
+    assert(gelatize(2 * a, basis={V: 'Nj', U: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = c1*Ni_x*Nj_x
+    assert(gelatize(c1*a, basis={V: 'Nj', U: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = c2*Ni*Nj + c1*Ni_x*Nj_x
+    assert(gelatize(c1*a + c2*b, basis={V: 'Nj', U: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = Ni_x*Nj_x*c1 + c2*(Ni*Nj + Ni_x*Nj)
+    assert(gelatize(c1*a  + c2*(b + adv), basis={V: 'Nj', U: 'Ni'}) == expected)
+    # ...
+
+#    expr = c1 * a  + c2*(b + adv)
+#    print('> input      >>> {0}'.format(expr))
+#    print('> gelatized  >>> {0}'.format(gelatize(expr, basis={V: 'Nj', U: 'Ni'}) ))
+#    print('')
 # ...
 
 # .....................................................

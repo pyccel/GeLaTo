@@ -327,18 +327,42 @@ def test_bilinear_form_2d_10():
     Ni, Ni_x, Ni_y = symbols('Ni Ni_x Ni_y')
     Nj, Nj_x, Nj_y = symbols('Nj Nj_x Nj_y')
 
+    c1 = Symbol('c1')
+    c2 = Symbol('c2')
+
     a = BilinearForm((V, U), inner(grad(u), grad(v)))
     b = BilinearForm((V, U), u*v)
+    adv = BilinearForm((V, U), dx(u)*v)
 
     # ...
     expected = Ni*Nj + Ni_x*Nj_x + Ni_y*Nj_y
     assert(gelatize(a + b, basis={V: 'Nj', U: 'Ni'}) == expected)
     # ...
 
-    expr = a + b
-    print('> input      >>> {0}'.format(expr))
-    print('> gelatized  >>> {0}'.format(gelatize(expr, basis={V: 'Nj', U: 'Ni'}) ))
-    print('')
+    # ...
+    expected = 2*Ni_x*Nj_x + 2*Ni_y*Nj_y
+    assert(gelatize(2 * a, basis={V: 'Nj', U: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = c1*(Ni_x*Nj_x + Ni_y*Nj_y)
+    assert(gelatize(c1*a, basis={V: 'Nj', U: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = Ni*Nj*c2 + c1*(Ni_x*Nj_x + Ni_y*Nj_y)
+    assert(gelatize(c1*a + c2*b, basis={V: 'Nj', U: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = c1*(Ni_x*Nj_x + Ni_y*Nj_y) + c2*(Ni*Nj + Ni_x*Nj)
+    assert(gelatize(c1*a  + c2*(b + adv), basis={V: 'Nj', U: 'Ni'}) == expected)
+    # ...
+
+#    expr = c1*a  + c2*(b + adv)
+#    print('> input      >>> {0}'.format(expr))
+#    print('> gelatized  >>> {0}'.format(gelatize(expr, basis={V: 'Nj', U: 'Ni'}) ))
+#    print('')
 # ...
 
 

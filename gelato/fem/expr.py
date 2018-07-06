@@ -418,7 +418,7 @@ def matricize(expr):
 # ...
 
 # ... TODO compute basis if not given
-def gelatize(a, basis=None, verbose=True):
+def gelatize(a, basis=None, verbose=False):
 
     if not isinstance(a, (BilinearForm, LinearForm, Add, Mul)):
         raise TypeError('Expecting a BilinearForm, LinearForm, Add or Mul')
@@ -428,7 +428,9 @@ def gelatize(a, basis=None, verbose=True):
         return Add(*args)
 
     elif isinstance(a, Mul):
-        coeffs  = [i for i in a.args if isinstance(i, _coeffs_registery)]
+        # a coeff can be a symbol, otherwise the expression c1 * a
+        # raises an error
+        coeffs  = [i for i in a.args if isinstance(i, _coeffs_registery) or isinstance(i, Symbol)]
         vectors = [i for i in a.args if not(i in coeffs)]
 
         i = S.One
