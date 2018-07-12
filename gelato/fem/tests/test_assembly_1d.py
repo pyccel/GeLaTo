@@ -39,10 +39,6 @@ def test_kernel_1d_scalar_1():
     a = BilinearForm((v,u), expr)
     print('> input      >>> {0}'.format(a))
 
-    a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
-    print('> gelatized  >>> {0}'.format(a_expr))
-    print('')
-
     # ...  create a finite element space
     p  = 3
     ne = 64

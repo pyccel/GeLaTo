@@ -26,6 +26,7 @@ from gelato.fem.utils    import compile_kernel
 from numpy import linspace
 
 from spl.fem.splines import SplineSpace
+from spl.fem.tensor  import TensorFemSpace
 
 
 # ...
@@ -43,20 +44,22 @@ def test_kernel_3d_scalar_1():
     a = BilinearForm((v,u), expr)
     print('> input      >>> {0}'.format(a))
 
-    a_expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
-    print('> gelatized  >>> {0}'.format(a_expr))
-    print('')
-
     # ...  create a finite element space
-    p  = 3
-    ne = 64
+    p1  = 2 ; p2  = 2 ; p3  = 2
+    ne1 = 2 ; ne2 = 2 ; ne3 = 2
 
-    print('> Grid   :: {ne}'.format(ne=ne))
-    print('> Degree :: {p}'.format(p=p))
+    print('> Grid   :: [{},{},{}]'.format(ne1, ne2, ne3))
+    print('> Degree :: [{},{},{}]'.format(p1, p2, p3))
 
-    grid = linspace(0., 1., ne+1)
+    grid_1 = linspace(0., 1., ne1+1)
+    grid_2 = linspace(0., 1., ne2+1)
+    grid_3 = linspace(0., 1., ne3+1)
 
-    V = SplineSpace(p, grid=grid)
+    V1 = SplineSpace(p1, grid=grid_1)
+    V2 = SplineSpace(p2, grid=grid_2)
+    V3 = SplineSpace(p3, grid=grid_3)
+
+    V = TensorFemSpace(V1, V2, V3)
     # ...
 
     # ...
