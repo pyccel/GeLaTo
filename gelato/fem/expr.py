@@ -13,6 +13,7 @@ from numpy import zeros
 
 from sympy.core import Basic
 from sympy.core import Symbol
+from sympy.core import Function
 from sympy.core import Expr, Add, Mul
 from sympy import S
 from sympy.core.containers import Tuple
@@ -23,6 +24,7 @@ from sympy import expand
 
 from gelato.calculus import _partial_derivatives
 from gelato.calculus import _calculus_operators
+from gelato.calculus import CalculusFunction
 from gelato.calculus import partial_derivative_as_symbol
 from gelato.calculus import sort_partial_derivatives
 from gelato.calculus import get_atom_derivatives
@@ -43,9 +45,81 @@ from gelato.fem.core import VectorTestFunction
 
 
 
-# TODO once BilinearForm is stable
 class LinearForm(Expr):
-    pass
+    """
+
+    Examples
+
+    """
+    def __new__(cls, test_functions, expr):
+        # ...
+        if isinstance(test_functions, (TestFunction, VectorTestFunction)):
+            test_functions = [test_functions]
+            test_functions = Tuple(*test_functions)
+
+        elif not isinstance(test_functions, (tuple, list, Tuple)):
+            raise TypeError('Wrong type for test function(s)')
+        # ...
+
+        return Basic.__new__(cls, expr, test_functions)
+
+    @property
+    def expr(self):
+        return self._args[0]
+
+    @property
+    def test_functions(self):
+        return self._args[1]
+
+    @property
+    def ldim(self):
+        return self.test_spaces[0].ldim
+
+    @property
+    def test_spaces(self):
+        return [u.space for u in self.test_functions]
+
+    @property
+    def fields(self):
+        ls = [a for a in self.expr.free_symbols if isinstance(a, Field)]
+        # no redanduncy
+        return list(set(ls))
+
+    def _sympystr(self, printer):
+        sstr = printer.doprint
+        expr = self.expr
+        return sstr(expr)
+
+    def __call__(self, *args):
+        # ...
+        if not(len(args) == 1):
+            raise ValueError('Expecting one argument')
+
+        test_functions = args[0]
+        if isinstance(test_functions, (TestFunction, VectorTestFunction)):
+            test_functions = [test_functions]
+            test_functions = Tuple(*test_functions)
+
+        elif not isinstance(test_functions, (tuple, list, Tuple)):
+            raise TypeError('Wrong type for test function(s)')
+        # ...
+
+        # ...
+        expr = self.expr
+        # ...
+
+        # ... replacing test functions
+        d = {}
+        for k,v in zip(self.test_functions, test_functions):
+            d[k] = v
+        expr = expr.subs(d)
+        # ...
+
+        # ... replacing trial functions from tmp symbols
+        expr = expr.subs(d_tmp)
+        # ...
+
+        return LinearForm(test_functions, expr)
 
 
 class BilinearForm(Expr):
@@ -196,7 +270,7 @@ def atomize(expr, dim=None):
     if not isinstance(expr, (Add, Mul,
                              _partial_derivatives, _calculus_operators,
                              TestFunction, VectorTestFunction, Indexed,
-                             Field, Constant, Symbol,
+                             Field, Constant, Symbol, Function,
                              list, tuple, Tuple)):
         msg = ('> Wrong input type.')
 
@@ -380,6 +454,10 @@ def matricize(expr):
         # a coeff can be a symbol, otherwise the expression rot(v) * rot(u) + c * div(v) * div(u)
         # raises an error
         coeffs  = [i for i in expr.args if isinstance(i, _coeffs_registery) or isinstance(i, Symbol)]
+        others = [i for i in expr.args if not(i in coeffs)]
+        for i in others:
+            if isinstance(i, Function) and not(isinstance(i, CalculusFunction)):
+                coeffs.append(i)
         vectors = [i for i in expr.args if not(i in coeffs)]
 
         i = S.One

@@ -5,6 +5,8 @@
 from sympy.core.containers import Tuple
 from sympy import symbols
 from sympy import Symbol
+from sympy import Function
+from sympy import pi, cos
 
 from gelato.calculus import dx, dy, dz
 from gelato.calculus import Constant
@@ -14,7 +16,7 @@ from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 from gelato.fem.core import H1Space
 from gelato.fem.core import TestFunction
 from gelato.fem.core import VectorTestFunction
-from gelato.fem.expr import BilinearForm
+from gelato.fem.expr import BilinearForm, LinearForm
 from gelato.fem.expr import atomize, normalize
 from gelato.fem.expr import gelatize
 
@@ -29,11 +31,14 @@ def test_atomize_1d_1():
     w = TestFunction(V, name='w')
     c = Constant('c')
     F = Field('F')
+    x = Symbol('x')
+    f = Function('f')
 
     # ...
     assert(atomize(grad(v)) == dx(v))
     assert(atomize(grad(c*v)) == c*dx(v))
     assert(atomize(grad(F*v)) == F*dx(v) + v*dx(F))
+    assert(atomize(f(x)*grad(v)) == dx(v)*f(x))
 
     assert(atomize(dot(grad(v), grad(w))) == dx(v)*dx(w))
     # ...
@@ -43,7 +48,7 @@ def test_atomize_1d_1():
     assert(atomize(div(grad(v*w))) == v*dx(dx(w)) + 2*dx(v)*dx(w) + dx(dx(v))*w)
     # ...
 
-#    expr = dot(grad(v), grad(w))
+#    expr = f(x)*grad(v)
 #    print('> input         >>> {0}'.format(expr))
 #    print('> atomized     >>> {0}'.format(atomize(expr)))
 # ...
@@ -322,18 +327,43 @@ def test_bilinear_form_1d_10():
 #    print('')
 # ...
 
+# ...
+def test_linear_form_1d_1():
+    print('============ test_linear_form_1d_1 =============')
+
+    V = H1Space('V', ldim=1)
+
+    v = TestFunction(V, name='v')
+
+    x = Symbol('x')
+    f = Function('f')
+
+#    expr = cos(2*pi*x)*v
+    expr = f(x)*v
+
+    a = LinearForm(v, expr)
+    print('> input      >>> {0}'.format(a))
+
+    a_expr = gelatize(a, basis={V: 'Nj'})
+    print('> gelatized  >>> {0}'.format(a_expr))
+    print('')
+# ...
+
 # .....................................................
 if __name__ == '__main__':
     test_atomize_1d_1()
     test_normalize_1d_1()
 
-    test_bilinear_form_1d_1()
-    test_bilinear_form_1d_2()
-    test_bilinear_form_1d_3()
+#    test_bilinear_form_1d_1()
+#    test_bilinear_form_1d_2()
+#    test_bilinear_form_1d_3()
 
-##    test_bilinear_form_1d_4()
-##    test_bilinear_form_1d_5()
-##    test_bilinear_form_1d_6()
-##    test_bilinear_form_1d_7()
-##    test_bilinear_form_1d_8()
+###    test_bilinear_form_1d_4()
+###    test_bilinear_form_1d_5()
+###    test_bilinear_form_1d_6()
+###    test_bilinear_form_1d_7()
+###    test_bilinear_form_1d_8()
     test_bilinear_form_1d_10()
+
+    test_linear_form_1d_1()
+

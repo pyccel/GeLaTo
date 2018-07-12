@@ -390,8 +390,9 @@ if __name__ == '__main__':
     test_normalize_2d_2()
     test_matricize_2d_2()
 
-    test_bilinear_form_2d_1()
-    test_bilinear_form_2d_2()
-    test_bilinear_form_2d_3()
-    test_bilinear_form_2d_4()
+#    test_bilinear_form_2d_1()
+#    test_bilinear_form_2d_2()
+#    test_bilinear_form_2d_3()
+#    test_bilinear_form_2d_4()
+
     test_bilinear_form_2d_10()

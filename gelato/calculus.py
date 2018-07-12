@@ -40,7 +40,6 @@ from sympy import simplify
 from sympy import S
 from sympy.core.compatibility import is_sequence
 from sympy import Basic
-from sympy import Function
 from sympy import Indexed, IndexedBase
 
 #try:
@@ -91,8 +90,13 @@ class Unknown(Symbol):
 
 _coeffs_registery = (Integer, Float, Constant)
 
+class CalculusFunction(Function):
+    """this class is needed to distinguish between functions and calculus
+    functions when manipulating our expressions"""
+    pass
+
 # ...
-class LinearOperator(Function):
+class LinearOperator(CalculusFunction):
     """
 
     Examples
@@ -348,8 +352,9 @@ def get_atom_derivatives(expr):
         return expr
 # ...
 
+
 # ...
-class DotBasic(Function):
+class DotBasic(CalculusFunction):
     """
 
     Examples
@@ -435,7 +440,7 @@ class Dot_3d(DotBasic):
 # ...
 
 # ...
-class CrossBasic(Function):
+class CrossBasic(CalculusFunction):
     """
 
     Examples
@@ -511,7 +516,7 @@ class Cross_3d(CrossBasic):
 
 
 # ...
-class GradBasic(Function):
+class GradBasic(CalculusFunction):
     """
 
     Examples
@@ -602,7 +607,7 @@ class Grad_3d(GradBasic):
 
 
 # ...
-class CurlBasic(Function):
+class CurlBasic(CalculusFunction):
     """
 
     Examples
@@ -676,7 +681,7 @@ class Curl_3d(CurlBasic):
 # ...
 
 # ...
-class Rot_2d(Function):
+class Rot_2d(CalculusFunction):
     """
 
     Examples
@@ -720,7 +725,7 @@ class Rot_2d(Function):
 # ...
 
 # ...
-class DivBasic(Function):
+class DivBasic(CalculusFunction):
     """
 
     Examples
@@ -827,7 +832,7 @@ _operators_3d = [Dot_3d, Cross_3d,
 
 
 # ... generic operators
-class GenericFunction(Function):
+class GenericFunction(CalculusFunction):
 
     def __getitem__(self, indices, **kw_args):
         if is_sequence(indices):

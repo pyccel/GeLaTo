@@ -453,9 +453,10 @@ if __name__ == '__main__':
     test_normalize_3d_2()
     test_matricize_3d_2()
 
-    test_bilinear_form_3d_1()
-    test_bilinear_form_3d_2()
-    test_bilinear_form_3d_3()
-#    test_bilinear_form_3d_4()
-#    test_bilinear_form_3d_5()
+#    test_bilinear_form_3d_1()
+#    test_bilinear_form_3d_2()
+#    test_bilinear_form_3d_3()
+##    test_bilinear_form_3d_4()
+##    test_bilinear_form_3d_5()
+
     test_bilinear_form_3d_10()
