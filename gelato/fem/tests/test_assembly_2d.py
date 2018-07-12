@@ -25,9 +25,6 @@ from gelato.fem.utils    import compile_kernel
 
 from numpy import linspace
 
-from spl.fem.splines import SplineSpace
-from spl.fem.tensor  import TensorFemSpace
-
 
 # ...
 def test_kernel_2d_scalar_1():
@@ -44,24 +41,29 @@ def test_kernel_2d_scalar_1():
     a = BilinearForm((v,u), expr)
     print('> input      >>> {0}'.format(a))
 
-    # ...  create a finite element space
-    p1  = 2 ; p2  = 2
-    ne1 = 8 ; ne2 = 8
-
-    print('> Grid   :: [{ne1},{ne2}]'.format(ne1=ne1, ne2=ne2))
-    print('> Degree :: [{p1},{p2}]'.format(p1=p1, p2=p2))
-
-    grid_1 = linspace(0., 1., ne1+1)
-    grid_2 = linspace(0., 1., ne2+1)
-
-    V1 = SplineSpace(p1, grid=grid_1)
-    V2 = SplineSpace(p2, grid=grid_2)
-
-    V = TensorFemSpace(V1, V2)
     # ...
+    kernel_py  = compile_kernel('kernel_2d_scalar_1', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
+def test_kernel_2d_block_1():
+    print('============ test_kernel_2d_block_1 =============')
+
+    V = H1Space('V', ldim=2, is_block=True, shape=2)
+    U = H1Space('U', ldim=2, is_block=True, shape=2)
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(U, name='u')
+
+    expr = div(v) * div(u) + rot(v) * rot(u)
+
+    a = BilinearForm((v,u), expr)
+    print('> input      >>> {0}'.format(a))
 
     # ...
-    kernel_py  = compile_kernel('kernel_2d_scalar_1', a, [V, V],
+    kernel_py  = compile_kernel('kernel_2d_block_1', a,
                                 backend='python', verbose=True)
     # ...
 
@@ -70,5 +72,5 @@ def test_kernel_2d_scalar_1():
 
 # .....................................................
 if __name__ == '__main__':
-    test_kernel_2d_scalar_1()
-
+#    test_kernel_2d_scalar_1()
+    test_kernel_2d_block_1()

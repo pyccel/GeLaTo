@@ -22,8 +22,6 @@ from gelato.fem.utils    import compile_kernel
 
 from numpy import linspace
 
-from spl.fem.splines import SplineSpace
-
 # ...
 def test_kernel_1d_scalar_1():
     print('============ test_kernel_1d_scalar_1 =============')
@@ -39,20 +37,8 @@ def test_kernel_1d_scalar_1():
     a = BilinearForm((v,u), expr)
     print('> input      >>> {0}'.format(a))
 
-    # ...  create a finite element space
-    p  = 3
-    ne = 64
-
-    print('> Grid   :: {ne}'.format(ne=ne))
-    print('> Degree :: {p}'.format(p=p))
-
-    grid = linspace(0., 1., ne+1)
-
-    V = SplineSpace(p, grid=grid)
     # ...
-
-    # ...
-    kernel_py  = compile_kernel('kernel_1d_scalar_1', a, [V, V],
+    kernel_py  = compile_kernel('kernel_1d_scalar_1', a,
                                 backend='python', verbose=True)
     # ...
 

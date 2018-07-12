@@ -6,6 +6,7 @@
 #       - use redbaron to modify the template
 
 from sympy.core.containers import Tuple
+from sympy import Matrix
 
 from gelato.expression import _is_base_function
 from gelato.expression import BASIS_PREFIX
@@ -94,7 +95,7 @@ def write_code(name, code, ext='py', folder='.pyccel'):
     f.close()
 
 
-def compile_kernel(name, a, spaces,
+def compile_kernel(name, a, spaces=None,
                    d_constants={},
                    d_args={},
                    verbose=False,
@@ -103,37 +104,39 @@ def compile_kernel(name, a, spaces,
                    backend='python',
                    export_pyfile=True):
     """."""
-    from spl.fem.vector  import VectorFemSpace
-    from spl.fem.splines import SplineSpace
-    from spl.fem.tensor  import TensorFemSpace
-
     if not isinstance(a, (BilinearForm, LinearForm)):
            raise TypeError('Expecting BilinearForm, LinearForm')
 
-    if not isinstance(spaces, (tuple, list, Tuple)):
-        raise TypeError('Expecting tuple, list, Tuple')
+    # ... TODO not used for the moment
+    test_space = None
+    trial_space = None
+    if spaces:
+        if not isinstance(spaces, (tuple, list, Tuple)):
+            raise TypeError('Expecting tuple, list, Tuple')
 
-    test_space = spaces[0]
-    trial_space = spaces[1]
+        test_space = spaces[0]
+        trial_space = spaces[1]
 
     if not(test_space is trial_space):
         raise NotImplementedError('TODO')
+    # ...
 
     # TODO: nderiv must be computed from the weak form
     nderiv = 1
 
-    # dimension
+    # ... weak form attributs
     dim = a.ldim
-
-    # ...
     fields = a.fields
+
     if verbose:
+        print('> dim    = ', dim)
         print('> Fields = ', fields)
     # ...
 
     # ... TODO improve
     V = a.trial_spaces[0]
     U = a.test_spaces[0]
+
     TEST_BASIS = 'Ni'
     TRIAL_BASIS = 'Nj'
     expr = gelatize(a, basis={V: TRIAL_BASIS, U: TEST_BASIS})
@@ -143,6 +146,16 @@ def compile_kernel(name, a, spaces,
 
     is_test_function = lambda a: _is_base_function(a, TEST_BASIS)
     is_trial_function = lambda a: _is_base_function(a, TRIAL_BASIS)
+
+    is_block = isinstance(expr, Matrix)
+    test_n_components = None
+    trial_n_components = None
+    if is_block:
+        test_n_components = expr.shape[0]
+        trial_n_components = expr.shape[1]
+
+    # TODO add once we handle feec
+    is_vector = False
     # ...
 
     # ... contants
@@ -199,20 +212,18 @@ def compile_kernel(name, a, spaces,
     # ...
 
     # ...
-    if isinstance(V, VectorFemSpace) and not( V.is_block ):
+    if is_vector and not( is_block ):
         raise NotImplementedError('We only treat the case of a block space, for '
                                   'which all components have are identical.')
     # ...
 
     # ...
-    pattern = 'scalar'
-    if isinstance(V, VectorFemSpace):
-        if V.is_block:
-            pattern = 'block'
-
-        else:
-            raise NotImplementedError('We only treat the case of a block space, for '
-                                      'which all components have are identical.')
+    if is_block:
+        pattern = 'block'
+    elif is_vector:
+        raise NotImplementedError('TODO.')
+    else:
+        pattern = 'scalar'
     # ...
 
     # ...
@@ -291,8 +302,101 @@ def compile_kernel(name, a, spaces,
     # ...
 
     # ...
-    if isinstance(V, VectorFemSpace):
-        raise NotImplementedError('TODO')
+    if is_block:
+        # ... - initializing element matrices
+        #     - define arguments
+        lines = []
+        mat_args = []
+        slices = ','.join(':' for i in range(0, 2*dim))
+        for i in range(0, test_n_components):
+            for j in range(0, trial_n_components):
+                mat = 'mat_{i}{j}'.format(i=i,j=j)
+                mat_args.append(mat)
+
+                line = '{mat}[{slices}] = 0.0'.format(mat=mat,slices=slices)
+                line = tab + line
+
+                lines.append(line)
+
+        mat_args_str = ', '.join(mat for mat in mat_args)
+        mat_init_str = '\n'.join(line for line in lines)
+        # ...
+
+        # ... update identation to be inside the loop
+        for i in range(0, 2*dim):
+            tab += ' '*4
+
+        tab_base = tab
+        # ...
+
+        # ... initializing accumulation variables
+        lines = []
+        for i in range(0, test_n_components):
+            for j in range(0, trial_n_components):
+                line = 'v_{i}{j} = 0.0'.format(i=i,j=j)
+                line = tab + line
+
+                lines.append(line)
+
+        accum_init_str = '\n'.join(line for line in lines)
+        # ...
+
+        # .. update indentation
+        for i in range(0, dim):
+            tab += ' '*4
+        # ...
+
+        # ... accumulation contributions
+        lines = []
+        for i in range(0, test_n_components):
+            for j in range(0, trial_n_components):
+                line = 'v_{i}{j} += ({__WEAK_FORM__}) * wvol'
+                e = _convert_int_to_float(expr[i,j].evalf())
+                # we call evalf to avoid having fortran doing the evaluation of rational
+                # division
+                line = line.format(i=i, j=j, __WEAK_FORM__=e)
+                line = tab + line
+
+                lines.append(line)
+
+        accum_str = '\n'.join(line for line in lines)
+        # ...
+
+        # ... assign accumulated values to element matrix
+        if dim == 1:
+            e_pattern = 'mat_{i}{j}[il_1, p1 + jl_1 - il_1] = v_{i}{j}'
+        elif dim == 2:
+            e_pattern = 'mat_{i}{j}[il_1, il_2, p1 + jl_1 - il_1, p2 + jl_2 - il_2] = v_{i}{j}'
+        elif dim ==3:
+            e_pattern = 'mat_{i}{j}[il_1, il_2, il_3, p1 + jl_1 - il_1, p2 + jl_2 - il_2, p3 + jl_3 - il_3] = v_{i}{j}'
+        else:
+            raise NotImplementedError('only 1d, 2d and 3d are available')
+
+        tab = tab_base
+        lines = []
+        for i in range(0, test_n_components):
+            for j in range(0, trial_n_components):
+                line = e_pattern.format(i=i,j=j)
+                line = tab + line
+
+                lines.append(line)
+
+        accum_assign_str = '\n'.join(line for line in lines)
+        # ...
+
+        code = template.format(__KERNEL_NAME__=name,
+                               __MAT_ARGS__=mat_args_str,
+                               __FIELD_COEFFS__=field_coeffs_str,
+                               __FIELD_EVALUATION__=eval_field_str,
+                               __MAT_INIT__=mat_init_str,
+                               __ACCUM_INIT__=accum_init_str,
+                               __FIELD_VALUE__=field_value_str,
+                               __TEST_FUNCTION__=test_function_str,
+                               __TRIAL_FUNCTION__=trial_function_str,
+                               __ACCUM__=accum_str,
+                               __ACCUM_ASSIGN__=accum_assign_str,
+                               __ARGS__=args)
+
     else:
         e = _convert_int_to_float(expr.evalf())
         # we call evalf to avoid having fortran doing the evaluation of rational
