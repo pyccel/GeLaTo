@@ -4,6 +4,7 @@
 *.bak
 *.so
 *.f90
+*.pyccel*
 
 *build*
 *egg*
