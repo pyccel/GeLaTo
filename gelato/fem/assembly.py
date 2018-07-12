@@ -32,11 +32,11 @@ def assemble_matrix(V, kernel, args=None, M=None, fields={}):
 
 def assemble_matrix_1d(V, kernel, args=None, M=None, fields={}):
 
-    from spl.fem.vector  import VectorFemSpace
+    from spl.fem.vector  import VectorBasicSobolevSpace
 
     # ...
     is_block = False
-    if isinstance(V, VectorFemSpace):
+    if isinstance(V, VectorBasicSobolevSpace):
         if not( V.is_block ):
             raise NotImplementedError('Expecting a scalar or vector space.')
 
@@ -138,11 +138,11 @@ def assemble_matrix_1d(V, kernel, args=None, M=None, fields={}):
 
 def assemble_matrix_2d(V, kernel, args=None, M=None, fields={}):
 
-    from spl.fem.vector  import VectorFemSpace
+    from spl.fem.vector  import VectorBasicSobolevSpace
 
     # ...
     is_block = False
-    if isinstance(V, VectorFemSpace):
+    if isinstance(V, VectorBasicSobolevSpace):
         if not( V.is_block ):
             raise NotImplementedError('Expecting a scalar or vector space.')
 
@@ -273,11 +273,11 @@ def assemble_matrix_2d(V, kernel, args=None, M=None, fields={}):
 
 def assemble_matrix_3d(V, kernel, args=None, M=None, fields={}):
 
-    from spl.fem.vector  import VectorFemSpace
+    from spl.fem.vector  import VectorBasicSobolevSpace
 
     # ...
     is_block = False
-    if isinstance(V, VectorFemSpace):
+    if isinstance(V, VectorBasicSobolevSpace):
         if not( V.is_block ):
             raise NotImplementedError('Expecting a scalar or vector space.')
 

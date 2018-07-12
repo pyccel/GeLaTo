@@ -41,9 +41,9 @@ class DottedName(Basic):
         return '.'.join(sstr(n) for n in self.name)
 
 # ...
-class FemSpace(Basic):
+class BasicSobolevSpace(Basic):
     """
-    Represents a symbolic finite elements space.
+    Represents a basic continuous Sobolev space.
 
     Examples
 
@@ -93,7 +93,48 @@ class FemSpace(Basic):
         return sstr(self.name)
 # ...
 
-class SplineFemSpace(FemSpace):
+# TODO make it as a singleton
+class H1Space(BasicSobolevSpace):
+    """
+    Represents the H1 continuous Sobolev space.
+
+    Examples
+
+    """
+    pass
+
+# TODO make it as a singleton
+class HcurlSpace(BasicSobolevSpace):
+    """
+    Represents the Hcurl continuous Sobolev space.
+
+    Examples
+
+    """
+    pass
+
+# TODO make it as a singleton
+class HdivSpace(BasicSobolevSpace):
+    """
+    Represents the Hdiv continuous Sobolev space.
+
+    Examples
+
+    """
+    pass
+
+# TODO make it as a singleton
+class L2Space(BasicSobolevSpace):
+    """
+    Represents the L2 continuous Sobolev space.
+
+    Examples
+
+    """
+    pass
+
+
+class SplineFemSpace(BasicSobolevSpace):
     """
     Represents a 1D fem space of splines.
 
@@ -134,17 +175,17 @@ class SplineFemSpace(FemSpace):
         sstr = printer.doprint
         return sstr(self.name)
 
-class TensorFemSpace(FemSpace):
+class TensorBasicSobolevSpace(BasicSobolevSpace):
     """
     Represents a tensor product of fem spaces.
 
     Examples
 
     >>> from gelato.fem.core import SplineFemSpace
-    >>> from gelato.fem.core import TensorFemSpace
+    >>> from gelato.fem.core import TensorBasicSobolevSpace
     >>> V1 = SplineFemSpace('V1')
     >>> V2 = SplineFemSpace('V2')
-    >>> V  = TensorFemSpace('V', V1, V2)
+    >>> V  = TensorBasicSobolevSpace('V', V1, V2)
     >>> V.degree
     (V1.p, V2.p)
     >>> V.n_elements
@@ -182,20 +223,20 @@ class TensorFemSpace(FemSpace):
         return sstr(self.name)
 
 
-class VectorFemSpace(FemSpace):
+class VectorBasicSobolevSpace(BasicSobolevSpace):
     """
     Represents a tensor product of fem spaces.
 
     Examples
 
     >>> from gelato.fem.core import SplineFemSpace
-    >>> from gelato.fem.core import TensorFemSpace
-    >>> from gelato.fem.core import VectorFemSpace
+    >>> from gelato.fem.core import TensorBasicSobolevSpace
+    >>> from gelato.fem.core import VectorBasicSobolevSpace
     >>> V1 = SplineFemSpace('V1')
     >>> V2 = SplineFemSpace('V2')
-    >>> Vx = TensorFemSpace('Vx', V1, V2)
-    >>> Vy = TensorFemSpace('Vy', V2, V1)
-    >>> V = VectorFemSpace('V', Vx, Vy)
+    >>> Vx = TensorBasicSobolevSpace('Vx', V1, V2)
+    >>> Vy = TensorBasicSobolevSpace('Vy', V2, V1)
+    >>> V = VectorBasicSobolevSpace('V', Vx, Vy)
     >>> V.degree
     ((V1.p, V2.p), (V2.p, V1.p))
     >>> V.n_elements

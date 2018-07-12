@@ -14,7 +14,7 @@ from gelato.calculus import Constant
 from gelato.calculus import Field
 from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 
-from gelato.fem.core import FemSpace
+from gelato.fem.core import BasicSobolevSpace
 from gelato.fem.core import TestFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.expr import BilinearForm
@@ -26,7 +26,7 @@ from gelato.fem.expr import gelatize
 def test_atomize_3d_1():
     print('============ test_atomize_3d_1 =============')
 
-    V = FemSpace('V', ldim=3)
+    V = BasicSobolevSpace('V', ldim=3)
 
     v = TestFunction(V, name='v')
     w = TestFunction(V, name='w')
@@ -56,8 +56,8 @@ def test_atomize_3d_1():
 def test_normalize_3d_1():
     print('============ test_normalize_3d_1 =============')
 
-    V = FemSpace('V', ldim=3)
-    U = FemSpace('U', ldim=3)
+    V = BasicSobolevSpace('V', ldim=3)
+    U = BasicSobolevSpace('U', ldim=3)
 
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
@@ -91,7 +91,7 @@ def test_normalize_3d_1():
 def test_atomize_3d_2():
     print('============ test_atomize_3d_2 =============')
 
-    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
+    V = BasicSobolevSpace('V', ldim=3, is_vector=True, shape=3)
 
     v = VectorTestFunction(V, name='v')
 
@@ -109,8 +109,8 @@ def test_atomize_3d_2():
 def test_normalize_3d_2():
     print('============ test_normalize_3d_2 =============')
 
-    V = FemSpace('V', ldim=3, is_block=True, shape=3)
-    U = FemSpace('U', ldim=3, is_block=True, shape=3)
+    V = BasicSobolevSpace('V', ldim=3, is_block=True, shape=3)
+    U = BasicSobolevSpace('U', ldim=3, is_block=True, shape=3)
 
     v = VectorTestFunction(V, name='v')
     u = VectorTestFunction(U, name='u')
@@ -157,8 +157,8 @@ def test_normalize_3d_2():
 def test_matricize_3d_2():
     print('============ test_matricize_3d_2 =============')
 
-    V = FemSpace('V', ldim=3, is_block=True, shape=3)
-    U = FemSpace('U', ldim=3, is_block=True, shape=3)
+    V = BasicSobolevSpace('V', ldim=3, is_block=True, shape=3)
+    U = BasicSobolevSpace('U', ldim=3, is_block=True, shape=3)
 
     v = VectorTestFunction(V, name='v')
     u = VectorTestFunction(U, name='u')
@@ -264,8 +264,8 @@ def test_matricize_3d_2():
 def test_bilinear_form_3d_1():
     print('============ test_bilinear_form_3d_1 =============')
 
-    U = FemSpace('U', ldim=3)
-    V = FemSpace('V', ldim=3)
+    U = BasicSobolevSpace('U', ldim=3)
+    V = BasicSobolevSpace('V', ldim=3)
 
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')
@@ -284,8 +284,8 @@ def test_bilinear_form_3d_1():
 def test_bilinear_form_3d_2():
     print('============ test_bilinear_form_3d_2 =============')
 
-    U = FemSpace('U', ldim=3, is_vector=True, shape=3)
-    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
+    U = BasicSobolevSpace('U', ldim=3, is_vector=True, shape=3)
+    V = BasicSobolevSpace('V', ldim=3, is_vector=True, shape=3)
 
     u = VectorTestFunction(U, name='u')
     v = VectorTestFunction(V, name='v')
@@ -304,8 +304,8 @@ def test_bilinear_form_3d_2():
 def test_bilinear_form_3d_3():
     print('============ test_bilinear_form_3d_3 =============')
 
-    U = FemSpace('U', ldim=3, is_vector=True, shape=3)
-    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
+    U = BasicSobolevSpace('U', ldim=3, is_vector=True, shape=3)
+    V = BasicSobolevSpace('V', ldim=3, is_vector=True, shape=3)
 
     u = VectorTestFunction(U, name='u')
     v = VectorTestFunction(V, name='v')
@@ -324,8 +324,8 @@ def test_bilinear_form_3d_3():
 #def test_bilinear_form_3d_4():
 #    print('============ test_bilinear_form_3d_4 =============')
 #
-#    U = FemSpace('U', ldim=3, is_vector=True, shape=3)
-#    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
+#    U = BasicSobolevSpace('U', ldim=3, is_vector=True, shape=3)
+#    V = BasicSobolevSpace('V', ldim=3, is_vector=True, shape=3)
 #
 #    u = VectorTestFunction(U, name='u')
 #    v = VectorTestFunction(V, name='v')
@@ -349,8 +349,8 @@ def test_bilinear_form_3d_3():
 #def test_bilinear_form_3d_5():
 #    print('============ test_bilinear_form_3d_5 =============')
 #
-#    U = FemSpace('U', ldim=3, is_vector=True, shape=3)
-#    V = FemSpace('V', ldim=3, is_vector=True, shape=3)
+#    U = BasicSobolevSpace('U', ldim=3, is_vector=True, shape=3)
+#    V = BasicSobolevSpace('V', ldim=3, is_vector=True, shape=3)
 #
 #    u = VectorTestFunction(U, name='u')
 #    v = VectorTestFunction(V, name='v')
@@ -376,8 +376,8 @@ def test_bilinear_form_3d_3():
 def test_bilinear_form_3d_10():
     print('============ test_bilinear_form_3d_10 =============')
 
-    U = FemSpace('U', ldim=3)
-    V = FemSpace('V', ldim=3)
+    U = BasicSobolevSpace('U', ldim=3)
+    V = BasicSobolevSpace('V', ldim=3)
 
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')

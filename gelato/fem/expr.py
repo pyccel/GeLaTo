@@ -37,7 +37,7 @@ from gelato.calculus import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
 from gelato.calculus import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
 
 
-from gelato.fem.core import FemSpace
+from gelato.fem.core import BasicSobolevSpace
 from gelato.fem.core import TestFunction
 from gelato.fem.core import VectorTestFunction
 

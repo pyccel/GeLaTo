@@ -11,7 +11,7 @@ from gelato.calculus import Constant
 from gelato.calculus import Field
 from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 
-from gelato.fem.core import FemSpace
+from gelato.fem.core import H1Space
 from gelato.fem.core import TestFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.expr import BilinearForm, LinearForm
@@ -28,8 +28,8 @@ from spl.fem.splines import SplineSpace
 def test_kernel_1d_scalar_1():
     print('============ test_kernel_1d_scalar_1 =============')
 
-    U = FemSpace('U', ldim=1)
-    V = FemSpace('V', ldim=1)
+    U = H1Space('U', ldim=1)
+    V = H1Space('V', ldim=1)
 
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')

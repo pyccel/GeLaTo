@@ -2,10 +2,10 @@
 
 # TODO add asserts
 
-from gelato.fem.core import FemSpace
+from gelato.fem.core import BasicSobolevSpace
 from gelato.fem.core import SplineFemSpace
-from gelato.fem.core import TensorFemSpace
-from gelato.fem.core import VectorFemSpace
+from gelato.fem.core import TensorBasicSobolevSpace
+from gelato.fem.core import VectorBasicSobolevSpace
 from gelato.fem.core import TestFunction
 from gelato.fem.core import VectorTestFunction
 
@@ -36,7 +36,7 @@ def test_fem_space_tensor():
 
     V1 = SplineFemSpace('V1')
     V2 = SplineFemSpace('V2')
-    V = TensorFemSpace('V', V1, V2)
+    V = TensorBasicSobolevSpace('V', V1, V2)
 
     print('> space :: ', V)
     print('> logical dim :: ', V.ldim)
@@ -62,10 +62,10 @@ def test_fem_space_vector():
 
     V1 = SplineFemSpace('V1')
     V2 = SplineFemSpace('V2')
-    Vx = TensorFemSpace('Vx', V1, V2)
-    Vy = TensorFemSpace('Vy', V2, V1)
+    Vx = TensorBasicSobolevSpace('Vx', V1, V2)
+    Vy = TensorBasicSobolevSpace('Vy', V2, V1)
 
-    V = VectorFemSpace('V', Vx, Vy)
+    V = VectorBasicSobolevSpace('V', Vx, Vy)
 
     print('> space :: ', V)
     print('> logical dim :: ', V.ldim)

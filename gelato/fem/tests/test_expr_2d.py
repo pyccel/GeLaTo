@@ -14,7 +14,7 @@ from gelato.calculus import Constant
 from gelato.calculus import Field
 from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 
-from gelato.fem.core import FemSpace
+from gelato.fem.core import BasicSobolevSpace
 from gelato.fem.core import TestFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.expr import BilinearForm
@@ -26,7 +26,7 @@ from gelato.fem.expr import gelatize
 def test_atomize_2d_1():
     print('============ test_atomize_2d_1 =============')
 
-    V = FemSpace('V', ldim=2)
+    V = BasicSobolevSpace('V', ldim=2)
 
     v = TestFunction(V, name='v')
     w = TestFunction(V, name='w')
@@ -53,8 +53,8 @@ def test_atomize_2d_1():
 def test_normalize_2d_1():
     print('============ test_normalize_2d_1 =============')
 
-    V = FemSpace('V', ldim=2)
-    U = FemSpace('U', ldim=2)
+    V = BasicSobolevSpace('V', ldim=2)
+    U = BasicSobolevSpace('U', ldim=2)
 
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
@@ -89,7 +89,7 @@ def test_normalize_2d_1():
 def test_atomize_2d_2():
     print('============ test_atomize_2d_2 =============')
 
-    V = FemSpace('V', ldim=2, is_block=True, shape=2)
+    V = BasicSobolevSpace('V', ldim=2, is_block=True, shape=2)
 
     v = VectorTestFunction(V, name='v')
 
@@ -105,8 +105,8 @@ def test_atomize_2d_2():
 def test_normalize_2d_2():
     print('============ test_normalize_2d_2 =============')
 
-    V = FemSpace('V', ldim=2, is_block=True, shape=2)
-    U = FemSpace('U', ldim=2, is_block=True, shape=2)
+    V = BasicSobolevSpace('V', ldim=2, is_block=True, shape=2)
+    U = BasicSobolevSpace('U', ldim=2, is_block=True, shape=2)
 
     v = VectorTestFunction(V, name='v')
     u = VectorTestFunction(U, name='u')
@@ -146,8 +146,8 @@ def test_normalize_2d_2():
 def test_matricize_2d_2():
     print('============ test_matricize_2d_2 =============')
 
-    V = FemSpace('V', ldim=2, is_block=True, shape=2)
-    U = FemSpace('U', ldim=2, is_block=True, shape=2)
+    V = BasicSobolevSpace('V', ldim=2, is_block=True, shape=2)
+    U = BasicSobolevSpace('U', ldim=2, is_block=True, shape=2)
 
     v = VectorTestFunction(V, name='v')
     u = VectorTestFunction(U, name='u')
@@ -234,8 +234,8 @@ def test_matricize_2d_2():
 def test_bilinear_form_2d_1():
     print('============ test_bilinear_form_2d_1 =============')
 
-    U = FemSpace('U', ldim=2)
-    V = FemSpace('V', ldim=2)
+    U = BasicSobolevSpace('U', ldim=2)
+    V = BasicSobolevSpace('V', ldim=2)
 
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')
@@ -254,8 +254,8 @@ def test_bilinear_form_2d_1():
 def test_bilinear_form_2d_2():
     print('============ test_bilinear_form_2d_2 =============')
 
-    U = FemSpace('U', ldim=2)
-    V = FemSpace('V', ldim=2)
+    U = BasicSobolevSpace('U', ldim=2)
+    V = BasicSobolevSpace('V', ldim=2)
 
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')
@@ -274,8 +274,8 @@ def test_bilinear_form_2d_2():
 def test_bilinear_form_2d_3():
     print('============ test_bilinear_form_2d_3 =============')
 
-    U = FemSpace('U', ldim=2)
-    V = FemSpace('V', ldim=2)
+    U = BasicSobolevSpace('U', ldim=2)
+    V = BasicSobolevSpace('V', ldim=2)
 
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')
@@ -298,8 +298,8 @@ def test_bilinear_form_2d_3():
 def test_bilinear_form_2d_4():
     print('============ test_bilinear_form_2d_4 =============')
 
-    U = FemSpace('U', ldim=2, is_block=True, shape=2)
-    V = FemSpace('V', ldim=2, is_block=True, shape=2)
+    U = BasicSobolevSpace('U', ldim=2, is_block=True, shape=2)
+    V = BasicSobolevSpace('V', ldim=2, is_block=True, shape=2)
 
     u = VectorTestFunction(U, name='u')
     v = VectorTestFunction(V, name='v')
@@ -318,8 +318,8 @@ def test_bilinear_form_2d_4():
 def test_bilinear_form_2d_10():
     print('============ test_bilinear_form_2d_10 =============')
 
-    U = FemSpace('U', ldim=2)
-    V = FemSpace('V', ldim=2)
+    U = BasicSobolevSpace('U', ldim=2)
+    V = BasicSobolevSpace('V', ldim=2)
 
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')

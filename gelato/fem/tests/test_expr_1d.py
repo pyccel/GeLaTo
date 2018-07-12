@@ -11,7 +11,7 @@ from gelato.calculus import Constant
 from gelato.calculus import Field
 from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 
-from gelato.fem.core import FemSpace
+from gelato.fem.core import H1Space
 from gelato.fem.core import TestFunction
 from gelato.fem.core import VectorTestFunction
 from gelato.fem.expr import BilinearForm
@@ -23,7 +23,7 @@ from gelato.fem.expr import gelatize
 def test_atomize_1d_1():
     print('============ test_atomize_1d_1 =============')
 
-    V = FemSpace('V', ldim=1)
+    V = H1Space('V', ldim=1)
 
     v = TestFunction(V, name='v')
     w = TestFunction(V, name='w')
@@ -52,8 +52,8 @@ def test_atomize_1d_1():
 def test_normalize_1d_1():
     print('============ test_normalize_1d_1 =============')
 
-    V = FemSpace('V', ldim=1)
-    U = FemSpace('U', ldim=1)
+    V = H1Space('V', ldim=1)
+    U = H1Space('U', ldim=1)
 
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
@@ -84,8 +84,8 @@ def test_normalize_1d_1():
 def test_bilinear_form_1d_1():
     print('============ test_bilinear_form_1d_1 =============')
 
-    U = FemSpace('U', ldim=1)
-    V = FemSpace('V', ldim=1)
+    U = H1Space('U', ldim=1)
+    V = H1Space('V', ldim=1)
 
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
@@ -104,8 +104,8 @@ def test_bilinear_form_1d_1():
 def test_bilinear_form_1d_2():
     print('============ test_bilinear_form_1d_2 =============')
 
-    U = FemSpace('U', ldim=1)
-    V = FemSpace('V', ldim=1)
+    U = H1Space('U', ldim=1)
+    V = H1Space('V', ldim=1)
 
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
@@ -126,8 +126,8 @@ def test_bilinear_form_1d_2():
 def test_bilinear_form_1d_3():
     print('============ test_bilinear_form_1d_3 =============')
 
-    U = FemSpace('U', ldim=1)
-    V = FemSpace('V', ldim=1)
+    U = H1Space('U', ldim=1)
+    V = H1Space('V', ldim=1)
 
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
@@ -147,8 +147,8 @@ def test_bilinear_form_1d_3():
 #def test_bilinear_form_1d_4():
 #    print('============ test_bilinear_form_1d_4 =============')
 #
-#    U = FemSpace('U', ldim=1)
-#    V = FemSpace('V', ldim=1)
+#    U = H1Space('U', ldim=1)
+#    V = H1Space('V', ldim=1)
 #
 #    v = TestFunction(V, name='v')
 #    u = TestFunction(U, name='u')
@@ -169,8 +169,8 @@ def test_bilinear_form_1d_3():
 #def test_bilinear_form_1d_5():
 #    print('============ test_bilinear_form_1d_5 =============')
 #
-#    U = FemSpace('U', ldim=1)
-#    V = FemSpace('V', ldim=1)
+#    U = H1Space('U', ldim=1)
+#    V = H1Space('V', ldim=1)
 #
 #    v = TestFunction(V, name='v')
 #    u = TestFunction(U, name='u')
@@ -189,8 +189,8 @@ def test_bilinear_form_1d_3():
 #def test_bilinear_form_1d_6():
 #    print('============ test_bilinear_form_1d_6 =============')
 #
-#    U = FemSpace('U', ldim=1)
-#    V = FemSpace('V', ldim=1)
+#    U = H1Space('U', ldim=1)
+#    V = H1Space('V', ldim=1)
 #
 #    v = TestFunction(V, name='v')
 #    u = TestFunction(U, name='u')
@@ -211,8 +211,8 @@ def test_bilinear_form_1d_3():
 #def test_bilinear_form_1d_7():
 #    print('============ test_bilinear_form_1d_7 =============')
 #
-#    U = FemSpace('U', ldim=1)
-#    V = FemSpace('V', ldim=1)
+#    U = H1Space('U', ldim=1)
+#    V = H1Space('V', ldim=1)
 #
 #    w1 = TestFunction(U,  name='w1')
 #    w2 = TestFunction(U,  name='w2')
@@ -236,8 +236,8 @@ def test_bilinear_form_1d_3():
 #def test_bilinear_form_1d_8():
 #    print('============ test_bilinear_form_1d_8 =============')
 #
-#    U = FemSpace('U', ldim=1)
-#    V = FemSpace('V', ldim=1)
+#    U = H1Space('U', ldim=1)
+#    V = H1Space('V', ldim=1)
 #
 #    w1 = TestFunction(U,  name='w1')
 #    w2 = TestFunction(U,  name='w2')
@@ -260,8 +260,8 @@ def test_bilinear_form_1d_3():
 def test_bilinear_form_1d_10():
     print('============ test_bilinear_form_1d_10 =============')
 
-    U = FemSpace('U', ldim=1)
-    V = FemSpace('V', ldim=1)
+    U = H1Space('U', ldim=1)
+    V = H1Space('V', ldim=1)
 
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')
