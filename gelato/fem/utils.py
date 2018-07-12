@@ -7,7 +7,7 @@
 
 from sympy.core.containers import Tuple
 
-from gelato.expression import is_test_function, is_trial_function
+from gelato.expression import _is_base_function
 from gelato.expression import BASIS_PREFIX
 
 from gelato.fem.expr import gelatize
@@ -58,9 +58,9 @@ def construct_test_functions(nderiv, dim):
     """
     d_basis = OrderedDict()
     for k in range(1, dim+1):
-        d_basis[k,0] = 'bs{k}[il_{k}, 0, g{k}]'.format(k=k)
+        d_basis[k,0] = 'test_bs{k}[il_{k}, 0, g{k}]'.format(k=k)
         for d in range(1, nderiv+1):
-            d_basis[k,d] = 'bs{k}[il_{k}, {d}, g{k}]'.format(d=d, k=k)
+            d_basis[k,d] = 'test_bs{k}[il_{k}, {d}, g{k}]'.format(d=d, k=k)
 
     return d_basis
 
@@ -70,9 +70,9 @@ def construct_trial_functions(nderiv, dim):
     """
     d_basis = OrderedDict()
     for k in range(1, dim+1):
-        d_basis[k,0] = 'bs{k}[jl_{k}, 0, g{k}]'.format(k=k)
+        d_basis[k,0] = 'trial_bs{k}[jl_{k}, 0, g{k}]'.format(k=k)
         for d in range(1, nderiv+1):
-            d_basis[k,d] = 'bs{k}[jl_{k}, {d}, g{k}]'.format(d=d, k=k)
+            d_basis[k,d] = 'trial_bs{k}[jl_{k}, {d}, g{k}]'.format(d=d, k=k)
 
     return d_basis
 
@@ -131,12 +131,18 @@ def compile_kernel(name, a, spaces,
         print('> Fields = ', fields)
     # ...
 
-    # ... TODO improve inside gelatize
+    # ... TODO improve
     V = a.trial_spaces[0]
     U = a.test_spaces[0]
-    expr = gelatize(a, basis={V: 'Nj', U: 'Ni'})
+    TEST_BASIS = 'Ni'
+    TRIAL_BASIS = 'Nj'
+    expr = gelatize(a, basis={V: TRIAL_BASIS, U: TEST_BASIS})
+
     if verbose:
         print('> gelatized  >>> {0}'.format(expr))
+
+    is_test_function = lambda a: _is_base_function(a, TEST_BASIS)
+    is_trial_function = lambda a: _is_base_function(a, TRIAL_BASIS)
     # ...
 
     # ... contants
@@ -245,16 +251,16 @@ def compile_kernel(name, a, spaces,
 
     lines = []
     for arg in test_names:
-        if arg == 'Ni':
+        if arg == TEST_BASIS:
             basis = ' * '.join(d_test_basis[k,0] for k in range(1, dim+1))
-            line = 'Ni = {basis}'.format(basis=basis)
+            line = '{test} = {basis}'.format(test=TEST_BASIS, basis=basis)
         else:
             deriv = arg.split('_')[-1]
             nx = _count_letter(deriv, 'x')
             ny = _count_letter(deriv, 'y')
             nz = _count_letter(deriv, 'z')
             basis = ' * '.join(d_test_basis[k,d] for k,d in zip(range(1, dim+1), [nx,ny,nz]))
-            line = 'Ni_{deriv} = {basis}'.format(deriv=deriv, basis=basis)
+            line = '{test}_{deriv} = {basis}'.format(test=TEST_BASIS, deriv=deriv, basis=basis)
         lines.append(tab+line)
     test_function_str = '\n'.join(l for l in lines)
     # ...
@@ -266,16 +272,16 @@ def compile_kernel(name, a, spaces,
 
     lines = []
     for arg in trial_names:
-        if arg == 'Nj':
+        if arg == TRIAL_BASIS:
             basis = ' * '.join(d_trial_basis[k,0] for k in range(1, dim+1))
-            line = 'Nj = {basis}'.format(basis=basis)
+            line = '{trial} = {basis}'.format(trial=TRIAL_BASIS, basis=basis)
         else:
             deriv = arg.split('_')[-1]
             nx = _count_letter(deriv, 'x')
             ny = _count_letter(deriv, 'y')
             nz = _count_letter(deriv, 'z')
             basis = ' * '.join(d_trial_basis[k,d] for k,d in zip(range(1, dim+1), [nx,ny,nz]))
-            line = 'Nj_{deriv} = {basis}'.format(deriv=deriv, basis=basis)
+            line = '{trial}_{deriv} = {basis}'.format(trial=TRIAL_BASIS, deriv=deriv, basis=basis)
         lines.append(tab+line)
     trial_function_str = '\n'.join(l for l in lines)
     # ...
