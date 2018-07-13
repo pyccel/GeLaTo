@@ -8,6 +8,8 @@ from sympy.core.containers import Tuple
 from sympy import symbols
 from sympy import IndexedBase
 from sympy import Matrix
+from sympy import Function
+from sympy import pi, cos
 
 from gelato.calculus import dx, dy, dz
 from gelato.calculus import Constant
@@ -26,8 +28,8 @@ from gelato.fem.utils    import compile_kernel
 from numpy import linspace
 
 # ...
-def test_kernel_3d_scalar_1():
-    print('============ test_kernel_3d_scalar_1 =============')
+def test_kernel_bilinear_3d_scalar_1():
+    print('============ test_kernel_bilinear_3d_scalar_1 =============')
 
     U = H1Space('U', ldim=3)
     V = H1Space('V', ldim=3)
@@ -41,14 +43,14 @@ def test_kernel_3d_scalar_1():
     print('> input      >>> {0}'.format(a))
 
     # ...
-    kernel_py  = compile_kernel('kernel_3d_scalar_1', a,
+    kernel_py  = compile_kernel('kernel_bilinear_3d_scalar_1', a,
                                 backend='python', verbose=True)
     # ...
 # ...
 
 # ...
-def test_kernel_3d_block_1():
-    print('============ test_kernel_3d_block_1 =============')
+def test_kernel_bilinear_3d_block_1():
+    print('============ test_kernel_bilinear_3d_block_1 =============')
 
     V = H1Space('V', ldim=3, is_block=True, shape=3)
     U = H1Space('U', ldim=3, is_block=True, shape=3)
@@ -62,14 +64,37 @@ def test_kernel_3d_block_1():
     print('> input      >>> {0}'.format(a))
 
     # ...
-    kernel_py  = compile_kernel('kernel_3d_block_1', a,
+    kernel_py  = compile_kernel('kernel_bilinear_3d_block_1', a,
                                 backend='python', verbose=True)
     # ...
+# ...
 
+# ...
+def test_kernel_linear_3d_scalar_1():
+    print('============ test_kernel_linear_3d_scalar_1 =============')
+
+    V = H1Space('V', ldim=3)
+
+    v = TestFunction(V, name='v')
+
+    x = Symbol('x')
+    y = Symbol('y')
+    z = Symbol('z')
+
+    expr = cos(2*pi*x)*cos(4*pi*y)*cos(5*pi*z)*v
+
+    a = LinearForm(v, expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_linear_3d_scalar_1', a,
+                                backend='python', verbose=True)
+    # ...
 # ...
 
 # .....................................................
 if __name__ == '__main__':
-    test_kernel_3d_scalar_1()
-    test_kernel_3d_block_1()
+#    test_kernel_bilinear_3d_scalar_1()
+#    test_kernel_bilinear_3d_block_1()
 
+    test_kernel_linear_3d_scalar_1()

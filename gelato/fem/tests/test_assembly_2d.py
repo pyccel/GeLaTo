@@ -8,6 +8,8 @@ from sympy.core.containers import Tuple
 from sympy import symbols
 from sympy import IndexedBase
 from sympy import Matrix
+from sympy import Function
+from sympy import pi, cos
 
 from gelato.calculus import dx, dy, dz
 from gelato.calculus import Constant
@@ -27,8 +29,8 @@ from numpy import linspace
 
 
 # ...
-def test_kernel_2d_scalar_1():
-    print('============ test_kernel_2d_scalar_1 =============')
+def test_kernel_bilinear_2d_scalar_1():
+    print('============ test_kernel_bilinear_2d_scalar_1 =============')
 
     U = H1Space('U', ldim=2)
     V = H1Space('V', ldim=2)
@@ -42,14 +44,14 @@ def test_kernel_2d_scalar_1():
     print('> input      >>> {0}'.format(a))
 
     # ...
-    kernel_py  = compile_kernel('kernel_2d_scalar_1', a,
+    kernel_py  = compile_kernel('kernel_bilinear_2d_scalar_1', a,
                                 backend='python', verbose=True)
     # ...
 # ...
 
 # ...
-def test_kernel_2d_block_1():
-    print('============ test_kernel_2d_block_1 =============')
+def test_kernel_bilinear_2d_block_1():
+    print('============ test_kernel_bilinear_2d_block_1 =============')
 
     V = H1Space('V', ldim=2, is_block=True, shape=2)
     U = H1Space('U', ldim=2, is_block=True, shape=2)
@@ -63,14 +65,38 @@ def test_kernel_2d_block_1():
     print('> input      >>> {0}'.format(a))
 
     # ...
-    kernel_py  = compile_kernel('kernel_2d_block_1', a,
+    kernel_py  = compile_kernel('kernel_bilinear_2d_block_1', a,
                                 backend='python', verbose=True)
     # ...
+# ...
 
+# ...
+def test_kernel_linear_2d_scalar_1():
+    print('============ test_kernel_linear_2d_scalar_1 =============')
+
+    V = H1Space('V', ldim=2)
+
+    v = TestFunction(V, name='v')
+
+    x = Symbol('x')
+    y = Symbol('y')
+
+    expr = cos(2*pi*x)*cos(4*pi*y)*v
+
+    a = LinearForm(v, expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_linear_2d_scalar_1', a,
+                                backend='python', verbose=True)
+    # ...
 # ...
 
 
 # .....................................................
 if __name__ == '__main__':
-#    test_kernel_2d_scalar_1()
-    test_kernel_2d_block_1()
+#    test_kernel_bilinear_2d_scalar_1()
+#    test_kernel_bilinear_2d_block_1()
+
+    test_kernel_linear_2d_scalar_1()
+

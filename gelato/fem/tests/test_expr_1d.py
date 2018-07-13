@@ -365,5 +365,4 @@ if __name__ == '__main__':
 ###    test_bilinear_form_1d_8()
     test_bilinear_form_1d_10()
 
-    test_linear_form_1d_1()
-
+#    test_linear_form_1d_1()

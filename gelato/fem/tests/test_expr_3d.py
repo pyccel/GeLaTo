@@ -449,7 +449,7 @@ def test_bilinear_form_3d_10():
 def test_linear_form_3d_1():
     print('============ test_linear_form_3d_1 =============')
 
-    V = H1Space('V', ldim=2)
+    V = H1Space('V', ldim=3)
 
     v = TestFunction(V, name='v')
 
@@ -487,4 +487,4 @@ if __name__ == '__main__':
 
     test_bilinear_form_3d_10()
 
-    test_linear_form_3d_1()
+#    test_linear_form_3d_1()
