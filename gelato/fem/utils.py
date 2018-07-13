@@ -1,12 +1,22 @@
 # coding: utf-8
 
 # TODO: - allow for giving a name for the trial/test basis
-#       - Ni/Nj should be Ni_0/Nj_O
+#       - Ni/Nj should be Ni_0/Nj_0
 #       - define templates as proper python functions
 #       - use redbaron to modify the template
 
+#     NOTE: THE PATH OF TEMPLATES IS HARD CODED!
+
+
 from sympy.core.containers import Tuple
 from sympy import Matrix
+from sympy import Integer, Float
+
+from numbers import Number
+from collections import OrderedDict
+
+import os
+import importlib
 
 from gelato.expression import _is_base_function
 from gelato.expression import BASIS_PREFIX
@@ -15,31 +25,6 @@ from gelato.fem.expr import gelatize
 from gelato.fem.expr import BilinearForm, LinearForm
 from gelato.calculus   import Constant
 from gelato.calculus   import Field
-from gelato.fem.templates import template_1d_scalar, template_header_1d_scalar
-from gelato.fem.templates import template_2d_scalar, template_header_2d_scalar
-from gelato.fem.templates import template_3d_scalar, template_header_3d_scalar
-
-from gelato.fem.templates import template_1d_block, template_header_1d_block
-from gelato.fem.templates import template_2d_block, template_header_2d_block
-from gelato.fem.templates import template_3d_block, template_header_3d_block
-
-from gelato.fem.templates import symbol_1d_scalar, symbol_header_1d_scalar
-from gelato.fem.templates import symbol_2d_scalar, symbol_header_2d_scalar
-from gelato.fem.templates import symbol_3d_scalar, symbol_header_3d_scalar
-
-from gelato.fem.templates import symbol_1d_block, symbol_header_1d_block
-from gelato.fem.templates import symbol_2d_block, symbol_header_2d_block
-from gelato.fem.templates import symbol_3d_block, symbol_header_3d_block
-
-from gelato.fem.templates import eval_field_1d_scalar
-from gelato.fem.templates import eval_field_2d_scalar
-from gelato.fem.templates import eval_field_3d_scalar
-
-
-from numbers import Number
-from collections import OrderedDict
-from sympy import Integer, Float
-import os
 
 def _convert_int_to_float(expr):
     sub = zip( expr.atoms(Integer), map(Float, expr.atoms(Integer)) )
@@ -127,6 +112,8 @@ def compile_kernel(name, a, spaces=None,
     # ... weak form attributs
     dim = a.ldim
     fields = a.fields
+    is_bilinear_form = isinstance(a, BilinearForm)
+    is_linear_form = isinstance(a, LinearForm)
 
     if verbose:
         print('> dim    = ', dim)
@@ -226,13 +213,30 @@ def compile_kernel(name, a, spaces=None,
         pattern = 'scalar'
     # ...
 
+    # ... get name of the template to be used
+    if is_bilinear_form:
+        template_str = '_bilinear_form_{dim}d_{pattern}'.format(dim=dim, pattern=pattern)
+    elif is_bilinear_form:
+        template_str = '_linear_form_{dim}d_{pattern}'.format(dim=dim, pattern=pattern)
+    else:
+        raise NotImplementedError('Only Bilinear and Linear forms are available')
     # ...
-    template_str = 'template_{dim}d_{pattern}'.format(dim=dim, pattern=pattern)
+
+    # ... import the variable from the templates module
+    #     NOTE: THE PATH IS HARD CODED HERE!
     try:
-        template = eval(template_str)
+        if is_bilinear_form:
+            package = importlib.import_module("gelato.fem.templates.bilinear_form")
+        elif is_linear_form:
+            package = importlib.import_module("gelato.fem.templates.linear_form")
+        else:
+            raise ValueError('only linear and bilinear form are available')
+
     except:
-        raise ValueError('Could not find the corresponding template {}'.format(template_str))
-    # ...
+        raise ImportError('could not import {0}'.format(name))
+
+    template = getattr(package, template_str)
+    # ...
 
     # ... identation (def function body)
     tab = ' '*4

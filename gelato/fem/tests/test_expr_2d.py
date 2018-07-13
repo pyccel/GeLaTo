@@ -8,16 +8,18 @@ from sympy.core.containers import Tuple
 from sympy import symbols
 from sympy import IndexedBase
 from sympy import Matrix
+from sympy import Function
+from sympy import pi, cos
 
 from gelato.calculus import dx, dy, dz
 from gelato.calculus import Constant
 from gelato.calculus import Field
 from gelato.calculus import grad, dot, inner, cross, rot, curl, div
 
-from gelato.fem.core import BasicSobolevSpace
+from gelato.fem.core import H1Space
 from gelato.fem.core import TestFunction
 from gelato.fem.core import VectorTestFunction
-from gelato.fem.expr import BilinearForm
+from gelato.fem.expr import BilinearForm, LinearForm
 from gelato.fem.expr import atomize, normalize, matricize
 from gelato.fem.expr import gelatize
 
@@ -26,7 +28,7 @@ from gelato.fem.expr import gelatize
 def test_atomize_2d_1():
     print('============ test_atomize_2d_1 =============')
 
-    V = BasicSobolevSpace('V', ldim=2)
+    V = H1Space('V', ldim=2)
 
     v = TestFunction(V, name='v')
     w = TestFunction(V, name='w')
@@ -53,8 +55,8 @@ def test_atomize_2d_1():
 def test_normalize_2d_1():
     print('============ test_normalize_2d_1 =============')
 
-    V = BasicSobolevSpace('V', ldim=2)
-    U = BasicSobolevSpace('U', ldim=2)
+    V = H1Space('V', ldim=2)
+    U = H1Space('U', ldim=2)
 
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
@@ -89,7 +91,7 @@ def test_normalize_2d_1():
 def test_atomize_2d_2():
     print('============ test_atomize_2d_2 =============')
 
-    V = BasicSobolevSpace('V', ldim=2, is_block=True, shape=2)
+    V = H1Space('V', ldim=2, is_block=True, shape=2)
 
     v = VectorTestFunction(V, name='v')
 
@@ -105,8 +107,8 @@ def test_atomize_2d_2():
 def test_normalize_2d_2():
     print('============ test_normalize_2d_2 =============')
 
-    V = BasicSobolevSpace('V', ldim=2, is_block=True, shape=2)
-    U = BasicSobolevSpace('U', ldim=2, is_block=True, shape=2)
+    V = H1Space('V', ldim=2, is_block=True, shape=2)
+    U = H1Space('U', ldim=2, is_block=True, shape=2)
 
     v = VectorTestFunction(V, name='v')
     u = VectorTestFunction(U, name='u')
@@ -146,8 +148,8 @@ def test_normalize_2d_2():
 def test_matricize_2d_2():
     print('============ test_matricize_2d_2 =============')
 
-    V = BasicSobolevSpace('V', ldim=2, is_block=True, shape=2)
-    U = BasicSobolevSpace('U', ldim=2, is_block=True, shape=2)
+    V = H1Space('V', ldim=2, is_block=True, shape=2)
+    U = H1Space('U', ldim=2, is_block=True, shape=2)
 
     v = VectorTestFunction(V, name='v')
     u = VectorTestFunction(U, name='u')
@@ -234,8 +236,8 @@ def test_matricize_2d_2():
 def test_bilinear_form_2d_1():
     print('============ test_bilinear_form_2d_1 =============')
 
-    U = BasicSobolevSpace('U', ldim=2)
-    V = BasicSobolevSpace('V', ldim=2)
+    U = H1Space('U', ldim=2)
+    V = H1Space('V', ldim=2)
 
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')
@@ -254,8 +256,8 @@ def test_bilinear_form_2d_1():
 def test_bilinear_form_2d_2():
     print('============ test_bilinear_form_2d_2 =============')
 
-    U = BasicSobolevSpace('U', ldim=2)
-    V = BasicSobolevSpace('V', ldim=2)
+    U = H1Space('U', ldim=2)
+    V = H1Space('V', ldim=2)
 
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')
@@ -274,8 +276,8 @@ def test_bilinear_form_2d_2():
 def test_bilinear_form_2d_3():
     print('============ test_bilinear_form_2d_3 =============')
 
-    U = BasicSobolevSpace('U', ldim=2)
-    V = BasicSobolevSpace('V', ldim=2)
+    U = H1Space('U', ldim=2)
+    V = H1Space('V', ldim=2)
 
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')
@@ -298,8 +300,8 @@ def test_bilinear_form_2d_3():
 def test_bilinear_form_2d_4():
     print('============ test_bilinear_form_2d_4 =============')
 
-    U = BasicSobolevSpace('U', ldim=2, is_block=True, shape=2)
-    V = BasicSobolevSpace('V', ldim=2, is_block=True, shape=2)
+    U = H1Space('U', ldim=2, is_block=True, shape=2)
+    V = H1Space('V', ldim=2, is_block=True, shape=2)
 
     u = VectorTestFunction(U, name='u')
     v = VectorTestFunction(V, name='v')
@@ -318,8 +320,8 @@ def test_bilinear_form_2d_4():
 def test_bilinear_form_2d_10():
     print('============ test_bilinear_form_2d_10 =============')
 
-    U = BasicSobolevSpace('U', ldim=2)
-    V = BasicSobolevSpace('V', ldim=2)
+    U = H1Space('U', ldim=2)
+    V = H1Space('V', ldim=2)
 
     u = TestFunction(U, name='u')
     v = TestFunction(V, name='v')
@@ -380,6 +382,29 @@ def test_bilinear_form_2d_10():
 #    print('')
 # ...
 
+# ...
+def test_linear_form_2d_1():
+    print('============ test_linear_form_2d_1 =============')
+
+    V = H1Space('V', ldim=2)
+
+    v = TestFunction(V, name='v')
+
+    x = Symbol('x')
+    y = Symbol('y')
+    f = Function('f')
+
+    expr = cos(2*pi*x)*cos(4*pi*y)*v
+#    expr = f(x)*v
+
+    a = LinearForm(v, expr)
+    print('> input      >>> {0}'.format(a))
+
+    a_expr = gelatize(a, basis={V: 'Nj'})
+    print('> gelatized  >>> {0}'.format(a_expr))
+    print('')
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
@@ -396,3 +421,6 @@ if __name__ == '__main__':
 #    test_bilinear_form_2d_4()
 
     test_bilinear_form_2d_10()
+
+    test_linear_form_2d_1()
+

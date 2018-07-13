@@ -338,8 +338,8 @@ def test_linear_form_1d_1():
     x = Symbol('x')
     f = Function('f')
 
-#    expr = cos(2*pi*x)*v
-    expr = f(x)*v
+    expr = cos(2*pi*x)*v
+#    expr = f(x)*v
 
     a = LinearForm(v, expr)
     print('> input      >>> {0}'.format(a))
