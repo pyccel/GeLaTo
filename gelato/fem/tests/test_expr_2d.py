@@ -383,6 +383,60 @@ def test_bilinear_form_2d_10():
 # ...
 
 # ...
+def test_linear_form_2d_10():
+    print('============ test_linear_form_2d_10 =============')
+
+    V = H1Space('V', ldim=2)
+
+    v = TestFunction(V, name='v')
+
+    x,y = V.coordinates
+    f = Function('f')
+    g = Function('g')
+
+    Ni, Ni_x, Ni_y = symbols('Ni Ni_x Ni_y')
+    Nj, Nj_x, Nj_y = symbols('Nj Nj_x Nj_y')
+
+    c1 = Symbol('c1')
+    c2 = Symbol('c2')
+
+    bx, by = symbols('bx by')
+    b = Tuple(bx, by)
+    fg = Tuple(f(x,y), g(x,y))
+
+    a = LinearForm(v, cos(2*pi*x)*cos(4*pi*y)*v)
+
+    # ...
+    expected = cos(2*pi*x)*cos(4*pi*y)*Ni
+    assert(gelatize(LinearForm(v, cos(2*pi*x)*cos(4*pi*y)*v),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = f(x,y)*Ni
+    assert(gelatize(LinearForm(v, f(x,y)*v),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = bx*Ni_x + by*Ni_y + f(x,y)*Ni
+    assert(gelatize(LinearForm(v, dot(b, grad(v)) + f(x,y)*v),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = f(x,y)*Ni_x + g(x,y)*Ni_y
+    assert(gelatize(LinearForm(v, dot(fg, grad(v))),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+#    expr =
+#    print('> input      >>> {0}'.format(expr))
+#    print('> gelatized  >>> {0}'.format(gelatize(expr, basis={V: 'Ni'}) ))
+#    print('')
+# ...
+
+# ...
 def test_linear_form_2d_1():
     print('============ test_linear_form_2d_1 =============')
 
@@ -407,19 +461,19 @@ def test_linear_form_2d_1():
 
 # .....................................................
 if __name__ == '__main__':
-    test_atomize_2d_1()
-    test_normalize_2d_1()
+#    test_atomize_2d_1()
+#    test_normalize_2d_1()
+#
+#    test_atomize_2d_2()
+#    test_normalize_2d_2()
+#    test_matricize_2d_2()
+#
+##    test_bilinear_form_2d_1()
+##    test_bilinear_form_2d_2()
+##    test_bilinear_form_2d_3()
+##    test_bilinear_form_2d_4()
+#
+#    test_bilinear_form_2d_10()
+    test_linear_form_2d_10()
 
-    test_atomize_2d_2()
-    test_normalize_2d_2()
-    test_matricize_2d_2()
-
-#    test_bilinear_form_2d_1()
-#    test_bilinear_form_2d_2()
-#    test_bilinear_form_2d_3()
-#    test_bilinear_form_2d_4()
-
-    test_bilinear_form_2d_10()
-
-    test_linear_form_2d_1()
-
+#    test_linear_form_2d_1()

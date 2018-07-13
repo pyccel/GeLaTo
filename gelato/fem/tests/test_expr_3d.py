@@ -446,6 +446,61 @@ def test_bilinear_form_3d_10():
 # ...
 
 # ...
+def test_linear_form_3d_10():
+    print('============ test_linear_form_3d_10 =============')
+
+    V = H1Space('V', ldim=3)
+
+    v = TestFunction(V, name='v')
+    x,y,z = V.coordinates
+
+    f = Function('f')
+    g = Function('g')
+    r = Function('r')
+
+    Ni, Ni_x, Ni_y, Ni_z = symbols('Ni Ni_x Ni_y Ni_z')
+    Nj, Nj_x, Nj_y, Nj_z = symbols('Nj Nj_x Nj_y Nj_z')
+
+    c1 = Symbol('c1')
+    c2 = Symbol('c2')
+
+    bx, by, bz = symbols('bx by bz')
+    b = Tuple(bx, by, bz)
+    fgr = Tuple(f(x,y,z), g(x,y,z), r(x,y,z))
+
+    a = LinearForm(v, cos(2*pi*x)*cos(4*pi*y)*cos(5*pi*z)*v)
+
+    # ...
+    expected = cos(2*pi*x)*cos(4*pi*y)*cos(5*pi*z)*Ni
+    assert(gelatize(LinearForm(v, cos(2*pi*x)*cos(4*pi*y)*cos(5*pi*z)*v),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = f(x,y,z)*Ni
+    assert(gelatize(LinearForm(v, f(x,y,z)*v),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = bx*Ni_x + by*Ni_y + bz*Ni_z + f(x,y,z)*Ni
+    assert(gelatize(LinearForm(v, dot(b, grad(v)) + f(x,y,z)*v),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = f(x,y,z)*Ni_x + g(x,y,z)*Ni_y + r(x,y,z)*Ni_z
+    assert(gelatize(LinearForm(v, dot(fgr, grad(v))),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+#    expr = c1*a  + c2*(b + adv)
+#    print('> input      >>> {0}'.format(expr))
+#    print('> gelatized  >>> {0}'.format(gelatize(expr, basis={V: 'Ni'}) ))
+#    print('')
+# ...
+
+# ...
 def test_linear_form_3d_1():
     print('============ test_linear_form_3d_1 =============')
 
@@ -470,19 +525,20 @@ def test_linear_form_3d_1():
 
 # .....................................................
 if __name__ == '__main__':
-    test_atomize_3d_1()
-    test_normalize_3d_1()
+#    test_atomize_3d_1()
+#    test_normalize_3d_1()
+#
+#    test_atomize_3d_2()
+#    test_normalize_3d_2()
+#    test_matricize_3d_2()
+#
+##    test_bilinear_form_3d_1()
+##    test_bilinear_form_3d_2()
+##    test_bilinear_form_3d_3()
+###    test_bilinear_form_3d_4()
+###    test_bilinear_form_3d_5()
+#
+#    test_bilinear_form_3d_10()
+    test_linear_form_3d_10()
 
-    test_atomize_3d_2()
-    test_normalize_3d_2()
-    test_matricize_3d_2()
-
-#    test_bilinear_form_3d_1()
-#    test_bilinear_form_3d_2()
-#    test_bilinear_form_3d_3()
-##    test_bilinear_form_3d_4()
-##    test_bilinear_form_3d_5()
-
-    test_bilinear_form_3d_10()
-
-    test_linear_form_3d_1()
+#    test_linear_form_3d_1()

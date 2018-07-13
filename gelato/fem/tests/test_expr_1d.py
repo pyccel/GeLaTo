@@ -349,20 +349,70 @@ def test_linear_form_1d_1():
     print('')
 # ...
 
+# ...
+def test_linear_form_1d_10():
+    print('============ test_linear_form_1d_10 =============')
+
+    V = H1Space('V', ldim=1)
+
+    v = TestFunction(V, name='v')
+
+    x = V.coordinates
+    f = Function('f')
+
+    Ni, Ni_x, Ni_xx = symbols('Ni Ni_x Ni_xx')
+
+    c1 = Symbol('c1')
+    c2 = Symbol('c2')
+
+    a = LinearForm(v, cos(2*pi*x)*v)
+
+    # ...
+    expected = cos(2*pi*x)*Ni
+    assert(gelatize(LinearForm(v, cos(2*pi*x)*v),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = f(x)*Ni
+    assert(gelatize(LinearForm(v, f(x)*v),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = cos(2*pi*x)*Ni_x
+    assert(gelatize(LinearForm(v, cos(2*pi*x)*dx(v)),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+    # ...
+    expected = f(x)*Ni_xx
+    assert(gelatize(LinearForm(v, f(x)*dx(dx(v))),
+                    basis={V: 'Ni'}) == expected)
+    # ...
+
+    expr = LinearForm(v, cos(2*pi*x)*dx(v))
+    print('> input      >>> {0}'.format(expr))
+    print('> gelatized  >>> {0}'.format(gelatize(expr, basis={V: 'Ni'}) ))
+    print('')
+# ...
+
 # .....................................................
 if __name__ == '__main__':
-    test_atomize_1d_1()
-    test_normalize_1d_1()
+#    test_atomize_1d_1()
+#    test_normalize_1d_1()
+#
+##    test_bilinear_form_1d_1()
+##    test_bilinear_form_1d_2()
+##    test_bilinear_form_1d_3()
+#
+####    test_bilinear_form_1d_4()
+####    test_bilinear_form_1d_5()
+####    test_bilinear_form_1d_6()
+####    test_bilinear_form_1d_7()
+####    test_bilinear_form_1d_8()
 
-#    test_bilinear_form_1d_1()
-#    test_bilinear_form_1d_2()
-#    test_bilinear_form_1d_3()
+#    test_bilinear_form_1d_10()
+    test_linear_form_1d_10()
 
-###    test_bilinear_form_1d_4()
-###    test_bilinear_form_1d_5()
-###    test_bilinear_form_1d_6()
-###    test_bilinear_form_1d_7()
-###    test_bilinear_form_1d_8()
-    test_bilinear_form_1d_10()
-
-    test_linear_form_1d_1()
+#    test_linear_form_1d_1()
