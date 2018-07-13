@@ -91,11 +91,33 @@ def test_kernel_linear_2d_scalar_1():
     # ...
 # ...
 
+# ...
+def test_kernel_linear_2d_block_1():
+    print('============ test_kernel_linear_2d_block_1 =============')
+
+    V = H1Space('V', ldim=2, is_block=True, shape=2)
+
+    v = VectorTestFunction(V, name='v')
+
+    x,y = V.coordinates
+
+    b = Tuple(2, 3)
+    expr = v[0] + v[1] #dot(v, b)
+
+    a = LinearForm(v, expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_linear_2d_block_1', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
-#    test_kernel_bilinear_2d_scalar_1()
-#    test_kernel_bilinear_2d_block_1()
+    test_kernel_bilinear_2d_scalar_1()
+    test_kernel_bilinear_2d_block_1()
 
     test_kernel_linear_2d_scalar_1()
-
+    test_kernel_linear_2d_block_1()

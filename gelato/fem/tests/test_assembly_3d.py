@@ -90,9 +90,32 @@ def test_kernel_linear_3d_scalar_1():
     # ...
 # ...
 
+# ...
+def test_kernel_linear_3d_block_1():
+    print('============ test_kernel_linear_3d_block_1 =============')
+
+    V = H1Space('V', ldim=3, is_block=True, shape=3)
+
+    v = VectorTestFunction(V, name='v')
+
+    x,y,z = V.coordinates
+
+    b = Tuple(2, 3, 5)
+    expr = v[0] - v[1] + v[2] #dot(v, b)
+
+    a = LinearForm(v, expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_linear_3d_block_1', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
 # .....................................................
 if __name__ == '__main__':
-#    test_kernel_bilinear_3d_scalar_1()
-#    test_kernel_bilinear_3d_block_1()
+    test_kernel_bilinear_3d_scalar_1()
+    test_kernel_bilinear_3d_block_1()
 
     test_kernel_linear_3d_scalar_1()
+    test_kernel_linear_3d_block_1()

@@ -156,6 +156,7 @@ def compile_kernel(name, a, spaces=None,
 
         elif is_linear_form:
             test_n_components = expr.shape[0]
+            trial_n_components = 1 # since we are using Matrix from sympy
 
         else:
             raise NotImplementedError('Only Bilinear and Linear forms are available')
@@ -349,7 +350,13 @@ def compile_kernel(name, a, spaces=None,
         #     - define arguments
         lines = []
         mat_args = []
-        slices = ','.join(':' for i in range(0, 2*dim))
+        # test functions and trial functions
+        if is_bilinear_form:
+            slices = ','.join(':' for i in range(0, 2*dim))
+        # test functions
+        elif is_linear_form:
+            slices = ','.join(':' for i in range(0, dim))
+
         for i in range(0, test_n_components):
             for j in range(0, trial_n_components):
                 mat = 'mat_{i}{j}'.format(i=i,j=j)
@@ -365,8 +372,15 @@ def compile_kernel(name, a, spaces=None,
         # ...
 
         # ... update identation to be inside the loop
-        for i in range(0, 2*dim):
-            tab += ' '*4
+        # test functions and trial functions
+        if is_bilinear_form:
+            for i in range(0, 2*dim):
+                tab += ' '*4
+
+        # test functions
+        elif is_linear_form:
+            for i in range(0, dim):
+                tab += ' '*4
 
         tab_base = tab
         # ...
@@ -406,11 +420,26 @@ def compile_kernel(name, a, spaces=None,
 
         # ... assign accumulated values to element matrix
         if dim == 1:
-            e_pattern = 'mat_{i}{j}[il_1, p1 + jl_1 - il_1] = v_{i}{j}'
+            if is_bilinear_form:
+                e_pattern = 'mat_{i}{j}[il_1, p1 + jl_1 - il_1] = v_{i}{j}'
+
+            elif is_linear_form:
+                e_pattern = 'mat_{i}{j}[il_1] = v_{i}{j}'
+
         elif dim == 2:
-            e_pattern = 'mat_{i}{j}[il_1, il_2, p1 + jl_1 - il_1, p2 + jl_2 - il_2] = v_{i}{j}'
+            if is_bilinear_form:
+                e_pattern = 'mat_{i}{j}[il_1, il_2, p1 + jl_1 - il_1, p2 + jl_2 - il_2] = v_{i}{j}'
+
+            elif is_linear_form:
+                e_pattern = 'mat_{i}{j}[il_1, il_2] = v_{i}{j}'
+
         elif dim ==3:
-            e_pattern = 'mat_{i}{j}[il_1, il_2, il_3, p1 + jl_1 - il_1, p2 + jl_2 - il_2, p3 + jl_3 - il_3] = v_{i}{j}'
+            if is_bilinear_form:
+                e_pattern = 'mat_{i}{j}[il_1, il_2, il_3, p1 + jl_1 - il_1, p2 + jl_2 - il_2, p3 + jl_3 - il_3] = v_{i}{j}'
+
+            elif is_linear_form:
+                e_pattern = 'mat_{i}{j}[il_1, il_2, il_3] = v_{i}{j}'
+
         else:
             raise NotImplementedError('only 1d, 2d and 3d are available')
 

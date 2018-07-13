@@ -467,18 +467,23 @@ def matricize(expr):
         j = S.One
         if vectors:
             args = [matricize(i) for i in vectors]
-            if not(len(args) == 2):
-                print(args)
-                raise ValueError('Expecting exactly 2 arguments')
 
-            # TODO how to be sure about who is left/right? test/trial?
-            left = args[0]
-            right = args[1]
+            if len(args) == 1:
+                j = args[0]
 
-            if isinstance(left, Matrix) and isinstance(right, Matrix):
-                j = TensorProduct(left.transpose(), right)
+            elif len(args) == 2:
+                # TODO how to be sure about who is left/right? test/trial?
+                left = args[0]
+                right = args[1]
+
+                if isinstance(left, Matrix) and isinstance(right, Matrix):
+                    j = TensorProduct(left.transpose(), right)
+                else:
+                    j = Mul(*args)
+
             else:
-                j = Mul(*args)
+                raise ValueError('Expecting one or two arguments')
+
 
         # we cannot return Mul(i, j)
         # since it gives the error:

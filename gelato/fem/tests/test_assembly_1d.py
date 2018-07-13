@@ -69,6 +69,6 @@ def test_kernel_linear_1d_scalar_1():
 
 # .....................................................
 if __name__ == '__main__':
-#    test_kernel_bilinear_1d_scalar_1()
+    test_kernel_bilinear_1d_scalar_1()
 
     test_kernel_linear_1d_scalar_1()

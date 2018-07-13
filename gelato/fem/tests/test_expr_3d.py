@@ -522,6 +522,38 @@ def test_linear_form_3d_1():
     print('')
 # ...
 
+# ...
+def test():
+    print('============ test =============')
+
+    V = H1Space('V', ldim=3, is_block=True, shape=3)
+    U = H1Space('U', ldim=3)
+
+    v = VectorTestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    Ni, Ni_x, Ni_y, Ni_z = symbols('Ni Ni_x Ni_y Ni_z')
+    Nj, Nj_x, Nj_y, Nj_z = symbols('Nj Nj_x Nj_y Nj_z')
+
+    # ...
+    expr = v[0]*u
+    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
+    expected = Matrix([[Ni*Nj], [0], [0]])
+    assert(matricize(expr) == expected)
+    # ...
+
+    # ...
+    expr = dot(v, grad(u))
+    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
+    expected = Matrix([[Ni*Nj_x], [Ni*Nj_y], [Ni*Nj_z]])
+    assert(matricize(expr) == expected)
+    # ...
+
+#    expr = v[0]*u
+#    print('> input         >>> {0}'.format(expr))
+#    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
+#    print('> matricize     >>> {0}'.format(matricize(expr)))
+
 
 # .....................................................
 if __name__ == '__main__':
@@ -539,6 +571,8 @@ if __name__ == '__main__':
 ###    test_bilinear_form_3d_5()
 #
 #    test_bilinear_form_3d_10()
-    test_linear_form_3d_10()
+#    test_linear_form_3d_10()
 
 #    test_linear_form_3d_1()
+
+    test()
