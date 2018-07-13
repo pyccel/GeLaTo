@@ -457,8 +457,6 @@ def compile_kernel(name, a, spaces=None,
     print(code)
     print('--------------')
 
-    import sys; sys.exit(0)
-
     # ...
     if context:
         from pyccel.epyccel import ContextPyccel
