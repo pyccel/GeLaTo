@@ -21,6 +21,7 @@ from sympy import preorder_traversal
 from sympy import Indexed, IndexedBase, Matrix
 from sympy.physics.quantum import TensorProduct
 from sympy import expand
+from sympy import Integer, Float
 
 from gelato.calculus import _partial_derivatives
 from gelato.calculus import _calculus_operators
@@ -271,6 +272,7 @@ def atomize(expr, dim=None):
                              _partial_derivatives, _calculus_operators,
                              TestFunction, VectorTestFunction, Indexed,
                              Field, Constant, Symbol, Function,
+                             Integer, Float, Matrix,
                              list, tuple, Tuple)):
         msg = ('> Wrong input type.')
 

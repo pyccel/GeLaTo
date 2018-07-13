@@ -60,8 +60,13 @@ def test_normalize_2d_1():
 
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
+
+    x,y = V.coordinates
+
     c = Constant('c')
     F = Field('F')
+    f1 = Function('f1')
+    f2 = Function('f2')
 
     Ni, Ni_x, Ni_y = symbols('Ni Ni_x Ni_y')
     Nj, Nj_x, Nj_y = symbols('Nj Nj_x Nj_y')
@@ -69,16 +74,28 @@ def test_normalize_2d_1():
     bx, by = symbols('bx by')
     b = Tuple(bx, by)
 
+    f = Tuple(f1(x,y), f2(x,y))
+
+    a00 = Constant('a00')
+    a10 = Constant('a10')
+    a01 = Constant('a01')
+    a11 = Constant('a11')
+    A = Matrix([[a00, a01], [a10, a11]])
+
     # ...
     assert(normalize(grad(v), basis={V: 'Ni'}) == Tuple(Ni_x, Ni_y))
     assert(normalize(grad(c*v), basis={V: 'Ni'}) == Tuple(c*Ni_x, c*Ni_y))
     assert(normalize(dot(b, grad(v)), basis={V: 'Ni'}) == Ni_x*bx + Ni_y*by)
     assert(normalize(dot(b, grad(v)) + c*v, basis={V: 'Ni'}) == Ni_x*bx + Ni_y*by + c*Ni)
+    assert(normalize(dot(f, grad(v)), basis={V: 'Ni'}) == Ni_x*f1(x,y) + Ni_y*f2(x,y))
+    assert(normalize(dot(Tuple(2, 3), grad(v)), basis={V: 'Ni'}) == 2*Ni_x + 3*Ni_y)
+#    assert(normalize(A*grad(v), basis={V: 'Ni'}) == 2*Ni_x + 3*Ni_y)
+
     assert(normalize(dot(grad(v), grad(u)), basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y)
     assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + c*Ni*Nj)
     # ...
 
-#    expr = dot(grad(v), b)
+#    expr = A*grad(v)
 #    print('> input         >>> {0}'.format(expr))
 #
 #    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
@@ -493,13 +510,13 @@ def test():
 
 # .....................................................
 if __name__ == '__main__':
-#    test_atomize_2d_1()
-#    test_normalize_2d_1()
-#
-#    test_atomize_2d_2()
-#    test_normalize_2d_2()
-#    test_matricize_2d_2()
-#
+    test_atomize_2d_1()
+    test_normalize_2d_1()
+
+    test_atomize_2d_2()
+    test_normalize_2d_2()
+    test_matricize_2d_2()
+
 ##    test_bilinear_form_2d_1()
 ##    test_bilinear_form_2d_2()
 ##    test_bilinear_form_2d_3()
@@ -510,4 +527,4 @@ if __name__ == '__main__':
 
 #    test_linear_form_2d_1()
 
-    test()
+#    test()
