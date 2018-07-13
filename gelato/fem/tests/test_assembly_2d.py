@@ -78,8 +78,7 @@ def test_kernel_linear_2d_scalar_1():
 
     v = TestFunction(V, name='v')
 
-    x = Symbol('x')
-    y = Symbol('y')
+    x,y = V.coordinates
 
     expr = cos(2*pi*x)*cos(4*pi*y)*v
 

@@ -77,9 +77,7 @@ def test_kernel_linear_3d_scalar_1():
 
     v = TestFunction(V, name='v')
 
-    x = Symbol('x')
-    y = Symbol('y')
-    z = Symbol('z')
+    x,y,z = V.coordinates
 
     expr = cos(2*pi*x)*cos(4*pi*y)*cos(5*pi*z)*v
 

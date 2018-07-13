@@ -62,6 +62,13 @@ class BasicSobolevSpace(Basic):
         obj._shape = shape
         obj._is_vector = is_vector
         obj._is_block = is_block
+
+        _coordinates = []
+        if ldim:
+            _coordinates = [Symbol(name) for name in ['x', 'y', 'z'][:ldim]]
+
+        obj._coordinates = _coordinates
+
         return obj
 
     @property
@@ -87,6 +94,13 @@ class BasicSobolevSpace(Basic):
     @property
     def ldim(self):
         return self._ldim
+
+    @property
+    def coordinates(self):
+        if self.ldim == 1:
+            return self._coordinates[0]
+        else:
+            return self._coordinates
 
     def _sympystr(self, printer):
         sstr = printer.doprint

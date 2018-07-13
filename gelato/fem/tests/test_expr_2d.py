@@ -390,8 +390,7 @@ def test_linear_form_2d_1():
 
     v = TestFunction(V, name='v')
 
-    x = Symbol('x')
-    y = Symbol('y')
+    x,y = V.coordinates
     f = Function('f')
 
     expr = cos(2*pi*x)*cos(4*pi*y)*v
@@ -422,5 +421,5 @@ if __name__ == '__main__':
 
     test_bilinear_form_2d_10()
 
-#    test_linear_form_2d_1()
+    test_linear_form_2d_1()
 

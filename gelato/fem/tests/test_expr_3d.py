@@ -452,10 +452,8 @@ def test_linear_form_3d_1():
     V = H1Space('V', ldim=3)
 
     v = TestFunction(V, name='v')
+    x,y,z = V.coordinates
 
-    x = Symbol('x')
-    y = Symbol('y')
-    z = Symbol('z')
     f = Function('f')
 
     expr = cos(2*pi*x)*cos(4*pi*y)*cos(5*pi*z)*v
@@ -487,4 +485,4 @@ if __name__ == '__main__':
 
     test_bilinear_form_3d_10()
 
-#    test_linear_form_3d_1()
+    test_linear_form_3d_1()

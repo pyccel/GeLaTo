@@ -53,7 +53,7 @@ def test_kernel_linear_1d_scalar_1():
 
     v = TestFunction(V, name='v')
 
-    x = Symbol('x')
+    x = V.coordinates
 
     expr = cos(2*pi*x)*v
 
