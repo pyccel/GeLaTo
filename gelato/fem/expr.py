@@ -18,7 +18,7 @@ from sympy.core import Expr, Add, Mul
 from sympy import S
 from sympy.core.containers import Tuple
 from sympy import preorder_traversal
-from sympy import Indexed, IndexedBase, Matrix
+from sympy import Indexed, IndexedBase, Matrix, ImmutableDenseMatrix
 from sympy.physics.quantum import TensorProduct
 from sympy import expand
 from sympy import Integer, Float
@@ -272,13 +272,13 @@ def atomize(expr, dim=None):
                              _partial_derivatives, _calculus_operators,
                              TestFunction, VectorTestFunction, Indexed,
                              Field, Constant, Symbol, Function,
-                             Integer, Float, Matrix,
+                             Integer, Float, Matrix, ImmutableDenseMatrix,
                              list, tuple, Tuple)):
         msg = ('> Wrong input type.')
 
-        raise TypeError(msg, ', given ', type(expr))
+        raise TypeError(msg, ', given ', expr, type(expr))
 
-#    print('> expr = ', expr)
+#    print('> expr = ', expr, type(expr))
 
     # ... compute dim if None
     if dim is None:
@@ -300,6 +300,9 @@ def atomize(expr, dim=None):
     elif isinstance(expr, Mul):
         coeffs  = [i for i in expr.args if isinstance(i, _coeffs_registery)]
         vectors = [i for i in expr.args if not(i in coeffs)]
+#        print('expr    = ', expr)
+#        print('vectors = ', vectors)
+#        print('coeffs  = ', coeffs )
 
         i = S.One
         if coeffs:
@@ -319,6 +322,16 @@ def atomize(expr, dim=None):
 
         args = [atomize(i, dim=dim) for i in expr.args]
         return new(*args)
+
+    elif isinstance(expr, Matrix):
+        n,m = expr.shape
+        lines = []
+        for i in range(0, n):
+            line = []
+            for j in range(0, m):
+                line.append(atomize(expr[i,j], dim=dim))
+            lines.append(line)
+        return Matrix(lines)
 
     return expr
 # ...
