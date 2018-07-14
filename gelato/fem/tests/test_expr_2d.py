@@ -95,9 +95,8 @@ def test_normalize_2d_1():
 #    assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + c*Ni*Nj)
     # ...
 
-#    expr = A*grad(v)
-    # TODO IMPLEMENT INNER CLASS TO TAKE INTO ACCOUNT RATHER THAN DOT
-    expr = dot(A, grad(v))
+#    expr = dot(A, grad(v))
+    expr = div(dot(A, grad(v)))
     print('> input         >>> {0}'.format(expr))
 
     print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))

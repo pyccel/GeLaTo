@@ -17,7 +17,7 @@ from sympy import cos
 from sympy import sin
 from sympy import Rational
 from sympy import diff
-from sympy import Matrix
+from sympy import Matrix, ImmutableDenseMatrix
 from sympy import latex
 from sympy import Integral
 from sympy import I as sympy_I
@@ -393,6 +393,9 @@ class Dot_1d(DotBasic):
         if not _args:
             return
 
+        if not( len(_args) == 2):
+            raise ValueError('Expecting two arguments')
+
         u = _args[0]
         v = _args[1]
 
@@ -413,10 +416,25 @@ class Dot_2d(DotBasic):
         if not _args:
             return
 
+        if not( len(_args) == 2):
+            raise ValueError('Expecting two arguments')
+
         u = _args[0]
         v = _args[1]
 
-        return u[0]*v[0] + u[1]*v[1]
+        if isinstance(u, (Matrix, ImmutableDenseMatrix)):
+            if isinstance(v, (Matrix, ImmutableDenseMatrix)):
+                raise NotImplementedError('TODO')
+
+            else:
+                return Tuple(u[0,0]*v[0] + u[0,1]*v[1], u[1,0]*v[0] + u[1,1]*v[1])
+
+        else:
+            if isinstance(v, (Matrix, ImmutableDenseMatrix)):
+                raise NotImplementedError('TODO')
+
+            else:
+                return u[0]*v[0] + u[1]*v[1]
 
 class Dot_3d(DotBasic):
     """
@@ -433,10 +451,27 @@ class Dot_3d(DotBasic):
         if not _args:
             return
 
+        if not( len(_args) == 2):
+            raise ValueError('Expecting two arguments')
+
         u = _args[0]
         v = _args[1]
 
-        return u[0]*v[0] + u[1]*v[1] + u[2]*v[2]
+        if isinstance(u, (Matrix, ImmutableDenseMatrix)):
+            if isinstance(v, (Matrix, ImmutableDenseMatrix)):
+                raise NotImplementedError('TODO')
+
+            else:
+                return Tuple(u[0,0]*v[0] + u[0,1]*v[1] + u[0,2]*v[2],
+                             u[1,0]*v[0] + u[1,1]*v[1] + u[1,2]*v[2],
+                             u[2,0]*v[0] + u[2,1]*v[1] + u[2,2]*v[2])
+
+        else:
+            if isinstance(v, (Matrix, ImmutableDenseMatrix)):
+                raise NotImplementedError('TODO')
+
+            else:
+                return u[0]*v[0] + u[1]*v[1] + u[2]*v[2]
 # ...
 
 # ...

@@ -80,6 +80,17 @@ def test_normalize_3d_1():
 
     f = Tuple(f1(x,y,z), f2(x,y,z), f3(x,y,z))
 
+    a00 = Constant('a00')
+    a10 = Constant('a10')
+    a20 = Constant('a20')
+    a01 = Constant('a01')
+    a11 = Constant('a11')
+    a21 = Constant('a21')
+    a02 = Constant('a02')
+    a12 = Constant('a12')
+    a22 = Constant('a22')
+    A = Matrix([[a00, a01, a02], [a10, a11, a12], [a20, a21, a22]])
+
     # ...
     assert(normalize(grad(v), basis={V: 'Ni'}) == Tuple(Ni_x, Ni_y, Ni_z))
     assert(normalize(grad(c*v), basis={V: 'Ni'}) == Tuple(c*Ni_x, c*Ni_y, c*Ni_z))
@@ -92,10 +103,11 @@ def test_normalize_3d_1():
     assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + Ni_z*Nj_z + c*Ni*Nj)
     # ...
 
-#    expr = dot(grad(v), b)
-#    print('> input         >>> {0}'.format(expr))
-#
-#    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
+#    expr = dot(A, grad(v))
+    expr = div(dot(A, grad(v)))
+    print('> input         >>> {0}'.format(expr))
+
+    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
 #    print('> normal form   >>> {0}'.format(normalize(dot(grad(v), grad(u)),
 #                                                     basis={V: 'Ni', U: 'Nj'})))
 # ...
@@ -568,12 +580,12 @@ def test():
 
 # .....................................................
 if __name__ == '__main__':
-    test_atomize_3d_1()
+#    test_atomize_3d_1()
     test_normalize_3d_1()
 
-    test_atomize_3d_2()
-    test_normalize_3d_2()
-    test_matricize_3d_2()
+#    test_atomize_3d_2()
+#    test_normalize_3d_2()
+#    test_matricize_3d_2()
 
 ##    test_bilinear_form_3d_1()
 ##    test_bilinear_form_3d_2()
