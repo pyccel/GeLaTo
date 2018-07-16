@@ -15,6 +15,7 @@ from sympy import Integer, Float
 from numbers import Number
 from collections import OrderedDict
 
+from numpy import unique
 import os
 import importlib
 
@@ -43,7 +44,7 @@ def _is_base_function(a, base):
 
     # letters
     ls = [i for i in names]
-    ls = np.unique(ls)
+    ls = unique(ls)
 
     # we should have only x,y or z
     for i in ls:
