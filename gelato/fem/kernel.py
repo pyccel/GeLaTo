@@ -50,14 +50,18 @@ def compile_kernel(name, a, spaces=None,
     test_space = None
     trial_space = None
     if spaces:
-        if not isinstance(spaces, (tuple, list, Tuple)):
+        if isinstance(a, BilinearForm) and not isinstance(spaces, (tuple, list, Tuple)):
             raise TypeError('Expecting tuple, list, Tuple')
 
-        test_space = spaces[0]
-        trial_space = spaces[1]
+        if isinstance(a, LinearForm):
+            spaces = [spaces]
 
-    if not(test_space is trial_space):
-        raise NotImplementedError('TODO')
+        test_space = spaces[0]
+        if isinstance(a, BilinearForm):
+            trial_space = spaces[1]
+
+            if not(test_space is trial_space):
+                raise NotImplementedError('TODO')
     # ...
 
     # TODO: nderiv must be computed from the weak form

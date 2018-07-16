@@ -78,8 +78,13 @@ def discretize(name, a, spaces,
     # ...
 
     # ... add the assemble method to the bilinear/linear form
-    def _assemble(target):
-        return assembly(target, spaces[0], spaces[1])
+    if isinstance(a, BilinearForm):
+        def _assemble(target):
+            return assembly(target, spaces[0], spaces[1])
+
+    elif isinstance(a, LinearForm):
+        def _assemble(target):
+            return assembly(target, spaces)
 
     a.assemble = types.MethodType(_assemble, a)
     # ...

@@ -75,20 +75,40 @@ def test_assembly_linear_1d_scalar_1():
 
     x = V.coordinates
 
-    expr = cos(2*pi*x)*v
+    #expr = cos(2*pi*x)*v
+    expr = x*(1.-x)*v
 
     a = LinearForm(v, expr)
     print('> input      >>> {0}'.format(a))
 
+    # ... discretization
+    # Input data: degree, number of elements
+    p  = 3
+    ne = 2**4
+
+    # Create uniform grid
+    grid = linspace( 0., 1., num=ne+1 )
+
+    # Create finite element space and precompute quadrature data
+    V = SplineSpace( p, grid=grid )
+    V.init_fem()
     # ...
-    assembly_py  = compile_assembly('assembly_linear_1d_scalar_1', a,
-                                backend='python', verbose=True)
+
+    # ...
+    discretize('linear_1d_scalar_1', a,
+               spaces=V,
+               backend='python', verbose=True)
+    # ...
+
+    # ...
+    b = a.assemble()
+    print(b.toarray())
     # ...
 # ...
 
 
 # .....................................................
 if __name__ == '__main__':
-    test_assembly_bilinear_1d_scalar_1()
+#    test_assembly_bilinear_1d_scalar_1()
 
-#    test_assembly_linear_1d_scalar_1()
+    test_assembly_linear_1d_scalar_1()
