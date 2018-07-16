@@ -23,26 +23,24 @@ from sympy.physics.quantum import TensorProduct
 from sympy import expand
 from sympy import Integer, Float
 
-from gelato.calculus import _partial_derivatives
-from gelato.calculus import _calculus_operators
-from gelato.calculus import CalculusFunction
-from gelato.calculus import partial_derivative_as_symbol
-from gelato.calculus import sort_partial_derivatives
-from gelato.calculus import get_atom_derivatives
-from gelato.calculus import dx, dy, dz
-from gelato.calculus import Field, Constant
-from gelato.calculus import Dot, Inner, Cross
-from gelato.calculus import Grad, Rot, Curl, Div
-from gelato.calculus import _generic_ops
-from gelato.calculus import _coeffs_registery
-from gelato.calculus import (Dot_1d, Grad_1d, Div_1d)
-from gelato.calculus import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
-from gelato.calculus import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
-
-
-from gelato.fem.core import BasicSobolevSpace
-from gelato.fem.core import TestFunction
-from gelato.fem.core import VectorTestFunction
+from gelato.core import _partial_derivatives
+from gelato.core import _calculus_operators
+from gelato.core import CalculusFunction
+from gelato.core import partial_derivative_as_symbol
+from gelato.core import sort_partial_derivatives
+from gelato.core import get_atom_derivatives
+from gelato.core import dx, dy, dz
+from gelato.core import Field, Constant
+from gelato.core import Dot, Inner, Cross
+from gelato.core import Grad, Rot, Curl, Div
+from gelato.core import _generic_ops
+from gelato.core import _coeffs_registery
+from gelato.core import (Dot_1d, Grad_1d, Div_1d)
+from gelato.core import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
+from gelato.core import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
+from gelato.core import BasicSobolevSpace
+from gelato.core import TestFunction
+from gelato.core import VectorTestFunction
 
 
 

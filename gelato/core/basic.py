@@ -1,18 +1,52 @@
 # coding: utf-8
+# TODO: - Unknown is not used here (mlhipy) remove it?
 
 from numpy import unique
 
 from sympy.core import Basic
 from sympy.tensor import Indexed, IndexedBase
-from sympy.core.compatibility import is_sequence
 from sympy.core import Symbol
 from sympy.core import Expr
 from sympy.core.containers import Tuple
+from sympy import Function
 
-from gelato.calculus import Field, Constant
-from gelato.calculus import _partial_derivatives
-from gelato.calculus import get_index_derivatives, get_atom_derivatives
+# ...
+class Constant(Symbol):
+    """
+    Represents a constant symbol.
 
+    Examples
+
+    """
+    pass
+# ...
+
+# ...
+class Field(Symbol):
+    """
+    Represents a Field variable.
+
+    Examples
+
+    """
+    pass
+# ...
+
+# ...
+class Unknown(Symbol):
+    """
+    Represents an unknown function
+
+    Examples
+
+    """
+    pass
+# ...
+
+class CalculusFunction(Function):
+    """this class is needed to distinguish between functions and calculus
+    functions when manipulating our expressions"""
+    pass
 
 class DottedName(Basic):
     """
@@ -400,4 +434,3 @@ class VectorTestFunction(Symbol, IndexedBase):
         assumptions ={}
         obj = IndexedTestTrial(self, *args)
         return obj
-
