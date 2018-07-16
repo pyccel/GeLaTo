@@ -85,19 +85,23 @@ class DifferentialOperator(LinearOperator):
             V = S.One
             if vectors:
                 if len(vectors) == 1:
-                    V = cls(Mul(vectors[0]), evaluate=False)
+                    V = cls(Mul(vectors[0]), evaluate=True)
 
                 elif len(vectors) == 2:
                     a = vectors[0]
                     b = vectors[1]
 
-                    fa = cls(a, evaluate=False)
-                    fb = cls(b, evaluate=False)
+                    fa = cls(a, evaluate=True)
+                    fb = cls(b, evaluate=True)
 
                     V = a * fb + fa * b
+#                    print('a  = ', a )
+#                    print('fa = ', fa)
+#                    print('b  = ', b )
+#                    print('fb = ', fb)
 
                 else:
-                    V = cls(Mul(*vectors), evaluate=False)
+                    V = cls(Mul(*vectors), evaluate=True)
 
             return Mul(c, V)
 
@@ -109,6 +113,7 @@ class DifferentialOperator(LinearOperator):
             msg = '{expr} of type {type}'.format(expr=expr, type=type(expr))
             raise NotImplementedError(msg)
 # ...
+
 
 # ...
 class dx(DifferentialOperator):
