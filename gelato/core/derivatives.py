@@ -44,7 +44,9 @@ from sympy import Indexed, IndexedBase
 
 from .basic import CalculusFunction
 from .basic import _coeffs_registery
+from .basic import Field, Constant
 from .algebra import LinearOperator
+from .space import TestFunction, VectorTestFunction, IndexedTestTrial
 
 # ...
 class DifferentialOperator(LinearOperator):
@@ -62,12 +64,17 @@ class DifferentialOperator(LinearOperator):
         """."""
 
         expr = _args[0]
-        if isinstance(expr, Add):
+
+        if isinstance(expr, (Field, TestFunction, VectorTestFunction,
+                             IndexedTestTrial, DifferentialOperator)):
+            return cls(expr, evaluate=False)
+
+        elif isinstance(expr, Add):
             args = expr.args
             args = [cls.eval(a) for a in expr.args]
             return Add(*args)
 
-        if isinstance(expr, Mul):
+        elif isinstance(expr, Mul):
             coeffs  = [a for a in expr.args if isinstance(a, _coeffs_registery)]
             vectors = [a for a in expr.args if not(a in coeffs)]
 
@@ -94,7 +101,13 @@ class DifferentialOperator(LinearOperator):
 
             return Mul(c, V)
 
-        return cls(expr, evaluate=False)
+        elif isinstance(expr, Expr):
+            x = Symbol(cls.coordinate)
+            return diff(expr, x)
+
+        else:
+            msg = '{expr} of type {type}'.format(expr=expr, type=type(expr))
+            raise NotImplementedError(msg)
 # ...
 
 # ...

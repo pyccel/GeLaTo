@@ -273,6 +273,7 @@ class TestFunction(Symbol):
     >>> phi = TestFunction(V, 'phi')
     """
     _space = None
+    is_commutative = True
     def __new__(cls, space, name=None):
         obj =  Basic.__new__(cls, name)
         obj._space = space
@@ -337,6 +338,7 @@ class VectorTestFunction(Symbol, IndexedBase):
     Examples
 
     """
+    is_commutative = True
     _space = None
     def __new__(cls, space, name=None):
         if not(space.is_vector) and not(space.is_block):
