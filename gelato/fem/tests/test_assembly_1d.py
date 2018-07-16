@@ -54,7 +54,7 @@ def test_assembly_bilinear_1d_scalar_1():
     # ...
 
     # ...
-    discretize('bilinear_1d_scalar_1', a,
+    discretize(a,
                spaces=[V, V],
                backend='python', verbose=True)
     # ...
@@ -95,7 +95,7 @@ def test_assembly_linear_1d_scalar_1():
     # ...
 
     # ...
-    discretize('linear_1d_scalar_1', a,
+    discretize(a,
                spaces=V,
                backend='python', verbose=True)
     # ...
@@ -109,6 +109,6 @@ def test_assembly_linear_1d_scalar_1():
 
 # .....................................................
 if __name__ == '__main__':
-#    test_assembly_bilinear_1d_scalar_1()
+    test_assembly_bilinear_1d_scalar_1()
 
     test_assembly_linear_1d_scalar_1()

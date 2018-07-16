@@ -1,11 +1,6 @@
 # coding: utf-8
 
-# TODO: - allow for giving a name for the trial/test basis
-#       - Ni/Nj should be Ni_0/Nj_0
-#       - define templates as proper python functions
-#       - use redbaron to modify the template
-
-#     NOTE: THE PATH OF TEMPLATES IS HARD CODED!
+# ... TODO: - add args
 
 
 from sympy.core.containers import Tuple
@@ -37,18 +32,56 @@ from .assembly import compile_assembly
 
 import types
 
+# TODO change target to meta var, and update spaces_str
+_template ="""
+def {__NAME__}(target):
+    {__DOCSTRING__}
+    return {__ASSEMBLY_NAME__}(target, {__SPACE_ARGS__})
+"""
+
+_template_docstring = """
+\"\"\"
+Assembly method for {__KIND_FORM__}.
+
+This method is calling two functions that have been automatically generated:
+    {__ASSEMBLY_NAME__} low-level assembly function
+    {__KERNEL_NAME__}   low-level kernel function
+\"\"\"
+"""
+
 
 # TODO add check on spaces
-def discretize(name, a, spaces,
+# TODO pass root to compile kernel and assembly
+def discretize(a, spaces,
                d_constants={},
                d_args={},
                verbose=False,
                namespace=globals(),
                context=None,
+               name=None,
+               root=None,
                backend='python',
                export_pyfile=True):
     """."""
     # ...
+    is_bilinear_form = isinstance(a, BilinearForm)
+    is_linear_form = isinstance(a, LinearForm)
+
+    if is_bilinear_form:
+        form = 'bilinear'
+    elif is_linear_form:
+        form = 'linear'
+    # ...
+
+    # ...
+    if root is None:
+        root = '.pyccel'
+    # ...
+
+    # ...
+    if name is None:
+        name = '{form}_{hash}'.format(form=form, hash=abs(hash(a)))
+
     assembly_name = 'assembly_{}'.format(name)
     kernel_name   = 'kernel_{}'.format(name)
     # ...
@@ -77,14 +110,40 @@ def discretize(name, a, spaces,
                                 export_pyfile=export_pyfile)
     # ...
 
-    # ... add the assemble method to the bilinear/linear form
-    if isinstance(a, BilinearForm):
-        def _assemble(target):
-            return assembly(target, spaces[0], spaces[1])
+    # ...
+    if is_bilinear_form:
+        spaces_str = 'target.discrete_spaces[0], target.discrete_spaces[1]'
 
-    elif isinstance(a, LinearForm):
-        def _assemble(target):
-            return assembly(target, spaces)
+    elif is_linear_form:
+        spaces_str = 'target.discrete_spaces'
+    # ...
 
+    # ...
+    docstring = _template_docstring.format(__KIND_FORM__=form,
+                                           __ASSEMBLY_NAME__=assembly_name,
+                                           __KERNEL_NAME__=kernel_name)
+    # identation (def function body)
+    tab = ' '*4
+
+    lines = []
+    for line in docstring.split('\n'):
+        lines.append(tab + line)
+    docstring = '\n'.join(i for i in lines)
+    # ...
+
+    # ...
+    code = _template.format(__NAME__=name,
+                            __ASSEMBLY_NAME__=assembly_name,
+                            __SPACE_ARGS__=spaces_str,
+                            __DOCSTRING__=docstring)
+    # ...
+
+    # ...
+    exec(code, namespace)
+    _assemble = namespace[name]
+    # ...
+
+    # ...
+    setattr(a, 'discrete_spaces', spaces)
     a.assemble = types.MethodType(_assemble, a)
     # ...
