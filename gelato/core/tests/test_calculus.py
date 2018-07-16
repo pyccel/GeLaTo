@@ -7,11 +7,11 @@ from sympy import symbols
 from sympy import Symbol
 from sympy import Lambda
 
-from gelato.calculus import (dx, dy, dz)
-from gelato.calculus import LinearOperator
-from gelato.calculus import Field
-from gelato.calculus import grad, dot, inner
-from gelato.calculus import get_index_derivatives
+from gelato.core import (dx, dy, dz)
+from gelato.core import LinearOperator
+from gelato.core import Field
+from gelato.core import grad, dot, inner
+from gelato.core import get_index_derivatives
 
 
 # ...

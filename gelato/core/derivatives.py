@@ -43,6 +43,7 @@ from sympy import Basic
 from sympy import Indexed, IndexedBase
 
 from .basic import CalculusFunction
+from .basic import _coeffs_registery
 from .algebra import LinearOperator
 
 # ...
@@ -231,9 +232,6 @@ def get_atom_derivatives(expr):
         assert(len(expr.args) == 1)
 
         return get_atom_derivatives(expr.args[0])
-
-    elif isinstance(expr, _calculus_operators):
-        raise TypeError('remove this raise later')
 
     else:
         return expr

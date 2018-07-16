@@ -23,25 +23,28 @@ from sympy.physics.quantum import TensorProduct
 from sympy import expand
 from sympy import Integer, Float
 
-from gelato.core import _partial_derivatives
-from gelato.core import _calculus_operators
-from gelato.core import CalculusFunction
-from gelato.core import partial_derivative_as_symbol
-from gelato.core import sort_partial_derivatives
-from gelato.core import get_atom_derivatives
-from gelato.core import dx, dy, dz
-from gelato.core import Field, Constant
-from gelato.core import Dot, Inner, Cross
-from gelato.core import Grad, Rot, Curl, Div
-from gelato.core import _generic_ops
-from gelato.core import _coeffs_registery
-from gelato.core import (Dot_1d, Grad_1d, Div_1d)
-from gelato.core import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
-from gelato.core import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
-from gelato.core import BasicSobolevSpace
-from gelato.core import TestFunction
-from gelato.core import VectorTestFunction
+from .derivatives import _partial_derivatives
+from .derivatives import partial_derivative_as_symbol
+from .derivatives import sort_partial_derivatives
+from .derivatives import get_atom_derivatives
+from .derivatives import dx, dy, dz
+from .derivatives import (Grad_1d, Div_1d,
+                          Grad_2d, Curl_2d, Rot_2d, Div_2d,
+                          Grad_3d, Curl_3d, Div_3d)
 
+from .basic import _coeffs_registery
+from .basic import CalculusFunction
+from .basic import Field, Constant
+
+from .generic import Dot, Inner, Cross
+from .generic import Grad, Rot, Curl, Div
+from .generic import _generic_ops
+
+from .algebra import (Dot_1d, Dot_2d, Cross_2d, Dot_3d, Cross_3d)
+
+from .space import BasicSobolevSpace
+from .space import TestFunction
+from .space import VectorTestFunction
 
 
 class LinearForm(Expr):
@@ -267,7 +270,7 @@ def atomize(expr, dim=None):
     """
     """
     if not isinstance(expr, (Add, Mul,
-                             _partial_derivatives, _calculus_operators,
+                             _partial_derivatives, _generic_ops,
                              TestFunction, VectorTestFunction, Indexed,
                              Field, Constant, Symbol, Function,
                              Integer, Float, Matrix, ImmutableDenseMatrix,

@@ -40,6 +40,9 @@ from sympy.core.compatibility import is_sequence
 from sympy import Basic
 from sympy import Indexed, IndexedBase
 
+from .basic import CalculusFunction
+from .basic import _coeffs_registery
+
 # ...
 class LinearOperator(CalculusFunction):
     """

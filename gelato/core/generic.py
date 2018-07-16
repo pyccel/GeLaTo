@@ -32,3 +32,23 @@ class Rot(GenericFunction):
 
 class Div(GenericFunction):
     pass
+
+Inner = Dot # TODO add the Inner class Function
+Outer = Dot # TODO add the Outer class Function
+
+# ...
+_generic_ops  = (Dot, Cross, Inner, Outer,
+                 Grad, Curl, Rot, Div)
+# ...
+
+# ... alias for ufl compatibility
+cross = Cross
+dot = Dot
+inner = Inner
+outer = Outer
+
+grad = Grad
+curl = Curl
+rot = Rot
+div = Div
+# ...

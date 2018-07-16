@@ -11,17 +11,16 @@ from sympy import Matrix
 from sympy import Function
 from sympy import pi, cos
 
-from gelato.calculus import dx, dy, dz
-from gelato.calculus import Constant
-from gelato.calculus import Field
-from gelato.calculus import grad, dot, inner, cross, rot, curl, div
-
-from gelato.fem.core import H1Space
-from gelato.fem.core import TestFunction
-from gelato.fem.core import VectorTestFunction
-from gelato.fem.expr import BilinearForm, LinearForm
-from gelato.fem.expr import atomize, normalize, matricize
-from gelato.fem.expr import gelatize
+from gelato.core import dx, dy, dz
+from gelato.core import Constant
+from gelato.core import Field
+from gelato.core import grad, dot, inner, cross, rot, curl, div
+from gelato.core import H1Space
+from gelato.core import TestFunction
+from gelato.core import VectorTestFunction
+from gelato.core import BilinearForm, LinearForm
+from gelato.core import atomize, normalize, matricize
+from gelato.core import gelatize
 
 
 # ...
@@ -511,21 +510,21 @@ def test():
 
 # .....................................................
 if __name__ == '__main__':
-#    test_atomize_2d_1()
+    test_atomize_2d_1()
     test_normalize_2d_1()
 
-#    test_atomize_2d_2()
-#    test_normalize_2d_2()
-#    test_matricize_2d_2()
+    test_atomize_2d_2()
+    test_normalize_2d_2()
+    test_matricize_2d_2()
 
 ##    test_bilinear_form_2d_1()
 ##    test_bilinear_form_2d_2()
 ##    test_bilinear_form_2d_3()
 ##    test_bilinear_form_2d_4()
-#
-#    test_bilinear_form_2d_10()
-#    test_linear_form_2d_10()
 
-#    test_linear_form_2d_1()
+    test_bilinear_form_2d_10()
+    test_linear_form_2d_10()
 
-#    test()
+    test_linear_form_2d_1()
+
+    test()

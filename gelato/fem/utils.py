@@ -18,13 +18,40 @@ from collections import OrderedDict
 import os
 import importlib
 
-from gelato.expression import _is_base_function
-from gelato.expression import BASIS_PREFIX
+from gelato.core import gelatize
+from gelato.core import BilinearForm, LinearForm
+from gelato.core import Constant
+from gelato.core import Field
 
-from gelato.fem.expr import gelatize
-from gelato.fem.expr import BilinearForm, LinearForm
-from gelato.calculus   import Constant
-from gelato.calculus   import Field
+# ...
+def _is_base_function(a, base):
+    """Returns True if the atom is a test/trial function or a partial derivative of a
+    test/trial function.
+
+    base: str
+        must be `Ni` or `Nj`
+    """
+    name = a.name
+    if name == base:
+        return True
+
+    if not name.startswith('{}_'.format(base)):
+        return False
+
+    # name starts with `Ni_` or `Nj_`
+    names = name[3:]
+
+    # letters
+    ls = [i for i in names]
+    ls = np.unique(ls)
+
+    # we should have only x,y or z
+    for i in ls:
+        if not(i in ['x', 'y', 'z']):
+            return False
+
+    return True
+# ...
 
 def _convert_int_to_float(expr):
     sub = zip( expr.atoms(Integer), map(Float, expr.atoms(Integer)) )

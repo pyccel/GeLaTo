@@ -2,15 +2,14 @@
 
 # TODO add asserts
 
-from gelato.fem.core import BasicSobolevSpace
-from gelato.fem.core import SplineFemSpace
-from gelato.fem.core import TensorBasicSobolevSpace
-from gelato.fem.core import VectorBasicSobolevSpace
-from gelato.fem.core import TestFunction
-from gelato.fem.core import VectorTestFunction
-
-from gelato.calculus import grad, dot, inner, cross, rot, curl, div
-from gelato.calculus import dx, dy, dz
+from gelato.core import BasicSobolevSpace
+from gelato.core import SplineFemSpace
+from gelato.core import TensorBasicSobolevSpace
+from gelato.core import VectorBasicSobolevSpace
+from gelato.core import TestFunction
+from gelato.core import VectorTestFunction
+from gelato.core import grad, dot, inner, cross, rot, curl, div
+from gelato.core import dx, dy, dz
 
 # ...
 def test_fem_space_spline():
