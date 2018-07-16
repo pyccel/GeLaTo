@@ -435,9 +435,9 @@ def compile_kernel(name, a, spaces=None,
                                __ARGS__=args)
     # ...
 
-    print('--------------')
-    print(code)
-    print('--------------')
+#    print('--------------')
+#    print(code)
+#    print('--------------')
 
     # ...
     if context:

@@ -17,7 +17,7 @@ def {__KERNEL_NAME__}(test_p1, trial_p1, k1, test_bs1, trial_bs1, u1, w1, mat{__
                 wvol = w1[g1]
 {__FIELD_VALUE__}
                 v += ({__WEAK_FORM__}) * wvol
-            mat[il_1, p1 + jl_1 - il_1] = v
+            mat[il_1, trial_p1 + jl_1 - il_1] = v
 """
 
 _bilinear_form_header_1d_scalar = '#$ header procedure {__KERNEL_NAME__}(int, int, int, double [:,:,:], double [:,:,:], double [:], double [:], double [:,:]{__TYPES__}{__FIELD_TYPES__})'
@@ -44,7 +44,7 @@ def {__KERNEL_NAME__}(test_p1, test_p2, trial_p1, trial_p2, k1, k2, test_bs1, te
                             wvol = w1[g1] * w2[g2]
 {__FIELD_VALUE__}
                             v += ({__WEAK_FORM__}) * wvol
-                    mat[il_1, il_2, p1 + jl_1 - il_1, p2 + jl_2 - il_2] = v
+                    mat[il_1, il_2, trial_p1 + jl_1 - il_1, trial_p2 + jl_2 - il_2] = v
 """
 
 _bilinear_form_header_2d_scalar = '#$ header procedure {__KERNEL_NAME__}(int, int, int, int, int, int, double [:,:,:], double [:,:,:], double [:,:,:], double [:,:,:], double [:], double [:], double [:], double [:], double [:,:,:,:]{__TYPES__}{__FIELD_TYPES__})'
@@ -77,7 +77,7 @@ def {__KERNEL_NAME__}(test_p1, test_p2, test_p3, trial_p1, trial_p2, trial_p3, k
                                         wvol = w1[g1] * w2[g2] * w3[g3]
 {__FIELD_VALUE__}
                                         v += ({__WEAK_FORM__}) * wvol
-                            mat[il_1, il_2, il_3, p1 + jl_1 - il_1, p2 + jl_2 - il_2, p3 + jl_3 - il_3] = v
+                            mat[il_1, il_2, il_3, trial_p1 + jl_1 - il_1, trial_p2 + jl_2 - il_2, trial_p3 + jl_3 - il_3] = v
 """
 
 _bilinear_form_header_3d_scalar = '#$ header procedure {__KERNEL_NAME__}(int, int, int, int, int, int, int, int, int, double [:,:,:], double [:,:,:], double [:,:,:], double [:,:,:], double [:,:,:], double [:,:,:], double [:], double [:], double [:], double [:], double [:], double [:], double [:,:,:,:,:,:]{__TYPES__}{__FIELD_TYPES__})'
