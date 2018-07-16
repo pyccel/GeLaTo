@@ -22,7 +22,7 @@ from gelato.core import BilinearForm, LinearForm
 from gelato.core import atomize, normalize, matricize
 from gelato.core import gelatize
 
-from gelato.fem.utils    import compile_kernel
+from gelato.fem    import compile_kernel
 
 from numpy import linspace
 
