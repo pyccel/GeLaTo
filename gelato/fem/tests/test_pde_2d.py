@@ -25,10 +25,11 @@ from numpy import linspace
 
 from spl.fem.splines import SplineSpace
 from spl.fem.tensor  import TensorFemSpace
+from spl.fem.basic   import FemField
 
 # ...
 def test_pde_2d_scalar_1():
-    print('============ test_spde_2d_scalar_1 =============')
+    print('============ test_pde_2d_scalar_1 =============')
 
     # ... abstract model
     U = H1Space('U', ldim=2)
@@ -49,7 +50,7 @@ def test_pde_2d_scalar_1():
     # ... discretization
     # Input data: degree, number of elements
     p1  = 3  ; p2  = 3
-    ne1 = 16 ; ne2 = 16
+    ne1 = 4 ; ne2 = 4
 
     # Create uniform grid
     grid_1 = linspace( 0., 1., num=ne1+1 )
@@ -77,7 +78,7 @@ def test_pde_2d_scalar_1():
 
 # ...
 def test_pde_2d_scalar_2():
-    print('============ test_spde_2d_scalar_2 =============')
+    print('============ test_pde_2d_scalar_2 =============')
 
     # ... abstract model
     U = H1Space('U', ldim=2)
@@ -100,7 +101,7 @@ def test_pde_2d_scalar_2():
     # ... discretization
     # Input data: degree, number of elements
     p1  = 3  ; p2  = 3
-    ne1 = 16 ; ne2 = 16
+    ne1 = 4 ; ne2 = 4
 
     # Create uniform grid
     grid_1 = linspace( 0., 1., num=ne1+1 )
@@ -125,7 +126,62 @@ def test_pde_2d_scalar_2():
     # ...
 # ...
 
+# ...
+def test_pde_2d_scalar_3():
+    print('============ test_spde_2d_scalar_3 =============')
+
+    # ... abstract model
+    U = H1Space('U', ldim=2)
+    V = H1Space('V', ldim=2)
+
+    x,y = V.coordinates
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    F = Field('F')
+
+    a = BilinearForm((v,u), dot(grad(v), grad(u)) + F*v*u)
+    b = LinearForm(v, x*(1.-x)*y*(1.-y)*v)
+
+    print('> input bilinear-form  >>> {0}'.format(a))
+    print('> input linear-form    >>> {0}'.format(b))
+    # ...
+
+    # ... discretization
+    # Input data: degree, number of elements
+    p1  = 3  ; p2  = 3
+    ne1 = 4 ; ne2 = 4
+
+    # Create uniform grid
+    grid_1 = linspace( 0., 1., num=ne1+1 )
+    grid_2 = linspace( 0., 1., num=ne2+1 )
+
+    # Create 1D finite element spaces and precompute quadrature data
+    V1 = SplineSpace( p1, grid=grid_1 ); V1.init_fem()
+    V2 = SplineSpace( p2, grid=grid_2 ); V2.init_fem()
+
+    # Create 2D tensor product finite element space
+    V = TensorFemSpace( V1, V2 )
+
+    # Define a field
+    phi = FemField( V, 'phi' )
+    phi._coeffs[:,:] = 1.
+    # ...
+
+    # ...
+    discretize( a, [V, V] )
+    discretize( b, V )
+    # ...
+
+    # ...
+    M   = a.assemble(phi)
+    rhs = b.assemble()
+    # ...
+# ...
+
 # .....................................................
 if __name__ == '__main__':
     test_pde_2d_scalar_1()
     test_pde_2d_scalar_2()
+    test_pde_2d_scalar_3()

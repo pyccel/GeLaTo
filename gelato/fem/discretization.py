@@ -36,9 +36,9 @@ import types
 
 # TODO change target to meta var, and update spaces_str
 _template ="""
-def {__NAME__}( target{__ARGS__} ):
+def {__NAME__}( target{__ARGS__}{__FIELDS__} ):
     {__DOCSTRING__}
-    return {__ASSEMBLY_NAME__}(target, {__SPACE_ARGS__}{__ARGS__})
+    return {__ASSEMBLY_NAME__}( target, {__SPACE_ARGS__}{__ARGS__}{__FIELDS__} )
 """
 
 _template_docstring = """
@@ -92,6 +92,7 @@ def discretize(a, spaces,
                export_pyfile=True):
     """."""
     # ...
+    fields = a.fields
     is_bilinear_form = isinstance(a, BilinearForm)
     is_linear_form = isinstance(a, LinearForm)
 
@@ -145,6 +146,14 @@ def discretize(a, spaces,
     args, dtypes = arguments_datatypes_split(d_args)
     # ...
 
+    # ... fields
+    if fields:
+        fields_str = ', '.join(i.name for i in fields)
+        fields_str = ', {}'.format(fields_str)
+    else:
+        fields_str = ''
+    # ...
+
     # ...
     args_docstring = docstring_arguments(a.constants, d_args)
     # ...
@@ -168,6 +177,7 @@ def discretize(a, spaces,
                             __ASSEMBLY_NAME__=assembly_name,
                             __SPACE_ARGS__=spaces_str,
                             __ARGS__=args,
+                            __FIELDS__=fields_str,
                             __DOCSTRING__=docstring)
     # ...
 
