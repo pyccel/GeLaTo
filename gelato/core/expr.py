@@ -85,7 +85,7 @@ class LinearForm(Expr):
     def fields(self):
         ls = [a for a in self.expr.free_symbols if isinstance(a, Field)]
         # no redanduncy
-        return list(set(ls))
+        return sorted(list(set(ls)))
 
     @property
     def constants(self):
@@ -192,7 +192,7 @@ class BilinearForm(Expr):
     def fields(self):
         ls = [a for a in self.expr.free_symbols if isinstance(a, Field)]
         # no redanduncy
-        return list(set(ls))
+        return sorted(list(set(ls)))
 
     @property
     def constants(self):

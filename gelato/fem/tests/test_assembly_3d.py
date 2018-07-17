@@ -48,6 +48,52 @@ def test_assembly_bilinear_3d_scalar_1():
 # ...
 
 # ...
+def test_assembly_bilinear_3d_scalar_2():
+    print('============ test_assembly_bilinear_3d_scalar_2 =============')
+
+    U = H1Space('U', ldim=3)
+    V = H1Space('V', ldim=3)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    c = Constant('c', real=True, label='mass stabilization')
+
+    expr = dot(grad(v), grad(u)) + c*v*u
+
+    a = BilinearForm((v,u), expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    assembly_py  = compile_assembly('assembly_bilinear_3d_scalar_2', a,
+                                    backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
+def test_assembly_bilinear_3d_scalar_3():
+    print('============ test_assembly_bilinear_3d_scalar_3 =============')
+
+    U = H1Space('U', ldim=3)
+    V = H1Space('V', ldim=3)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    F = Field('F')
+
+    expr = dot(grad(v), grad(u)) + F*v*u
+
+    a = BilinearForm((v,u), expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    assembly_py  = compile_assembly('assembly_bilinear_3d_scalar_3', a,
+                                    backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
 def test_assembly_linear_3d_scalar_1():
     print('============ test_assembly_linear_3d_scalar_1 =============')
 
@@ -72,6 +118,8 @@ def test_assembly_linear_3d_scalar_1():
 
 # .....................................................
 if __name__ == '__main__':
-    test_assembly_bilinear_3d_scalar_1()
+#    test_assembly_bilinear_3d_scalar_1()
+#    test_assembly_bilinear_3d_scalar_2()
+    test_assembly_bilinear_3d_scalar_3()
 
-    test_assembly_linear_3d_scalar_1()
+#    test_assembly_linear_3d_scalar_1()

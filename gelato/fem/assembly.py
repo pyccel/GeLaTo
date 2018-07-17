@@ -68,6 +68,38 @@ def compile_assembly(name, a, kernel_name=None,
     args, dtypes = arguments_datatypes_split(d_args)
     # ...
 
+    # ... fields
+    if fields:
+        fields_str = ', '.join(i.name for i in fields)
+        fields_str = ', {}'.format(fields_str)
+
+        # ...
+        # TODO must use span, to use local index in kernel
+        slices = None
+        if dim == 1:
+            slices = 's1:s1+test_p1+1'
+
+        elif dim == 2:
+            slices = 's1:s1+test_p1+1,s2:s2+test_p2+1'
+
+        elif dim == 3:
+            slices = 's1:s1+test_p1+1,s2:s2+test_p2+1,s3:s3+test_p3+1'
+
+        coeffs = []
+        for F in fields:
+            coeff_str = '{field}.coeffs[{slices}]'.format(field=F.name,
+                                                          slices=slices)
+            coeffs.append(coeff_str)
+        # ...
+
+        fields_coeffs_str = ', '.join(c for c in coeffs)
+        fields_coeffs_str = ', {}'.format(fields_coeffs_str)
+
+    else:
+        fields_str = ''
+        fields_coeffs_str = ''
+    # ...
+
     # ... TODO is_block must be set inside compile_kernel?
 #    if is_block:
 #        pattern = 'block'
@@ -103,6 +135,8 @@ def compile_assembly(name, a, kernel_name=None,
     code = template.format(__ASSEMBLY_NAME__=assembly_name,
                            __ARGS__=args,
                            __DOCSTRING__=docstring,
+                           __FIELDS__=fields_str,
+                           __FIELDS_COEFFS__=fields_coeffs_str,
                            __KERNEL_NAME__=kernel_name)
     # ...
 

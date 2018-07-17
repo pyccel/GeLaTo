@@ -68,6 +68,29 @@ def test_assembly_bilinear_1d_scalar_2():
 # ...
 
 # ...
+def test_assembly_bilinear_1d_scalar_3():
+    print('============ test_assembly_bilinear_1d_scalar_3 =============')
+
+    U = H1Space('U', ldim=1)
+    V = H1Space('V', ldim=1)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    F = Field('F')
+
+    expr = dot(grad(v), grad(u)) + F*v*u
+
+    a = BilinearForm((v,u), expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    assembly_py  = compile_assembly('assembly_bilinear_1d_scalar_3', a,
+                                    backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
 def test_assembly_linear_1d_scalar_1():
     print('============ test_assembly_linear_1d_scalar_1 =============')
 
@@ -92,7 +115,8 @@ def test_assembly_linear_1d_scalar_1():
 
 # .....................................................
 if __name__ == '__main__':
-    test_assembly_bilinear_1d_scalar_1()
+#    test_assembly_bilinear_1d_scalar_1()
 #    test_assembly_bilinear_1d_scalar_2()
+    test_assembly_bilinear_1d_scalar_3()
 
-    test_assembly_linear_1d_scalar_1()
+#    test_assembly_linear_1d_scalar_1()
