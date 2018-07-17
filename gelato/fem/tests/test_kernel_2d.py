@@ -49,6 +49,52 @@ def test_kernel_bilinear_2d_scalar_1():
 # ...
 
 # ...
+def test_kernel_bilinear_2d_scalar_2():
+    print('============ test_kernel_bilinear_2d_scalar_2 =============')
+
+    U = H1Space('U', ldim=2)
+    V = H1Space('V', ldim=2)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    c = Constant('c', real=True, label='mass stabilization')
+
+    expr = dot(grad(v), grad(u)) + c*v*u
+
+    a = BilinearForm((v,u), expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_bilinear_2d_scalar_2', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
+def test_kernel_bilinear_2d_scalar_3():
+    print('============ test_kernel_bilinear_2d_scalar_3 =============')
+
+    U = H1Space('U', ldim=2)
+    V = H1Space('V', ldim=2)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    F = Field('F')
+
+    expr = dot(grad(v), grad(u)) + F*v*u
+
+    a = BilinearForm((v,u), expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_bilinear_2d_scalar_3', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
 def test_kernel_bilinear_2d_block_1():
     print('============ test_kernel_bilinear_2d_block_1 =============')
 
@@ -115,8 +161,11 @@ def test_kernel_linear_2d_block_1():
 
 # .....................................................
 if __name__ == '__main__':
-    test_kernel_bilinear_2d_scalar_1()
-    test_kernel_bilinear_2d_block_1()
+#    test_kernel_bilinear_2d_scalar_1()
+#    test_kernel_bilinear_2d_scalar_2()
+    test_kernel_bilinear_2d_scalar_3()
 
-    test_kernel_linear_2d_scalar_1()
-    test_kernel_linear_2d_block_1()
+#    test_kernel_bilinear_2d_block_1()
+
+#    test_kernel_linear_2d_scalar_1()
+#    test_kernel_linear_2d_block_1()
