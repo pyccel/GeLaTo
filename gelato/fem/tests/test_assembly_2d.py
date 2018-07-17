@@ -19,7 +19,7 @@ from gelato.core import BilinearForm, LinearForm
 from gelato.core import atomize, normalize
 from gelato.core import gelatize
 
-from gelato.fem  import discretize
+from gelato.fem  import compile_assembly
 
 from numpy import linspace
 
@@ -41,29 +41,9 @@ def test_assembly_bilinear_2d_scalar_1():
     a = BilinearForm((v,u), expr)
     print('> input      >>> {0}'.format(a))
 
-    # ... discretization
-    # Input data: degree, number of elements
-    p1  = 3  ; p2  = 3
-    ne1 = 16 ; ne2 = 16
-
-    # Create uniform grid
-    grid_1 = linspace( 0., 1., num=ne1+1 )
-    grid_2 = linspace( 0., 1., num=ne2+1 )
-
-    # Create 1D finite element spaces and precompute quadrature data
-    V1 = SplineSpace( p1, grid=grid_1 ); V1.init_fem()
-    V2 = SplineSpace( p2, grid=grid_2 ); V2.init_fem()
-
-    # Create 2D tensor product finite element space
-    V = TensorFemSpace( V1, V2 )
     # ...
-
-    # ...
-    discretize( a, [V, V] )
-    # ...
-
-    # ...
-    M = a.assemble()
+    assembly_py  = compile_assembly('assembly_bilinear_2d_scalar_1', a,
+                                    backend='python', verbose=True)
     # ...
 # ...
 
@@ -83,29 +63,9 @@ def test_assembly_linear_2d_scalar_1():
     a = LinearForm(v, expr)
     print('> input      >>> {0}'.format(a))
 
-    # ... discretization
-    # Input data: degree, number of elements
-    p1  = 3  ; p2  = 3
-    ne1 = 16 ; ne2 = 16
-
-    # Create uniform grid
-    grid_1 = linspace( 0., 1., num=ne1+1 )
-    grid_2 = linspace( 0., 1., num=ne2+1 )
-
-    # Create 1D finite element spaces and precompute quadrature data
-    V1 = SplineSpace( p1, grid=grid_1 ); V1.init_fem()
-    V2 = SplineSpace( p2, grid=grid_2 ); V2.init_fem()
-
-    # Create 2D tensor product finite element space
-    V = TensorFemSpace( V1, V2 )
     # ...
-
-    # ...
-    discretize( a, V )
-    # ...
-
-    # ...
-    b = a.assemble()
+    assembly_py  = compile_assembly('assembly_linear_2d_scalar_1', a,
+                                    backend='python', verbose=True)
     # ...
 # ...
 

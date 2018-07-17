@@ -19,7 +19,7 @@ from gelato.core import BilinearForm, LinearForm
 from gelato.core import atomize, normalize
 from gelato.core import gelatize
 
-from gelato.fem  import discretize
+from gelato.fem  import compile_assembly
 
 from numpy import linspace
 
@@ -41,31 +41,9 @@ def test_assembly_bilinear_3d_scalar_1():
     a = BilinearForm((v,u), expr)
     print('> input      >>> {0}'.format(a))
 
-    # ... discretization
-    # Input data: degree, number of elements
-    p1  = 3 ; p2  = 3 ; p3  = 3
-    ne1 = 2 ; ne2 = 2 ; ne3 = 2
-
-    # Create uniform grid
-    grid_1 = linspace( 0., 1., num=ne1+1 )
-    grid_2 = linspace( 0., 1., num=ne2+1 )
-    grid_3 = linspace( 0., 1., num=ne3+1 )
-
-    # Create 1D finite element spaces and precompute quadrature data
-    V1 = SplineSpace( p1, grid=grid_1 ); V1.init_fem()
-    V2 = SplineSpace( p2, grid=grid_2 ); V2.init_fem()
-    V3 = SplineSpace( p3, grid=grid_3 ); V3.init_fem()
-
-    # Create 3D tensor product finite element space
-    V = TensorFemSpace( V1, V2, V3 )
     # ...
-
-    # ...
-    discretize( a, [V, V] )
-    # ...
-
-    # ...
-    M = a.assemble()
+    assembly_py  = compile_assembly('assembly_bilinear_3d_scalar_1', a,
+                                    backend='python', verbose=True)
     # ...
 # ...
 
@@ -85,31 +63,9 @@ def test_assembly_linear_3d_scalar_1():
     a = LinearForm(v, expr)
     print('> input      >>> {0}'.format(a))
 
-    # ... discretization
-    # Input data: degree, number of elements
-    p1  = 3 ; p2  = 3 ; p3  = 3
-    ne1 = 2 ; ne2 = 2 ; ne3 = 2
-
-    # Create uniform grid
-    grid_1 = linspace( 0., 1., num=ne1+1 )
-    grid_2 = linspace( 0., 1., num=ne2+1 )
-    grid_3 = linspace( 0., 1., num=ne3+1 )
-
-    # Create 1D finite element spaces and precompute quadrature data
-    V1 = SplineSpace( p1, grid=grid_1 ); V1.init_fem()
-    V2 = SplineSpace( p2, grid=grid_2 ); V2.init_fem()
-    V3 = SplineSpace( p3, grid=grid_3 ); V3.init_fem()
-
-    # Create 3D tensor product finite element space
-    V = TensorFemSpace( V1, V2, V3 )
     # ...
-
-    # ...
-    discretize( a, V )
-    # ...
-
-    # ...
-    b = a.assemble()
+    assembly_py  = compile_assembly('assembly_linear_3d_scalar_1', a,
+                                    backend='python', verbose=True)
     # ...
 # ...
 

@@ -4,6 +4,7 @@
 #       - Ni/Nj should be Ni_0/Nj_0
 #       - define templates as proper python functions
 #       - use redbaron to modify the template
+#       - check what are the free_symbols of expr,
 
 #     NOTE: THE PATH OF TEMPLATES IS HARD CODED!
 
@@ -31,11 +32,11 @@ from .utils import construct_test_functions
 from .utils import construct_trial_functions
 from .utils import mkdir_p
 from .utils import write_code
+from .utils import arguments_datatypes_as_dict
+from .utils import arguments_datatypes_split
 
 
-def compile_kernel(name, a, spaces=None,
-                   d_constants={},
-                   d_args={},
+def compile_kernel(name, a,
                    verbose=False,
                    namespace=globals(),
                    context=None,
@@ -44,25 +45,6 @@ def compile_kernel(name, a, spaces=None,
     """."""
     if not isinstance(a, (BilinearForm, LinearForm)):
            raise TypeError('Expecting BilinearForm, LinearForm')
-
-    # ... TODO: - not used for the moment
-    #           - must work also for LinearForm
-    test_space = None
-    trial_space = None
-    if spaces:
-        if isinstance(a, BilinearForm) and not isinstance(spaces, (tuple, list, Tuple)):
-            raise TypeError('Expecting tuple, list, Tuple')
-
-        if isinstance(a, LinearForm):
-            spaces = [spaces]
-
-        test_space = spaces[0]
-        if isinstance(a, BilinearForm):
-            trial_space = spaces[1]
-
-            if not(test_space is trial_space):
-                raise NotImplementedError('TODO')
-    # ...
 
     # TODO: nderiv must be computed from the weak form
     nderiv = 1
@@ -123,57 +105,14 @@ def compile_kernel(name, a, spaces=None,
     # ...
 
     # ... contants
-    #     for each argument, we compute its datatype (needed for Pyccel)
-    #     case of Numeric Native Python types
-    #     this means that a has a given value (1, 1.0 etc)
-    if d_constants:
-        for k, arg in list(d_constants.items()):
-            if not isinstance(arg, Number):
-                raise TypeError('Expecting a Python Numeric object')
-
-        # update the weak formulation using the given arguments
-        _d = {}
-        for k,v in list(d_constants.items()):
-            if isinstance(k, str):
-                _d[Constant(k)] = v
-            else:
-                _d[k] = v
-
-        expr = expr.subs(_d)
-
-    args = ''
-    dtypes = ''
-    if d_args:
-        # ... additional arguments
-        #     for each argument, we compute its datatype (needed for Pyccel)
-        for k, arg in list(d_args.items()):
-            # otherwise it can be a string, that specifies its type
-            if not isinstance(arg, str):
-                raise TypeError('Expecting a string')
-
-            if not arg in ['int', 'double', 'complex']:
-                raise TypeError('Wrong type for {} :: {}'.format(k, arg))
-
-        # we convert the dictionaries to OrderedDict, to avoid wrong ordering
-        d_args = OrderedDict(sorted(list(d_args.items())))
-
-        names = []
-        dtypes = []
-        for n,d in list(d_args.items()):
-            names.append(n)
-            dtypes.append(d)
-
-        args = ', '.join('{}'.format(arg) for arg in names)
-        dtypes = ', '.join('{}'.format(arg) for arg in dtypes)
-
-        args = ', {}'.format(args)
-        dtypes = ', {}'.format(dtypes)
-
-        # TODO check what are the free_symbols of expr,
-        #      to make sure the final code will compile
-        #      the remaining free symbols must be the trial/test basis functions,
-        #      and the coordinates
+    d_args = arguments_datatypes_as_dict(a.constants)
+    args, dtypes = arguments_datatypes_split(d_args)
     # ...
+
+    # TODO check what are the free_symbols of expr,
+    #      to make sure the final code will compile
+    #      the remaining free symbols must be the trial/test basis functions,
+    #      and the coordinates
 
     # ...
     if is_vector and not( is_block ):

@@ -26,6 +26,8 @@ from .utils import construct_test_functions
 from .utils import construct_trial_functions
 from .utils import mkdir_p
 from .utils import write_code
+from .utils import arguments_datatypes_as_dict
+from .utils import arguments_datatypes_split
 
 from .kernel import compile_kernel
 from .assembly import compile_assembly
@@ -34,9 +36,9 @@ import types
 
 # TODO change target to meta var, and update spaces_str
 _template ="""
-def {__NAME__}(target):
+def {__NAME__}( target{__ARGS__} ):
     {__DOCSTRING__}
-    return {__ASSEMBLY_NAME__}(target, {__SPACE_ARGS__})
+    return {__ASSEMBLY_NAME__}(target, {__SPACE_ARGS__}{__ARGS__})
 """
 
 _template_docstring = """
@@ -44,17 +46,43 @@ _template_docstring = """
 Assembly method for {__KIND_FORM__}.
 
 This method is calling two functions that have been automatically generated:
-    {__ASSEMBLY_NAME__} low-level assembly function
-    {__KERNEL_NAME__}   low-level kernel function
+    - {__ASSEMBLY_NAME__} low-level assembly function
+    - {__KERNEL_NAME__}   low-level kernel function
+{__PARAMETERS__}
 \"\"\"
 """
 
+_docstring_header = """
+Parameters
+----------
+"""
+
+_pattern_docstring_argument = """
+{__ARG__} : {__TYPE__}
+   {__LABEL__}
+"""
+
+def docstring_arguments(constants, d_args):
+    if len(constants) == 0:
+        return ''
+
+    pattern = _pattern_docstring_argument
+
+    lines = []
+    for c in constants:
+        dtype = d_args[c.name]
+        arg = pattern.format(__ARG__=c.name, __TYPE__=dtype, __LABEL__=c.label)
+        lines += [arg]
+
+    code = '\n'.join(line for line in lines)
+
+    txt = '{header}{arguments}'.format(header=_docstring_header,
+                                       arguments=code)
+    return txt
 
 # TODO add check on spaces
 # TODO pass root to compile kernel and assembly
 def discretize(a, spaces,
-               d_constants={},
-               d_args={},
                verbose=False,
                namespace=globals(),
                context=None,
@@ -88,9 +116,6 @@ def discretize(a, spaces,
 
     # ...
     kernel = compile_kernel(kernel_name, a,
-                            spaces=spaces,
-                            d_constants=d_constants,
-                            d_args=d_args,
                             verbose=verbose,
                             namespace=namespace,
                             context=context,
@@ -100,9 +125,6 @@ def discretize(a, spaces,
 
     # ...
     assembly = compile_assembly(assembly_name, a, kernel_name,
-                                spaces=spaces,
-                                d_constants=d_constants,
-                                d_args=d_args,
                                 verbose=verbose,
                                 namespace=namespace,
                                 context=context,
@@ -118,10 +140,20 @@ def discretize(a, spaces,
         spaces_str = 'target.discrete_spaces'
     # ...
 
+    # ... contants
+    d_args = arguments_datatypes_as_dict(a.constants)
+    args, dtypes = arguments_datatypes_split(d_args)
+    # ...
+
+    # ...
+    args_docstring = docstring_arguments(a.constants, d_args)
+    # ...
+
     # ...
     docstring = _template_docstring.format(__KIND_FORM__=form,
                                            __ASSEMBLY_NAME__=assembly_name,
-                                           __KERNEL_NAME__=kernel_name)
+                                           __KERNEL_NAME__=kernel_name,
+                                           __PARAMETERS__=args_docstring)
     # identation (def function body)
     tab = ' '*4
 
@@ -135,6 +167,7 @@ def discretize(a, spaces,
     code = _template.format(__NAME__=name,
                             __ASSEMBLY_NAME__=assembly_name,
                             __SPACE_ARGS__=spaces_str,
+                            __ARGS__=args,
                             __DOCSTRING__=docstring)
     # ...
 

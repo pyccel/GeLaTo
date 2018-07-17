@@ -98,3 +98,61 @@ def write_code(name, code, ext='py', folder='.pyccel'):
     for line in code:
         f.write(line)
     f.close()
+
+def arguments_datatypes_as_dict(arguments):
+    d_args = {}
+    for c in arguments:
+        if c.is_integer:
+            dtype = 'int'
+
+        elif c.is_real:
+            dtype = 'double'
+
+        elif c.is_complex:
+            dtype = 'complex'
+
+        else:
+            dtype = 'double'
+            print('> found a constant without prescribed type. Default type (double) will be used!')
+
+        d_args[c.name] = dtype
+    # ...
+
+    return d_args
+
+def arguments_datatypes_split(d_args):
+
+    # ... contants
+    #     for each argument, we compute its datatype (needed for Pyccel)
+    #     case of Numeric Native Python types
+    #     this means that a has a given value (1, 1.0 etc)
+    args = ''
+    dtypes = ''
+    if d_args:
+        # ... additional arguments
+        #     for each argument, we compute its datatype (needed for Pyccel)
+        for k, arg in list(d_args.items()):
+            # otherwise it can be a string, that specifies its type
+            if not isinstance(arg, str):
+                raise TypeError('Expecting a string')
+
+            if not arg in ['int', 'double', 'complex']:
+                raise TypeError('Wrong type for {} :: {}'.format(k, arg))
+
+        # we convert the dictionaries to OrderedDict, to avoid wrong ordering
+        d_args = OrderedDict(sorted(list(d_args.items())))
+
+        names = []
+        dtypes = []
+        for n,d in list(d_args.items()):
+            names.append(n)
+            dtypes.append(d)
+
+        args = ', '.join('{}'.format(arg) for arg in names)
+        dtypes = ', '.join('{}'.format(arg) for arg in dtypes)
+
+        args = ', {}'.format(args)
+        dtypes = ', {}'.format(dtypes)
+    # ...
+
+    return args, dtypes

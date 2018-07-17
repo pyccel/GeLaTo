@@ -19,7 +19,17 @@ class Constant(Symbol):
     Examples
 
     """
-    pass
+    _label = ''
+    def __new__(cls, *args, **kwargs):
+        label = kwargs.pop('label', '')
+
+        obj = Symbol.__new__(cls, *args, **kwargs)
+        obj._label = label
+        return obj
+
+    @property
+    def label(self):
+        return self._label
 # ...
 
 # ...

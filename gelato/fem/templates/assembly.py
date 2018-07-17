@@ -4,7 +4,7 @@
 #          ASSEMBLY OF BILINEAR FORM 1D case - scalar
 # .............................................
 _assembly_bilinear_1d_scalar = """
-def {__ASSEMBLY_NAME__}( self, test_space, trial_space ):
+def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1] = test_space.vector_space.starts
@@ -45,7 +45,7 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space ):
         trial_bs1 = trial_basis_1[ie1,:,:,:]
 
         # Compute element matrices
-        {__KERNEL_NAME__}( test_p1, trial_p1, k1, test_bs1, trial_bs1, u1, w1, mat )
+        {__KERNEL_NAME__}( test_p1, trial_p1, k1, test_bs1, trial_bs1, u1, w1, mat{__ARGS__} )
 
         # Update global matrices
         M[is1-test_p1:is1+1,:] += mat[:,:]
@@ -58,7 +58,7 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space ):
 #          ASSEMBLY OF LINEAR FORM 1D case - scalar
 # .............................................
 _assembly_linear_1d_scalar = """
-def {__ASSEMBLY_NAME__}( self, test_space ):
+def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1] = test_space.vector_space.starts
@@ -95,7 +95,7 @@ def {__ASSEMBLY_NAME__}( self, test_space ):
         test_bs1  = test_basis_1[ie1,:,:,:]
 
         # Compute element matrices
-        {__KERNEL_NAME__}( test_p1, k1, test_bs1, u1, w1, mat )
+        {__KERNEL_NAME__}( test_p1, k1, test_bs1, u1, w1, mat{__ARGS__} )
 
         # Update global vectors
         rhs[is1-test_p1:is1+1] += mat[:]
@@ -108,7 +108,7 @@ def {__ASSEMBLY_NAME__}( self, test_space ):
 #          ASSEMBLY OF BILINEAR FORM 2D case - scalar
 # .............................................
 _assembly_bilinear_2d_scalar = """
-def {__ASSEMBLY_NAME__}( self, test_space, trial_space ):
+def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1, s2] = test_space.vector_space.starts
@@ -156,7 +156,7 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space ):
             trial_bs2 = trial_basis_2[ie2,:,:,:]
 
             # Compute element matrices
-            {__KERNEL_NAME__}( test_p1, test_p2, trial_p1, trial_p2, k1, k2, test_bs1, test_bs2, trial_bs1, trial_bs2, u1, u2, w1, w2, mat )
+            {__KERNEL_NAME__}( test_p1, test_p2, trial_p1, trial_p2, k1, k2, test_bs1, test_bs2, trial_bs1, trial_bs2, u1, u2, w1, w2, mat{__ARGS__} )
 
             # Update global matrices
             M[is1-test_p1:is1+1, is2-test_p2:is2+1, :, :] += mat[:,:,:,:]
@@ -169,7 +169,7 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space ):
 #          ASSEMBLY OF LINEAR FORM 2D case - scalar
 # .............................................
 _assembly_linear_2d_scalar = """
-def {__ASSEMBLY_NAME__}( self, test_space ):
+def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1, s2] = test_space.vector_space.starts
@@ -212,7 +212,7 @@ def {__ASSEMBLY_NAME__}( self, test_space ):
             test_bs2  = test_basis_2[ie2,:,:,:]
 
             # Compute element matrices
-            {__KERNEL_NAME__}( test_p1, test_p2, k1, k2, test_bs1, test_bs2, u1, u2, w1, w2, mat )
+            {__KERNEL_NAME__}( test_p1, test_p2, k1, k2, test_bs1, test_bs2, u1, u2, w1, w2, mat{__ARGS__} )
 
             # Update global matrices
             rhs[is1-test_p1:is1+1, is2-test_p2:is2+1] += mat[:,:]
@@ -225,7 +225,7 @@ def {__ASSEMBLY_NAME__}( self, test_space ):
 #          ASSEMBLY OF BILINEAR FORM 3D case - scalar
 # .............................................
 _assembly_bilinear_3d_scalar = """
-def {__ASSEMBLY_NAME__}( self, test_space, trial_space ):
+def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1, s2, s3] = test_space.vector_space.starts
@@ -279,7 +279,7 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space ):
                 trial_bs3 = trial_basis_3[ie3,:,:,:]
 
                 # Compute element matrices
-                {__KERNEL_NAME__}( test_p1, test_p2, test_p3, trial_p1, trial_p2, trial_p3, k1, k2, k3, test_bs1, test_bs2, test_bs3, trial_bs1, trial_bs2, trial_bs3, u1, u2, u3, w1, w2, w3, mat )
+                {__KERNEL_NAME__}( test_p1, test_p2, test_p3, trial_p1, trial_p2, trial_p3, k1, k2, k3, test_bs1, test_bs2, test_bs3, trial_bs1, trial_bs2, trial_bs3, u1, u2, u3, w1, w2, w3, mat{__ARGS__} )
 
                 # Update global matrices
                 M[is1-test_p1:is1+1, is2-test_p2:is2+1, is3-test_p3:is3+1, :, :, :] += mat[:,:,:,:,:,:]
@@ -292,7 +292,7 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space ):
 #          ASSEMBLY OF LINEAR FORM 3D case - scalar
 # .............................................
 _assembly_linear_3d_scalar = """
-def {__ASSEMBLY_NAME__}( self, test_space ):
+def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1, s2, s3] = test_space.vector_space.starts
@@ -340,7 +340,7 @@ def {__ASSEMBLY_NAME__}( self, test_space ):
                 test_bs3  = test_basis_3[ie3,:,:,:]
 
                 # Compute element matrices
-                {__KERNEL_NAME__}( test_p1, test_p2, test_p3, k1, k2, k3, test_bs1, test_bs2, test_bs3, u1, u2, u3, w1, w2, w3, mat )
+                {__KERNEL_NAME__}( test_p1, test_p2, test_p3, k1, k2, k3, test_bs1, test_bs2, test_bs3, u1, u2, u3, w1, w2, w3, mat{__ARGS__} )
 
                 # Update global matrices
                 rhs[is1-test_p1:is1+1, is2-test_p2:is2+1, is3-test_p3:is3+1] += mat[:,:,:]

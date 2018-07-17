@@ -26,8 +26,8 @@ from numpy import linspace
 from spl.fem.splines import SplineSpace
 
 # ...
-def test_poisson_1d_scalar_1():
-    print('============ test_spoisson_1d_scalar_1 =============')
+def test_pde_1d_scalar_1():
+    print('============ test_pde_1d_scalar_1 =============')
 
     # ... abstract model
     U = H1Space('U', ldim=1)
@@ -63,12 +63,69 @@ def test_poisson_1d_scalar_1():
     discretize( b, V )
     # ...
 
+#    # ...
+#    print(a.assemble.__doc__)
+#    print(b.assemble.__doc__)
+#    # ...
+
     # ...
     M   = a.assemble()
     rhs = b.assemble()
     # ...
 # ...
 
+# ...
+def test_pde_1d_scalar_2():
+    print('============ test_pde_1d_scalar_2 =============')
+
+    # ... abstract model
+    U = H1Space('U', ldim=1)
+    V = H1Space('V', ldim=1)
+
+    x = V.coordinates
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    c = Constant('c', real=True, label='mass stabilization')
+
+    a = BilinearForm((v,u), dot(grad(v), grad(u)) + c*v*u)
+    b = LinearForm(v, x*(1.-x)*v)
+
+    print('> input bilinear-form  >>> {0}'.format(a))
+    print('> input linear-form    >>> {0}'.format(b))
+    # ...
+
+    # ... discretization
+    # Input data: degree, number of elements
+    p  = 3
+    ne = 2**4
+
+    # Create uniform grid
+    grid = linspace( 0., 1., num=ne+1 )
+
+    # Create finite element space and precompute quadrature data
+    V = SplineSpace( p, grid=grid )
+    V.init_fem()
+    # ...
+
+    # ...
+    discretize( a, [V, V] )
+    discretize( b, V )
+    # ...
+
+#    # ...
+#    print(a.assemble.__doc__)
+#    print(b.assemble.__doc__)
+#    # ...
+
+    # ...
+    M   = a.assemble(0.1)
+    rhs = b.assemble()
+    # ...
+# ...
+
 # .....................................................
 if __name__ == '__main__':
-    test_poisson_1d_scalar_1()
+    test_pde_1d_scalar_1()
+    test_pde_1d_scalar_2()

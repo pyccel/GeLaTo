@@ -31,14 +31,13 @@ from .utils import construct_test_functions
 from .utils import construct_trial_functions
 from .utils import mkdir_p
 from .utils import write_code
+from .utils import arguments_datatypes_as_dict
+from .utils import arguments_datatypes_split
 
 from .kernel import compile_kernel
 
 
-def compile_assembly(name, a, kernel_name,
-                     spaces=None,
-                     d_constants={},
-                     d_args={},
+def compile_assembly(name, a, kernel_name=None,
                      verbose=False,
                      namespace=globals(),
                      context=None,
@@ -48,6 +47,8 @@ def compile_assembly(name, a, kernel_name,
     # ...
     assembly_name = name
     docstring     = ''
+    if kernel_name is None:
+        kernel_name = 'kernel_{}'.format(name)
     # ...
 
     # ... weak form attributs
@@ -61,6 +62,11 @@ def compile_assembly(name, a, kernel_name,
     elif is_linear_form:
         form = 'linear'
     # ...
+
+    # ... contants
+    d_args = arguments_datatypes_as_dict(a.constants)
+    args, dtypes = arguments_datatypes_split(d_args)
+    # ...
 
     # ... TODO is_block must be set inside compile_kernel?
 #    if is_block:
@@ -95,6 +101,7 @@ def compile_assembly(name, a, kernel_name,
 
     # ...
     code = template.format(__ASSEMBLY_NAME__=assembly_name,
+                           __ARGS__=args,
                            __DOCSTRING__=docstring,
                            __KERNEL_NAME__=kernel_name)
     # ...

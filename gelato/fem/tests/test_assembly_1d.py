@@ -19,11 +19,9 @@ from gelato.core import BilinearForm, LinearForm
 from gelato.core import atomize, normalize
 from gelato.core import gelatize
 
-from gelato.fem  import discretize
+from gelato.fem  import compile_assembly
 
 from numpy import linspace
-
-from spl.fem.splines import SplineSpace
 
 # ...
 def test_assembly_bilinear_1d_scalar_1():
@@ -40,25 +38,32 @@ def test_assembly_bilinear_1d_scalar_1():
     a = BilinearForm((v,u), expr)
     print('> input      >>> {0}'.format(a))
 
-    # ... discretization
-    # Input data: degree, number of elements
-    p  = 3
-    ne = 2**4
-
-    # Create uniform grid
-    grid = linspace( 0., 1., num=ne+1 )
-
-    # Create finite element space and precompute quadrature data
-    V = SplineSpace( p, grid=grid )
-    V.init_fem()
     # ...
+    assembly_py  = compile_assembly('assembly_bilinear_1d_scalar_1', a,
+                                    backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
+def test_assembly_bilinear_1d_scalar_2():
+    print('============ test_assembly_bilinear_1d_scalar_2 =============')
+
+    U = H1Space('U', ldim=1)
+    V = H1Space('V', ldim=1)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    c = Constant('c', real=True, label='mass stabilization')
+
+    expr = dot(grad(v), grad(u)) + c*v*u
+
+    a = BilinearForm((v,u), expr)
+    print('> input      >>> {0}'.format(a))
 
     # ...
-    discretize( a, [V, V] )
-    # ...
-
-    # ...
-    M = a.assemble()
+    assembly_py  = compile_assembly('assembly_bilinear_1d_scalar_2', a,
+                                    backend='python', verbose=True)
     # ...
 # ...
 
@@ -78,25 +83,9 @@ def test_assembly_linear_1d_scalar_1():
     a = LinearForm(v, expr)
     print('> input      >>> {0}'.format(a))
 
-    # ... discretization
-    # Input data: degree, number of elements
-    p  = 3
-    ne = 2**4
-
-    # Create uniform grid
-    grid = linspace( 0., 1., num=ne+1 )
-
-    # Create finite element space and precompute quadrature data
-    V = SplineSpace( p, grid=grid )
-    V.init_fem()
     # ...
-
-    # ...
-    discretize( a, V )
-    # ...
-
-    # ...
-    b = a.assemble()
+    assembly_py  = compile_assembly('assembly_linear_1d_scalar_1', a,
+                                    backend='python', verbose=True)
     # ...
 # ...
 
@@ -104,5 +93,6 @@ def test_assembly_linear_1d_scalar_1():
 # .....................................................
 if __name__ == '__main__':
     test_assembly_bilinear_1d_scalar_1()
+#    test_assembly_bilinear_1d_scalar_2()
 
     test_assembly_linear_1d_scalar_1()

@@ -87,6 +87,12 @@ class LinearForm(Expr):
         # no redanduncy
         return list(set(ls))
 
+    @property
+    def constants(self):
+        ls = [a for a in self.expr.free_symbols if isinstance(a, Constant)]
+        # no redanduncy
+        return list(set(ls))
+
     def _sympystr(self, printer):
         sstr = printer.doprint
         expr = self.expr
@@ -185,6 +191,12 @@ class BilinearForm(Expr):
     @property
     def fields(self):
         ls = [a for a in self.expr.free_symbols if isinstance(a, Field)]
+        # no redanduncy
+        return list(set(ls))
+
+    @property
+    def constants(self):
+        ls = [a for a in self.expr.free_symbols if isinstance(a, Constant)]
         # no redanduncy
         return list(set(ls))
 
