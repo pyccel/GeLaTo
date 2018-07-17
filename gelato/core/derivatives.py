@@ -65,9 +65,20 @@ class DifferentialOperator(LinearOperator):
 
         expr = _args[0]
 
-        if isinstance(expr, (Field, TestFunction, VectorTestFunction,
+        if isinstance(expr, (Field, TestFunction,
                              IndexedTestTrial, DifferentialOperator)):
             return cls(expr, evaluate=False)
+
+        elif isinstance(expr, VectorTestFunction):
+            n = expr.shape[0]
+            args = [cls(expr[i], evaluate=False) for i in range(0, n)]
+            args = Tuple(*args)
+            return Matrix([args])
+
+        elif isinstance(expr, (list, tuple, Tuple)):
+            args = [cls(i, evaluate=True) for i in expr]
+            args = Tuple(*args)
+            return Matrix([args])
 
         elif isinstance(expr, Add):
             args = expr.args

@@ -104,10 +104,10 @@ def test_normalize_3d_1():
     # ...
 
 #    expr = dot(A, grad(v))
-    expr = div(dot(A, grad(v)))
-    print('> input         >>> {0}'.format(expr))
-
-    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
+#    expr = div(dot(A, grad(v)))
+#    print('> input         >>> {0}'.format(expr))
+#
+#    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
 #    print('> normal form   >>> {0}'.format(normalize(dot(grad(v), grad(u)),
 #                                                     basis={V: 'Ni', U: 'Nj'})))
 # ...
