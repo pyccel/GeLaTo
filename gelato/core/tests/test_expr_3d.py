@@ -116,6 +116,60 @@ def test_normalize_3d_1():
 # ...
 
 # ...
+def test_gelatize_3d_1():
+    print('============ test_gelatize_3d_1 =============')
+
+    V = H1Space('V', ldim=3)
+    U = H1Space('U', ldim=3)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    x,y,z = V.coordinates
+
+    c = Constant('c')
+    F = Field('F', space=V)
+    f1 = Function('f1')
+    f2 = Function('f2')
+    f3 = Function('f3')
+
+    Ni, Ni_x, Ni_y, Ni_z = symbols('Ni Ni_x Ni_y Ni_z')
+    Nj, Nj_x, Nj_y, Nj_z = symbols('Nj Nj_x Nj_y Nj_z')
+
+    bx, by, bz = symbols('bx by bz')
+    b = Tuple(bx, by, bz)
+
+    f = Tuple(f1(x,y,z), f2(x,y,z), f3(x,y,z))
+
+    a00 = Constant('a00')
+    a10 = Constant('a10')
+    a20 = Constant('a20')
+    a01 = Constant('a01')
+    a11 = Constant('a11')
+    a21 = Constant('a21')
+    a02 = Constant('a02')
+    a12 = Constant('a12')
+    a22 = Constant('a22')
+    A = Matrix([[a00, a01, a02], [a10, a11, a12], [a20, a21, a22]])
+
+    # ...
+    a = BilinearForm((v,u), dot(grad(v), grad(u)))
+    assert(gelatize(a, basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + Ni_z*Nj_z)
+    # ...
+
+    # ...
+    a = BilinearForm((v,u), dot(grad(v), grad(u)) + c*v*u)
+    assert(gelatize(a, basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + Ni_z*Nj_z + c*Ni*Nj)
+    # ...
+
+    # ...
+    a = BilinearForm((v,u), dot(grad(v), grad(u)) + F*v*u)
+    assert(gelatize(a, basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + Ni_z*Nj_z + F*Ni*Nj)
+    # ...
+
+# ...
+
+# ...
 def test_atomize_3d_2():
     print('============ test_atomize_3d_2 =============')
 
@@ -585,6 +639,7 @@ def test():
 if __name__ == '__main__':
     test_atomize_3d_1()
     test_normalize_3d_1()
+    test_gelatize_3d_1()
 
     test_atomize_3d_2()
     test_normalize_3d_2()
