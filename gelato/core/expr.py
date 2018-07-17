@@ -291,14 +291,19 @@ def atomize(expr, dim=None):
 
         raise TypeError(msg, ', given ', expr, type(expr))
 
-#    print('> expr = ', expr, type(expr))
+#    print('> expr [atomize] = ', expr, type(expr))
 
     # ... compute dim if None
     if dim is None:
-        ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction, VectorTestFunction))]
+        ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction,
+                                                             VectorTestFunction,
+                                                             Field))]
 
         if ls:
             atom = ls[0]
+            if atom.space is None:
+                raise ValueError('Expecting atom to be associated to a space')
+
             dim = atom.space.ldim
     # ...
 
@@ -380,7 +385,7 @@ def normalize(expr, basis=None):
     expr = atomize(expr)
     # ...
 
-#    print('> expr = ', expr, type(expr))
+#    print('> expr [normalize] = ', expr, type(expr))
 
     if isinstance(expr, (list, tuple, Tuple)):
         args = [normalize(i, basis=basis) for i in expr]

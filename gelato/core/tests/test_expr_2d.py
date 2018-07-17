@@ -96,15 +96,15 @@ def test_normalize_2d_1():
 
     assert(normalize(dot(grad(v), grad(u)), basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y)
     assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + c*Ni*Nj)
+    assert(normalize(dot(grad(F*v), grad(u)), basis={V: 'Ni', U: 'Nj'}) == Nj_x*(F*Ni_x + Ni*dx(F)) + Nj_y*(F*Ni_y + Ni*dy(F)))
     # ...
 
 #    expr = dot(A, grad(v))
 #    expr = div(dot(A, grad(v)))
 #    print('> input         >>> {0}'.format(expr))
-#
+
 #    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
-#    print('> normal form   >>> {0}'.format(normalize(dot(grad(v), grad(u)),
-#                                                     basis={V: 'Ni', U: 'Nj'})))
+#    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni', U: 'Nj'})))
 # ...
 
 
@@ -152,6 +152,11 @@ def test_gelatize_2d_1():
     # ...
     a = BilinearForm((v,u), dot(grad(v), grad(u)) + F*v*u)
     assert(gelatize(a, basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + Ni_y*Nj_y + F*Ni*Nj)
+    # ...
+
+    # ...
+    a = BilinearForm((v,u), dot(grad(F*v), grad(u)))
+    assert(gelatize(a, basis={V: 'Ni', U: 'Nj'}) == F*Ni_x*Nj_x + F*Ni_y*Nj_y + Ni*Nj_x*dx(F) + Ni*Nj_y*dy(F))
     # ...
 
 # ...
