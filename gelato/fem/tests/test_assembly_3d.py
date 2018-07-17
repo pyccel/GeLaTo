@@ -80,7 +80,7 @@ def test_assembly_bilinear_3d_scalar_3():
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
 
-    F = Field('F')
+    F = Field('F', space=V)
 
     expr = dot(grad(v), grad(u)) + F*v*u
 

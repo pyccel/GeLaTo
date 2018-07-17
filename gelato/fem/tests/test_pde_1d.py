@@ -140,7 +140,7 @@ def test_pde_1d_scalar_3():
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
 
-    F = Field('F')
+    F = Field('F', space=V)
 
     a = BilinearForm((v,u), dot(grad(v), grad(u)) + F*v*u)
     b = LinearForm(v, x*(1.-x)*v)

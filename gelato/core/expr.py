@@ -364,10 +364,15 @@ def normalize(expr, basis=None):
         for every space we give the name of the basis function symbol
     """
     # ... compute dim
-    ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction, VectorTestFunction))]
+    ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction,
+                                                         VectorTestFunction,
+                                                         Field))]
 
     if ls:
         atom = ls[0]
+        if atom.space is None:
+            raise ValueError('Expecting atom to be associated to a space')
+
         dim = atom.space.ldim
     # ...
 
@@ -424,8 +429,9 @@ def normalize(expr, basis=None):
                         name = basis[base.space]
 
             # terms like dx(..)
-            new = partial_derivative_as_symbol(i, name=name, dim=dim)
-            expr = expr.subs({i: new})
+            if not isinstance(arg, Field):
+                new = partial_derivative_as_symbol(i, name=name, dim=dim)
+                expr = expr.subs({i: new})
         # ...
 
         return expr

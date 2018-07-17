@@ -33,7 +33,7 @@ def test_atomize_2d_1():
     v = TestFunction(V, name='v')
     w = TestFunction(V, name='w')
     c = Constant('c')
-    F = Field('F')
+    F = Field('F', space=V)
 
     # ... expressions that can be normalized (valid for a weak formulation)
     assert(atomize(grad(v)) == Tuple(dx(v),
@@ -64,7 +64,7 @@ def test_normalize_2d_1():
     x,y = V.coordinates
 
     c = Constant('c')
-    F = Field('F')
+    F = Field('F', space=V)
     f1 = Function('f1')
     f2 = Function('f2')
 
@@ -89,6 +89,8 @@ def test_normalize_2d_1():
     assert(normalize(dot(b, grad(v)) + c*v, basis={V: 'Ni'}) == Ni_x*bx + Ni_y*by + c*Ni)
     assert(normalize(dot(f, grad(v)), basis={V: 'Ni'}) == Ni_x*f1(x,y) + Ni_y*f2(x,y))
     assert(normalize(dot(Tuple(2, 3), grad(v)), basis={V: 'Ni'}) == 2*Ni_x + 3*Ni_y)
+    assert(normalize(grad(F*v), basis={V: 'Ni'}) == Tuple(F*Ni_x + Ni*dx(F),
+                                                          F*Ni_y + Ni*dy(F)))
     # TODO debug
 #    assert(normalize(A*grad(v), basis={V: 'Ni'}) == 2*Ni_x + 3*Ni_y)
 

@@ -31,7 +31,7 @@ def test_atomize_1d_1():
     v = TestFunction(V, name='v')
     w = TestFunction(V, name='w')
     c = Constant('c')
-    F = Field('F')
+    F = Field('F', space=V)
     x = Symbol('x')
     f = Function('f')
 
@@ -65,7 +65,7 @@ def test_normalize_1d_1():
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
     c = Constant('c')
-    F = Field('F')
+    F = Field('F', space=V)
 
     Ni, Ni_x = symbols('Ni Ni_x')
     Nj, Nj_x = symbols('Nj Nj_x')
@@ -74,14 +74,16 @@ def test_normalize_1d_1():
     assert(normalize(grad(v), basis={V: 'Ni'}) == Ni_x)
     assert(normalize(grad(c*v), basis={V: 'Ni'}) == c*Ni_x)
     assert(normalize(grad(v) + c*v, basis={V: 'Ni'}) == Ni_x + c*Ni)
+    assert(normalize(grad(F*v), basis={V: 'Ni'}) == F*Ni_x + Ni*dx(F))
 
     assert(normalize(dot(grad(v), grad(u)), basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x)
     assert(normalize(dot(grad(v), grad(u)) + c*v*u, basis={V: 'Ni', U: 'Nj'}) == Ni_x*Nj_x + c*Ni*Nj)
     # ...
 
-#    expr = dot(grad(v), grad(u))
+#    expr = grad(F*v)
+#    expr = dot(grad(F*v), grad(u))
 #    print('> input         >>> {0}'.format(expr))
-
+#
 #    print('> normal form   >>> {0}'.format(normalize(expr, basis={V: 'Ni'})))
 #    print('> normal form   >>> {0}'.format(normalize(dot(grad(v), grad(u)),
 #                                                     basis={V: 'Ni', U: 'Nj'})))
@@ -139,7 +141,7 @@ def test_bilinear_form_1d_3():
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
 
-    F = Field('F')
+    F = Field('F', space=V)
     expr = inner(grad(u), grad(v)) + F*u*v
 
     a = BilinearForm((v,u), expr)
@@ -160,7 +162,7 @@ def test_bilinear_form_1d_3():
 #    v = TestFunction(V, name='v')
 #    u = TestFunction(U, name='u')
 #
-#    F = Field('F')
+#    F = Field('F', space=V)
 #
 #    expr = inner(grad(F*u), grad(v))
 #
@@ -202,7 +204,7 @@ def test_bilinear_form_1d_3():
 #    v = TestFunction(V, name='v')
 #    u = TestFunction(U, name='u')
 #
-#    F = Field('F')
+#    F = Field('F', space=V)
 #
 #    expr = inner(grad(dx(F)*v), grad(u)) + u*v
 #

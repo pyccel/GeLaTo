@@ -40,7 +40,24 @@ class Field(Symbol):
     Examples
 
     """
-    pass
+    _space = None
+    is_commutative = True
+    def __new__(cls, name, space=None):
+        obj =  Basic.__new__(cls, name)
+        obj._space = space
+        return obj
+
+    @property
+    def space(self):
+        return self._space
+
+    @property
+    def name(self):
+        return self._args[0]
+
+    def _sympystr(self, printer):
+        sstr = printer.doprint
+        return sstr(self.name)
 # ...
 
 # ...
