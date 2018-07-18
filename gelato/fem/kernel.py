@@ -122,7 +122,6 @@ def compile_kernel(name, a,
     setattr(a, 'is_block', is_block)
     setattr(a, 'n_rows', test_n_components)
     setattr(a, 'n_cols', trial_n_components)
-    print('kernel = ', a.is_block)
     # ...
 
     # ... contants

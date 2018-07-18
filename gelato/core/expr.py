@@ -53,9 +53,6 @@ class LinearForm(Expr):
     Examples
 
     """
-    _is_block = None
-    _n_rows = None
-    _n_cols = None
     def __new__(cls, test_functions, expr):
         # ...
         if isinstance(test_functions, (TestFunction, VectorTestFunction)):
@@ -95,18 +92,6 @@ class LinearForm(Expr):
         ls = [a for a in self.expr.free_symbols if isinstance(a, Constant)]
         # no redanduncy
         return list(set(ls))
-
-    @property
-    def is_block(self):
-        return self._is_block
-
-    @property
-    def n_rows(self):
-        return self._n_rows
-
-    @property
-    def n_cols(self):
-        return self._n_cols
 
     def _sympystr(self, printer):
         sstr = printer.doprint
@@ -151,9 +136,6 @@ class BilinearForm(Expr):
     Examples
 
     """
-    _is_block = None
-    _n_rows = None
-    _n_cols = None
     def __new__(cls, test_trial, expr):
         # ...
         # TODO put this in a private function since it is used in __new__ and __call__
@@ -217,18 +199,6 @@ class BilinearForm(Expr):
         ls = [a for a in self.expr.free_symbols if isinstance(a, Constant)]
         # no redanduncy
         return list(set(ls))
-
-    @property
-    def is_block(self):
-        return self._is_block
-
-    @property
-    def n_rows(self):
-        return self._n_rows
-
-    @property
-    def n_cols(self):
-        return self._n_cols
 
     def _sympystr(self, printer):
         sstr = printer.doprint
