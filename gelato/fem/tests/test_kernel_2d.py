@@ -106,7 +106,7 @@ def test_kernel_bilinear_2d_scalar_4():
 
     F = Field('F', space=V)
 
-    expr = dot(grad(F*v), grad(u)) #+ F*v*u
+    expr = dot(grad(F*v), grad(u))
 
     a = BilinearForm((v,u), expr)
     print('> input      >>> {0}'.format(a))
@@ -184,12 +184,12 @@ def test_kernel_linear_2d_block_1():
 
 # .....................................................
 if __name__ == '__main__':
-#    test_kernel_bilinear_2d_scalar_1()
-#    test_kernel_bilinear_2d_scalar_2()
-#    test_kernel_bilinear_2d_scalar_3()
+    test_kernel_bilinear_2d_scalar_1()
+    test_kernel_bilinear_2d_scalar_2()
+    test_kernel_bilinear_2d_scalar_3()
     test_kernel_bilinear_2d_scalar_4()
 
-#    test_kernel_bilinear_2d_block_1()
+    test_kernel_bilinear_2d_block_1()
 
-#    test_kernel_linear_2d_scalar_1()
-#    test_kernel_linear_2d_block_1()
+    test_kernel_linear_2d_scalar_1()
+    test_kernel_linear_2d_block_1()

@@ -177,8 +177,59 @@ def test_pde_1d_scalar_3():
     # ...
 # ...
 
+# ...
+def test_pde_1d_scalar_4():
+    print('============ test_pde_1d_scalar_4 =============')
+
+    # ... abstract model
+    U = H1Space('U', ldim=1)
+    V = H1Space('V', ldim=1)
+
+    x = V.coordinates
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    F = Field('F', space=V)
+
+    a = BilinearForm((v,u), dot(grad(F*v), grad(u)))
+    b = LinearForm(v, x*(1.-x)*v)
+
+    print('> input bilinear-form  >>> {0}'.format(a))
+    print('> input linear-form    >>> {0}'.format(b))
+    # ...
+
+    # ... discretization
+    # Input data: degree, number of elements
+    p  = 3
+    ne = 2**4
+
+    # Create uniform grid
+    grid = linspace( 0., 1., num=ne+1 )
+
+    # Create finite element space and precompute quadrature data
+    V = SplineSpace( p, grid=grid )
+    V.init_fem()
+
+    # Define a field
+    phi = FemField( V, 'phi' )
+    phi._coeffs[:] = 1.
+    # ...
+
+    # ...
+    discretize( a, [V, V] )
+    discretize( b, V )
+    # ...
+
+    # ...
+    M   = a.assemble(phi)
+    rhs = b.assemble()
+    # ...
+# ...
+
 # .....................................................
 if __name__ == '__main__':
     test_pde_1d_scalar_1()
     test_pde_1d_scalar_2()
     test_pde_1d_scalar_3()
+    test_pde_1d_scalar_4()

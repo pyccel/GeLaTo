@@ -66,14 +66,6 @@ def construct_field_values_names(expr, fields, verbose=False):
 def print_eval_field(expr, dim, fields, field_coeffs, field_values,
                      verbose=False):
     """."""
-    # ...
-    if verbose:
-        print('> input     := {0}'.format(expr))
-    # ...
-
-    # TODO compute nderiv needed to evaluate fields
-    nderiv = 1
-
     # ... identation (def function body)
     tab = ' '*4
     # ...

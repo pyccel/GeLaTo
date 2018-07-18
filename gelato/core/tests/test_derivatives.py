@@ -1,5 +1,7 @@
 # coding: utf-8
 
+# TODO: - add more tests and asserts
+
 from sympy import symbols
 from sympy import Tuple
 from sympy import Matrix

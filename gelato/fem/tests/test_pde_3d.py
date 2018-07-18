@@ -185,8 +185,65 @@ def test_pde_3d_scalar_3():
     # ...
 # ...
 
+# ...
+def test_pde_3d_scalar_4():
+    print('============ test_pde_3d_scalar_4 =============')
+
+    # ... abstract model
+    U = H1Space('U', ldim=3)
+    V = H1Space('V', ldim=3)
+
+    x,y,z = V.coordinates
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    F = Field('F', space=V)
+
+    a = BilinearForm((v,u), dot(grad(F*v), grad(u)))
+    b = LinearForm(v, x*(1.-x)*y*(1.-y)*z*v)
+
+    print('> input bilinear-form  >>> {0}'.format(a))
+    print('> input linear-form    >>> {0}'.format(b))
+    # ...
+
+    # ... discretization
+    # Input data: degree, number of elements
+    p1  = 2 ; p2  = 2 ; p3  = 2
+    ne1 = 2 ; ne2 = 2 ; ne3 = 2
+
+    # Create uniform grid
+    grid_1 = linspace( 0., 1., num=ne1+1 )
+    grid_2 = linspace( 0., 1., num=ne2+1 )
+    grid_3 = linspace( 0., 1., num=ne3+1 )
+
+    # Create 1D finite element spaces and precompute quadrature data
+    V1 = SplineSpace( p1, grid=grid_1 ); V1.init_fem()
+    V2 = SplineSpace( p2, grid=grid_2 ); V2.init_fem()
+    V3 = SplineSpace( p3, grid=grid_3 ); V3.init_fem()
+
+    # Create 3D tensor product finite element space
+    V = TensorFemSpace( V1, V2, V3 )
+
+    # Define a field
+    phi = FemField( V, 'phi' )
+    phi._coeffs[:,:,:] = 1.
+    # ...
+
+    # ...
+    discretize( a, [V, V] )
+    discretize( b, V )
+    # ...
+
+    # ...
+    M   = a.assemble(phi)
+    rhs = b.assemble()
+    # ...
+# ...
+
 # .....................................................
 if __name__ == '__main__':
     test_pde_3d_scalar_1()
     test_pde_3d_scalar_2()
     test_pde_3d_scalar_3()
+    test_pde_3d_scalar_4()
