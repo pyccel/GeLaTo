@@ -35,8 +35,13 @@ from .utils import write_code
 from .utils import arguments_datatypes_as_dict
 from .utils import arguments_datatypes_split
 
-# TODO remove
-BASIS_PREFIX = ["x", "y", "z", "xx", "yy", "zz", "xy", "yz", "xz"]
+from .field import construct_field_coeffs_names
+from .field import print_field_coeffs
+from .field import print_field_coeffs_types
+from .field import construct_field_values_names
+from .field import print_eval_field
+from .field import print_assign_field
+
 
 def compile_kernel(name, a,
                    verbose=False,
@@ -162,86 +167,35 @@ def compile_kernel(name, a,
 
     # ... field coeffs
     if fields:
-        field_coeffs = OrderedDict()
-        for f in fields:
-            coeffs = 'coeff_{}'.format(f.name)
-            field_coeffs[str(f.name)] = coeffs
+        field_coeffs = construct_field_coeffs_names(fields)
+        field_coeffs_str = print_field_coeffs(field_coeffs)
+        field_types_str = print_field_coeffs_types(field_coeffs, dim)
 
-        ls = [v for v in list(field_coeffs.values())]
-        field_coeffs_str = ', '.join(i for i in ls)
+        field_values = construct_field_values_names(expr, fields)
 
-        # add ',' for kernel signature
-        field_coeffs_str = ', {}'.format(field_coeffs_str)
-
-#        print('**** ', expr)
-        # we call normalize a second time, and activate the modification of the
-        # fields, this will turn terms like dx(F) into F_x if F is a field
-        expr = normalize(expr, enable_fields=True)
-#        print(e)
-#        import sys; sys.exit(0)
-        eval_field_str = print_eval_field(expr, dim, fields, verbose=verbose)
-
-        # ...
-        if dim == 1:
-            e_pattern = '{field}{deriv} = {field}{deriv}_values[g1]'
-        elif dim == 2:
-            e_pattern = '{field}{deriv} = {field}{deriv}_values[g1,g2]'
-        elif dim ==3:
-            e_pattern = '{field}{deriv} = {field}{deriv}_values[g1,g2,g3]'
-        else:
-            raise NotImplementedError('only 1d, 2d and 3d are available')
-
-        field_values = OrderedDict()
-        free_names = [str(f.name) for f in expr.free_symbols]
-        for f in fields:
-            ls = []
-            if f.name in free_names:
-                ls.append(f.name)
-            for deriv in BASIS_PREFIX:
-                f_d = '{field}_{deriv}'.format(field=f.name, deriv=deriv)
-                if f_d in free_names:
-                    ls.append(f_d)
-
-            field_values[f.name] = ls
-
-        tab_base = tab
-        # ... update identation to be inside the loop
-        for i in range(0, 3*dim):
-            tab += ' '*4
-
-        lines = []
-        for k, fs in list(field_values.items()):
-            coeff = field_coeffs[k]
-            for f in fs:
-                ls = f.split('_')
-                if len(ls) == 1:
-                    deriv = ''
-                else:
-                    deriv = '_{}'.format(ls[-1])
-                line = e_pattern.format(field=k, deriv=deriv)
-                line = tab + line
-
-                lines.append(line)
-
-        field_value_str = '\n'.join(line for line in lines)
-        tab = tab_base
-        # ...
-
-        # ...
-        field_types = []
-        slices = ','.join(':' for i in range(0, dim))
-        for v in list(field_coeffs.values()):
-            field_types.append('double [{slices}]'.format(slices=slices))
-
-        field_types_str = ', '.join(i for i in field_types)
-        field_types_str = ', {}'.format(field_types_str)
-        # ...
+        eval_field_str = print_eval_field(expr, dim,
+                                          fields,
+                                          field_coeffs,
+                                          field_values,
+                                          verbose=verbose)
+        field_value_str = print_assign_field(expr, dim,
+                                             fields,
+                                             field_coeffs,
+                                             field_values,
+                                             tab, verbose=verbose)
 
     else:
         field_coeffs_str = ''
         eval_field_str   = ''
         field_value_str  = ''
         field_types_str  = ''
+    # ...
+
+    # ...
+    if fields:
+        # we call normalize a second time, and activate the modification of the
+        # fields, this will turn terms like dx(F) into F_x if F is a field
+        expr = normalize(expr, enable_fields=True)
     # ...
 
     # ... compute indentation
@@ -262,7 +216,7 @@ def compile_kernel(name, a,
         tab += ' '*4
     # ...
 
-    # ...
+    # ... TODO improve following the same idea as for Fields
     test_function_str = ''
     if is_bilinear_form or is_linear_form:
         # ... print test functions
@@ -287,7 +241,7 @@ def compile_kernel(name, a,
         # ...
     # ...
 
-    # ...
+    # ... TODO improve following the same idea as for Fields
     trial_function_str = ''
     if is_bilinear_form:
         # ... print trial functions
@@ -484,125 +438,3 @@ def compile_kernel(name, a,
     if export_pyfile:
         write_code(name, code, ext='py', folder='.pyccel')
     # ...
-
-
-
-# TODO improve
-def print_eval_field(expr, dim, fields, verbose=False):
-    """."""
-
-    # ...
-    if verbose:
-        print('> input     := {0}'.format(expr))
-    # ...
-
-    # TODO compute nderiv needed to evaluate fields
-    nderiv = 1
-
-    # ... field coeffs
-    field_coeffs = OrderedDict()
-    for f in fields:
-        coeffs = 'coeff_{}'.format(f.name)
-        field_coeffs[str(f.name)] = coeffs
-
-    #
-    field_values = OrderedDict()
-    free_names = [str(f.name) for f in expr.free_symbols]
-    for f in fields:
-        ls = []
-        if f.name in free_names:
-            ls.append(f.name)
-        for deriv in BASIS_PREFIX:
-            f_d = '{field}_{deriv}'.format(field=f.name, deriv=deriv)
-            if f_d in free_names:
-                ls.append(f_d)
-
-        field_values[f.name] = ls
-#    print('>>> field_values = ', field_values)
-    # ...
-
-    # ... identation (def function body)
-    tab = ' '*4
-    # ...
-
-    # ... field values init
-    sizes = ','.join('k{}'.format(i) for i in range(1, dim+1))
-    if dim > 1:
-        sizes = '({})'.format(sizes)
-
-    lines = []
-    for k, fs in list(field_values.items()):
-        for f in fs:
-            line = '{field}_values = zeros({sizes})'.format(field=f, sizes=sizes)
-            line = tab + line
-
-            lines.append(line)
-
-    field_init_str = '\n'.join(line for line in lines)
-    # ...
-
-    # ... update identation to be inside the loop
-    for i in range(0, 2*dim):
-        tab += ' '*4
-
-    tab_base = tab
-    # ...
-#    print('>>>> expr = ', expr)
-
-    # ...
-    if dim == 1:
-        e_pattern = '{field}{deriv}_values[g1] += {coeff}[jl_1]*Nj{deriv}'
-    elif dim == 2:
-        e_pattern = '{field}{deriv}_values[g1,g2] += {coeff}[jl_1,jl_2]*Nj{deriv}'
-    elif dim ==3:
-        e_pattern = '{field}{deriv}_values[g1,g2,g3] += {coeff}[jl_1,jl_2,jl_3]*Nj{deriv}'
-    else:
-        raise NotImplementedError('only 1d, 2d and 3d are available')
-
-    lines = []
-    for k, fs in list(field_values.items()):
-        coeff = field_coeffs[k]
-        for f in fs:
-            ls = f.split('_')
-            if len(ls) == 1:
-                deriv = ''
-            else:
-                deriv = '_{}'.format(ls[-1])
-            line = e_pattern.format(field=k, deriv=deriv, coeff=coeff)
-            line = tab + line
-
-            lines.append(line)
-
-    field_accum_str = '\n'.join(line for line in lines)
-    # ...
-
-
-    # ...
-    # TODO
-    pattern = 'scalar'
-    # ...
-
-    # ...
-    template_str = 'eval_field_{dim}d_{pattern}'.format(dim=dim, pattern=pattern)
-    try:
-        from .templates import eval_field_1d_scalar
-        from .templates import eval_field_2d_scalar
-        from .templates import eval_field_3d_scalar
-
-        template = eval(template_str)
-    except:
-        raise ValueError('Could not find the corresponding template {}'.format(template_str))
-    # ...
-
-    # ...
-    e = _convert_int_to_float(expr)
-    # we call evalf to avoid having fortran doing the evaluation of rational
-    # division
-    field_coeffs_str = ', '.join('{}'.format(c) for c in list(field_coeffs.values()))
-
-    code = template.format(__FIELD_INIT__=field_init_str,
-                           __FIELD_ACCUM__=field_accum_str)
-    # ...
-
-    return code
-

@@ -798,3 +798,23 @@ def partial_derivative_as_symbol(expr, name=None, dim=None):
         name = '{name}_{code}'.format(name=name, code=code)
         return Symbol(name)
 # ...
+
+# ...
+def get_index_derivatives_atom(expr, atom, verbose=False):
+    """This function return a dictionary of partial derivative indices for
+    a given atom.
+    it must be called after atomizing the expression.
+    """
+    ops = sort_partial_derivatives(expr)
+    if verbose:
+        print('> ops = ', ops)
+
+    indices = []
+    for i in ops:
+        a = get_atom_derivatives(i)
+        if a.name == atom.name:
+            index = get_index_derivatives(i)
+            indices.append(index)
+
+    return indices
+# ...

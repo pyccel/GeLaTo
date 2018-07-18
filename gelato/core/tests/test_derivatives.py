@@ -8,11 +8,12 @@ from sympy import srepr
 from gelato.core import (dx, dy, dz)
 from gelato.core import grad, dot, inner
 from gelato.core import Field
+from gelato.core import get_index_derivatives_atom
 
 
 # ...
-def test_partial_derivatives():
-    print('============ test_partial_derivatives ==============')
+def test_partial_derivatives_1():
+    print('============ test_partial_derivatives_1 ==============')
 
     x, y, z = symbols('x y z')
     alpha, beta = symbols('alpha beta')
@@ -48,6 +49,26 @@ def test_partial_derivatives():
 #    print('')
 # ...
 
+# ...
+def test_partial_derivatives_2():
+    print('============ test_partial_derivatives_2 ==============')
+
+    x, y, z = symbols('x y z')
+    alpha, beta = symbols('alpha beta')
+
+    F = Field('F')
+
+    expr = alpha * dx(F) + beta * dy(F) + dx(dy(F))
+#    expr = alpha * dx(F)
+    print('> expr = ', expr)
+    indices = get_index_derivatives_atom(expr, F)
+    print('> indices = ', indices)
+
+#    print('> ', srepr(expr))
+#    print('')
+# ...
+
 # .....................................................
 if __name__ == '__main__':
-    test_partial_derivatives()
+    test_partial_derivatives_1()
+    test_partial_derivatives_2()
