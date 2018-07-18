@@ -42,12 +42,19 @@ from .matrix import print_global_matrix_args
 from .matrix import print_global_matrix_decs
 from .matrix import print_global_matrix_update
 
-# NOTE: is_block, test_n_components, trial_n_components  will be provided after calling compile_kernel
+from .vector import construct_element_vector_names
+from .vector import print_element_vector_args
+from .vector import print_element_vector_decs
+from .vector import construct_global_vector_names
+from .vector import print_global_vector_args
+from .vector import print_global_vector_decs
+from .vector import print_global_vector_update
+
+# NOTE: test_n_components, trial_n_components  will be provided after calling compile_kernel
 def compile_assembly(name, a, kernel_name=None,
                      verbose=False,
                      namespace=globals(),
                      context=None,
-                     is_block=False,
                      is_vector=False,
                      test_n_components=1,
                      trial_n_components=1,
@@ -133,24 +140,64 @@ def compile_assembly(name, a, kernel_name=None,
     # ...
     n_rows = test_n_components
     n_cols = trial_n_components
-
-    element_mat_args = construct_element_matrix_names(n_rows, n_cols)
-    element_mat_args_str = print_element_matrix_args(n_rows, n_cols, element_mat_args)
-    element_mat_decs_str = print_element_matrix_decs(n_rows, n_cols, dim, element_mat_args, tab)
-
-    global_mat_args = construct_global_matrix_names(n_rows, n_cols)
-    global_mat_args_str = print_global_matrix_args(n_rows, n_cols, global_mat_args)
-    global_mat_decs_str = print_global_matrix_decs(n_rows, n_cols, global_mat_args, tab)
     # ...
 
     # ...
-    for i in range(0, dim):
-        tab += ' '*4
+    element_mat_args = ''
+    element_mat_args_str = ''
+    element_mat_decs_str = ''
 
-    global_mat_update_str = print_global_matrix_update(n_rows, n_cols, dim,
-                                                       element_mat_args,
-                                                       global_mat_args,
-                                                       tab)
+    global_mat_args = ''
+    global_mat_args_str = ''
+    global_mat_decs_str = ''
+    global_mat_update_str = ''
+
+    element_vec_args = ''
+    element_vec_args_str = ''
+    element_vec_decs_str = ''
+
+    global_vec_args = ''
+    global_vec_args_str = ''
+    global_vec_decs_str = ''
+    global_vec_update_str = ''
+
+    if is_bilinear_form:
+        element_mat_args = construct_element_matrix_names(n_rows, n_cols)
+        element_mat_args_str = print_element_matrix_args(n_rows, n_cols, element_mat_args)
+        element_mat_decs_str = print_element_matrix_decs(n_rows, n_cols, dim, element_mat_args, tab)
+
+        global_mat_args = construct_global_matrix_names(n_rows, n_cols)
+        global_mat_args_str = print_global_matrix_args(n_rows, n_cols, global_mat_args)
+        global_mat_decs_str = print_global_matrix_decs(n_rows, n_cols, global_mat_args, tab)
+
+        # ...
+        for i in range(0, dim):
+            tab += ' '*4
+
+        global_mat_update_str = print_global_matrix_update(n_rows, n_cols, dim,
+                                                           element_mat_args,
+                                                           global_mat_args,
+                                                           tab)
+        # ...
+
+    elif is_linear_form:
+        element_vec_args = construct_element_vector_names(n_rows)
+        element_vec_args_str = print_element_vector_args(n_rows, element_vec_args)
+        element_vec_decs_str = print_element_vector_decs(n_rows, dim, element_vec_args, tab)
+
+        global_vec_args = construct_global_vector_names(n_rows)
+        global_vec_args_str = print_global_vector_args(n_rows, global_vec_args)
+        global_vec_decs_str = print_global_vector_decs(n_rows, global_vec_args, tab)
+
+        # ...
+        for i in range(0, dim):
+            tab += ' '*4
+
+        global_vec_update_str = print_global_vector_update(n_rows, dim,
+                                                           element_vec_args,
+                                                           global_vec_args,
+                                                           tab)
+        # ...
     # ...
 
     # ...
@@ -164,6 +211,11 @@ def compile_assembly(name, a, kernel_name=None,
                            __ELEMENT_MAT_DEC__=element_mat_decs_str,
                            __ELEMENT_MAT_ARGS__=element_mat_args_str,
                            __GLOBAL_MAT_UPDATE__=global_mat_update_str,
+                           __GLOBAL_VEC_DEC__=global_vec_decs_str,
+                           __GLOBAL_VEC_ARGS__=global_vec_args_str,
+                           __ELEMENT_VEC_DEC__=element_vec_decs_str,
+                           __ELEMENT_VEC_ARGS__=element_vec_args_str,
+                           __GLOBAL_VEC_UPDATE__=global_vec_update_str,
                            __KERNEL_NAME__=kernel_name)
     # ...
 

@@ -155,7 +155,6 @@ def test_assembly_bilinear_2d_block_1():
 
     # ...
     assembly_py  = compile_assembly('assembly_bilinear_2d_block_1', a,
-                                    is_block=True,
                                     test_n_components=2,
                                     trial_n_components=2,
                                     backend='python', verbose=True)
@@ -170,6 +169,6 @@ if __name__ == '__main__':
     test_assembly_bilinear_2d_scalar_3()
     test_assembly_bilinear_2d_scalar_4()
 
-#    test_assembly_linear_2d_scalar_1()
+    test_assembly_linear_2d_scalar_1()
 
     test_assembly_bilinear_2d_block_1()

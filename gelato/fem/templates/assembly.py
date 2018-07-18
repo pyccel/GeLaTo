@@ -214,11 +214,11 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
 
     # Create global matrices
     from spl.linalg.stencil import StencilVector
-    rhs = StencilVector( test_space.vector_space )
+{__GLOBAL_VEC_DEC__}
 
     # Create element matrices
     from numpy import zeros
-    mat = zeros( test_p1+1 )
+{__ELEMENT_VEC_DEC__}
 
     # Build global matrices: cycle over elements
     for ie1 in range(s1, e1+1-test_p1):
@@ -234,12 +234,12 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
         # Compute element matrices
         {__KERNEL_NAME__}( test_p1, k1,
         test_bs1,
-        u1, w1, mat{__ARGS__}{__FIELDS_COEFFS__} )
+        u1, w1, {__ELEMENT_VEC_ARGS__}{__ARGS__}{__FIELDS_COEFFS__} )
 
         # Update global vectors
-        rhs[is1-test_p1:is1+1] += mat[:]
+{__GLOBAL_VEC_UPDATE__}
 
-    return rhs
+    return {__GLOBAL_VEC_ARGS__}
 """
 # .............................................
 
@@ -266,11 +266,11 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
 
     # Create global matrices
     from spl.linalg.stencil import StencilVector
-    rhs = StencilVector( test_space.vector_space )
+{__GLOBAL_VEC_DEC__}
 
     # Create element matrices
     from numpy import zeros
-    mat = zeros( (test_p1+1, test_p2+1) )
+{__ELEMENT_VEC_DEC__}
 
     # Build global matrices: cycle over elements
     for ie1 in range(s1, e1+1-test_p1):
@@ -292,12 +292,12 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
             # Compute element matrices
             {__KERNEL_NAME__}( test_p1, test_p2, k1, k2,
             test_bs1, test_bs2,
-            u1, u2, w1, w2, mat{__ARGS__}{__FIELDS_COEFFS__} )
+            u1, u2, w1, w2, {__ELEMENT_VEC_ARGS__}{__ARGS__}{__FIELDS_COEFFS__} )
 
             # Update global matrices
-            rhs[is1-test_p1:is1+1, is2-test_p2:is2+1] += mat[:,:]
+{__GLOBAL_VEC_UPDATE__}
 
-    return rhs
+    return {__GLOBAL_VEC_ARGS__}
 """
 # .............................................
 
@@ -324,11 +324,11 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
 
     # Create global matrices
     from spl.linalg.stencil import StencilVector
-    rhs = StencilVector( test_space.vector_space )
+{__GLOBAL_VEC_DEC__}
 
     # Create element matrices
     from numpy import zeros
-    mat = zeros( (test_p1+1, test_p2+1, test_p3+1) )
+{__ELEMENT_VEC_DEC__}
 
     # Build global matrices: cycle over elements
     for ie1 in range(s1, e1+1-test_p1):
@@ -355,11 +355,11 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
                 # Compute element matrices
                 {__KERNEL_NAME__}( test_p1, test_p2, test_p3, k1, k2, k3,
                 test_bs1, test_bs2, test_bs3,
-                u1, u2, u3, w1, w2, w3, mat{__ARGS__}{__FIELDS_COEFFS__} )
+                u1, u2, u3, w1, w2, w3, {__ELEMENT_VEC_ARGS__}{__ARGS__}{__FIELDS_COEFFS__} )
 
                 # Update global matrices
-                rhs[is1-test_p1:is1+1, is2-test_p2:is2+1, is3-test_p3:is3+1] += mat[:,:,:]
+{__GLOBAL_VEC_UPDATE__}
 
-    return rhs
+    return {__GLOBAL_VEC_ARGS__}
 """
 # .............................................

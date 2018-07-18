@@ -146,4 +146,4 @@ if __name__ == '__main__':
     test_assembly_bilinear_3d_scalar_3()
     test_assembly_bilinear_3d_scalar_4()
 
-#    test_assembly_linear_3d_scalar_1()
+    test_assembly_linear_3d_scalar_1()
