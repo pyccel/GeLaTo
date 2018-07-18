@@ -91,6 +91,29 @@ def test_kernel_bilinear_1d_scalar_3():
 # ...
 
 # ...
+def test_kernel_bilinear_1d_scalar_4():
+    print('============ test_kernel_bilinear_1d_scalar_4 =============')
+
+    U = H1Space('U', ldim=1)
+    V = H1Space('V', ldim=1)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    F = Field('F', space=V)
+
+    expr = dot(grad(F*v), grad(u)) #+ F*v*u
+
+    a = BilinearForm((v,u), expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_bilinear_1d_scalar_4', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
 def test_kernel_linear_1d_scalar_1():
     print('============ test_kernel_linear_1d_scalar_1 =============')
 
@@ -116,6 +139,7 @@ def test_kernel_linear_1d_scalar_1():
 if __name__ == '__main__':
 #    test_kernel_bilinear_1d_scalar_1()
 #    test_kernel_bilinear_1d_scalar_2()
-    test_kernel_bilinear_1d_scalar_3()
+#    test_kernel_bilinear_1d_scalar_3()
+    test_kernel_bilinear_1d_scalar_4()
 
 #    test_kernel_linear_1d_scalar_1()

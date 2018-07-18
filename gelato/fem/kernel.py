@@ -20,7 +20,7 @@ from numpy import unique
 import os
 import importlib
 
-from gelato.core import gelatize
+from gelato.core import gelatize, normalize
 from gelato.core import BilinearForm, LinearForm
 from gelato.core import Constant
 from gelato.core import Field
@@ -173,6 +173,12 @@ def compile_kernel(name, a,
         # add ',' for kernel signature
         field_coeffs_str = ', {}'.format(field_coeffs_str)
 
+#        print('**** ', expr)
+        # we call normalize a second time, and activate the modification of the
+        # fields, this will turn terms like dx(F) into F_x if F is a field
+        expr = normalize(expr, enable_fields=True)
+#        print(e)
+#        import sys; sys.exit(0)
         eval_field_str = print_eval_field(expr, dim, fields, verbose=verbose)
 
         # ...

@@ -361,7 +361,7 @@ def normalize_weak_from(a, basis=None):
 
 
 # ...
-def normalize(expr, basis=None):
+def normalize(expr, basis=None, enable_fields=False):
     """
     must be applied after calling atomize
 
@@ -388,11 +388,11 @@ def normalize(expr, basis=None):
 #    print('> expr [normalize] = ', expr, type(expr))
 
     if isinstance(expr, (list, tuple, Tuple)):
-        args = [normalize(i, basis=basis) for i in expr]
+        args = [normalize(i, basis=basis, enable_fields=enable_fields) for i in expr]
         return Tuple(*args)
 
     elif isinstance(expr, Add):
-        args = [normalize(i, basis=basis) for i in expr.args]
+        args = [normalize(i, basis=basis, enable_fields=enable_fields) for i in expr.args]
         return Add(*args)
 
     elif isinstance(expr, Mul):
@@ -405,7 +405,7 @@ def normalize(expr, basis=None):
 
         j = S.One
         if vectors:
-            args = [normalize(i, basis=basis) for i in vectors]
+            args = [normalize(i, basis=basis, enable_fields=enable_fields) for i in vectors]
             j = Mul(*args)
 
         return Mul(i, j)
@@ -434,7 +434,7 @@ def normalize(expr, basis=None):
                         name = basis[base.space]
 
             # terms like dx(..)
-            if not isinstance(arg, Field):
+            if  enable_fields or not isinstance(arg, Field):
                 new = partial_derivative_as_symbol(i, name=name, dim=dim)
                 expr = expr.subs({i: new})
         # ...
@@ -442,9 +442,10 @@ def normalize(expr, basis=None):
         return expr
 
     elif isinstance(expr, (TestFunction, VectorTestFunction)):
-        if expr.space in list(basis.keys()):
-            name = basis[expr.space]
-            return Symbol(name)
+        if not(basis is None):
+            if expr.space in list(basis.keys()):
+                name = basis[expr.space]
+                return Symbol(name)
 
 #    elif isinstance(expr, Symbol) and expr.is_Indexed:
 #        base = expr.base
@@ -453,11 +454,12 @@ def normalize(expr, basis=None):
 #            return Symbol(name)
 
     elif isinstance(expr, Indexed):
-        base = expr.base
-        if base.space in list(basis.keys()):
-            name = basis[base.space]
-            indices = expr.indices
-            return IndexedBase(name, shape=dim)[indices]
+        if not(basis is None):
+            base = expr.base
+            if base.space in list(basis.keys()):
+                name = basis[base.space]
+                indices = expr.indices
+                return IndexedBase(name, shape=dim)[indices]
 
     return expr
 # ...
