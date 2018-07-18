@@ -138,6 +138,30 @@ def test_assembly_linear_2d_scalar_1():
     # ...
 # ...
 
+# ...
+def test_assembly_bilinear_2d_block_1():
+    print('============ test_assembly_bilinear_2d_block_1 =============')
+
+    V = H1Space('V', ldim=2, is_block=True, shape=2)
+    U = H1Space('U', ldim=2, is_block=True, shape=2)
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(U, name='u')
+
+    expr = div(v) * div(u) + rot(v) * rot(u)
+
+    a = BilinearForm((v,u), expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    assembly_py  = compile_assembly('assembly_bilinear_2d_block_1', a,
+                                    is_block=True,
+                                    test_n_components=2,
+                                    trial_n_components=2,
+                                    backend='python', verbose=True)
+    # ...
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
@@ -146,4 +170,6 @@ if __name__ == '__main__':
     test_assembly_bilinear_2d_scalar_3()
     test_assembly_bilinear_2d_scalar_4()
 
-    test_assembly_linear_2d_scalar_1()
+#    test_assembly_linear_2d_scalar_1()
+
+    test_assembly_bilinear_2d_block_1()

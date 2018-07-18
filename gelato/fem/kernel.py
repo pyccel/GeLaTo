@@ -42,6 +42,14 @@ from .field import construct_field_values_names
 from .field import print_eval_field
 from .field import print_assign_field
 
+from .matrix import construct_element_matrix_names
+from .matrix import print_element_matrix_args
+from .matrix import print_element_matrix_init
+from .matrix import print_accumulation_var_init
+from .matrix import print_accumulation_var
+from .matrix import print_bilinear_accumulation_assign
+from .matrix import print_linear_accumulation_assign
+
 
 def compile_kernel(name, a,
                    verbose=False,
@@ -109,6 +117,12 @@ def compile_kernel(name, a,
 
     # TODO add once we handle feec
     is_vector = False
+
+    # we add attributs of Bilinear/Linear form
+    setattr(a, 'is_block', is_block)
+    setattr(a, 'n_rows', test_n_components)
+    setattr(a, 'n_cols', trial_n_components)
+    print('kernel = ', a.is_block)
     # ...
 
     # ... contants
@@ -273,53 +287,28 @@ def compile_kernel(name, a,
     if is_block:
         # ... - initializing element matrices
         #     - define arguments
-        lines = []
-        mat_args = []
         # test functions and trial functions
         if is_bilinear_form:
-            slices = ','.join(':' for i in range(0, 2*dim))
+            size = 2*dim
         # test functions
         elif is_linear_form:
-            slices = ','.join(':' for i in range(0, dim))
+            size = dim
 
-        for i in range(0, test_n_components):
-            for j in range(0, trial_n_components):
-                mat = 'mat_{i}{j}'.format(i=i,j=j)
-                mat_args.append(mat)
-
-                line = '{mat}[{slices}] = 0.0'.format(mat=mat,slices=slices)
-                line = tab + line
-
-                lines.append(line)
-
-        mat_args_str = ', '.join(mat for mat in mat_args)
-        mat_init_str = '\n'.join(line for line in lines)
-        # ...
+        n_rows = test_n_components
+        n_cols = trial_n_components
+        mat_args = construct_element_matrix_names(n_rows, n_cols)
+        mat_args_str = print_element_matrix_args(n_rows, n_cols, mat_args)
+        mat_init_str = print_element_matrix_init(n_rows, n_cols, mat_args, size, tab)
 
         # ... update identation to be inside the loop
-        # test functions and trial functions
-        if is_bilinear_form:
-            for i in range(0, 2*dim):
-                tab += ' '*4
-
-        # test functions
-        elif is_linear_form:
-            for i in range(0, dim):
-                tab += ' '*4
+        for i in range(0, size):
+            tab += ' '*4
 
         tab_base = tab
         # ...
 
         # ... initializing accumulation variables
-        lines = []
-        for i in range(0, test_n_components):
-            for j in range(0, trial_n_components):
-                line = 'v_{i}{j} = 0.0'.format(i=i,j=j)
-                line = tab + line
-
-                lines.append(line)
-
-        accum_init_str = '\n'.join(line for line in lines)
+        accum_init_str = print_accumulation_var_init(n_rows, n_cols, tab)
         # ...
 
         # .. update indentation
@@ -328,56 +317,19 @@ def compile_kernel(name, a,
         # ...
 
         # ... accumulation contributions
-        lines = []
-        for i in range(0, test_n_components):
-            for j in range(0, trial_n_components):
-                line = 'v_{i}{j} += ({__WEAK_FORM__}) * wvol'
-                e = _convert_int_to_float(expr[i,j].evalf())
-                # we call evalf to avoid having fortran doing the evaluation of rational
-                # division
-                line = line.format(i=i, j=j, __WEAK_FORM__=e)
-                line = tab + line
-
-                lines.append(line)
-
-        accum_str = '\n'.join(line for line in lines)
+        accum_str = print_accumulation_var(n_rows, n_cols, expr, tab)
         # ...
 
         # ... assign accumulated values to element matrix
-        if dim == 1:
-            if is_bilinear_form:
-                e_pattern = 'mat_{i}{j}[il_1, p1 + jl_1 - il_1] = v_{i}{j}'
+        if is_bilinear_form:
+            accum_assign_str = print_bilinear_accumulation_assign(n_rows,
+                                                                  n_cols, dim,
+                                                                  tab_base)
 
-            elif is_linear_form:
-                e_pattern = 'mat_{i}{j}[il_1] = v_{i}{j}'
-
-        elif dim == 2:
-            if is_bilinear_form:
-                e_pattern = 'mat_{i}{j}[il_1, il_2, p1 + jl_1 - il_1, p2 + jl_2 - il_2] = v_{i}{j}'
-
-            elif is_linear_form:
-                e_pattern = 'mat_{i}{j}[il_1, il_2] = v_{i}{j}'
-
-        elif dim ==3:
-            if is_bilinear_form:
-                e_pattern = 'mat_{i}{j}[il_1, il_2, il_3, p1 + jl_1 - il_1, p2 + jl_2 - il_2, p3 + jl_3 - il_3] = v_{i}{j}'
-
-            elif is_linear_form:
-                e_pattern = 'mat_{i}{j}[il_1, il_2, il_3] = v_{i}{j}'
-
-        else:
-            raise NotImplementedError('only 1d, 2d and 3d are available')
-
-        tab = tab_base
-        lines = []
-        for i in range(0, test_n_components):
-            for j in range(0, trial_n_components):
-                line = e_pattern.format(i=i,j=j)
-                line = tab + line
-
-                lines.append(line)
-
-        accum_assign_str = '\n'.join(line for line in lines)
+        elif is_linear_form:
+            accum_assign_str = print_linear_accumulation_assign(n_rows,
+                                                                n_cols, dim,
+                                                                tab_base)
         # ...
 
         code = template.format(__KERNEL_NAME__=name,

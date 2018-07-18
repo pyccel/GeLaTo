@@ -118,27 +118,6 @@ def test_kernel_bilinear_2d_scalar_4():
 # ...
 
 # ...
-def test_kernel_bilinear_2d_block_1():
-    print('============ test_kernel_bilinear_2d_block_1 =============')
-
-    V = H1Space('V', ldim=2, is_block=True, shape=2)
-    U = H1Space('U', ldim=2, is_block=True, shape=2)
-
-    v = VectorTestFunction(V, name='v')
-    u = VectorTestFunction(U, name='u')
-
-    expr = div(v) * div(u) + rot(v) * rot(u)
-
-    a = BilinearForm((v,u), expr)
-    print('> input      >>> {0}'.format(a))
-
-    # ...
-    kernel_py  = compile_kernel('kernel_bilinear_2d_block_1', a,
-                                backend='python', verbose=True)
-    # ...
-# ...
-
-# ...
 def test_kernel_linear_2d_scalar_1():
     print('============ test_kernel_linear_2d_scalar_1 =============')
 
@@ -155,6 +134,27 @@ def test_kernel_linear_2d_scalar_1():
 
     # ...
     kernel_py  = compile_kernel('kernel_linear_2d_scalar_1', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
+def test_kernel_bilinear_2d_block_1():
+    print('============ test_kernel_bilinear_2d_block_1 =============')
+
+    V = H1Space('V', ldim=2, is_block=True, shape=2)
+    U = H1Space('U', ldim=2, is_block=True, shape=2)
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(U, name='u')
+
+    expr = div(v) * div(u) + rot(v) * rot(u)
+
+    a = BilinearForm((v,u), expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_bilinear_2d_block_1', a,
                                 backend='python', verbose=True)
     # ...
 # ...
@@ -184,12 +184,13 @@ def test_kernel_linear_2d_block_1():
 
 # .....................................................
 if __name__ == '__main__':
-    test_kernel_bilinear_2d_scalar_1()
-    test_kernel_bilinear_2d_scalar_2()
-    test_kernel_bilinear_2d_scalar_3()
-    test_kernel_bilinear_2d_scalar_4()
+#    test_kernel_bilinear_2d_scalar_1()
+#    test_kernel_bilinear_2d_scalar_2()
+#    test_kernel_bilinear_2d_scalar_3()
+#    test_kernel_bilinear_2d_scalar_4()
+
+#    test_kernel_linear_2d_scalar_1()
 
     test_kernel_bilinear_2d_block_1()
 
-    test_kernel_linear_2d_scalar_1()
-    test_kernel_linear_2d_block_1()
+#    test_kernel_linear_2d_block_1()

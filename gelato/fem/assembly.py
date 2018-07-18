@@ -34,13 +34,23 @@ from .utils import write_code
 from .utils import arguments_datatypes_as_dict
 from .utils import arguments_datatypes_split
 
-from .kernel import compile_kernel
+from .matrix import construct_element_matrix_names
+from .matrix import print_element_matrix_args
+from .matrix import print_element_matrix_decs
+from .matrix import construct_global_matrix_names
+from .matrix import print_global_matrix_args
+from .matrix import print_global_matrix_decs
+from .matrix import print_global_matrix_update
 
-
+# NOTE: is_block, test_n_components, trial_n_components  will be provided after calling compile_kernel
 def compile_assembly(name, a, kernel_name=None,
                      verbose=False,
                      namespace=globals(),
                      context=None,
+                     is_block=False,
+                     is_vector=False,
+                     test_n_components=1,
+                     trial_n_components=1,
                      backend='python',
                      export_pyfile=True):
     """."""
@@ -100,20 +110,9 @@ def compile_assembly(name, a, kernel_name=None,
         fields_coeffs_str = ''
     # ...
 
-    # ... TODO is_block must be set inside compile_kernel?
-#    if is_block:
-#        pattern = 'block'
-#    elif is_vector:
-#        raise NotImplementedError('TODO.')
-#    else:
-#        pattern = 'scalar'
-    pattern = 'scalar'
-    # ...
-
     # ... get name of the template to be used
-    template_str = '_assembly_{form}_{dim}d_{pattern}'.format(dim=dim,
-                                                              pattern=pattern,
-                                                              form=form)
+    template_str = '_assembly_{form}_{dim}d'.format(dim=dim,
+                                                    form=form)
     # ...
 
     # ... import the variable from the templates module
@@ -132,11 +131,39 @@ def compile_assembly(name, a, kernel_name=None,
     # ...
 
     # ...
+    n_rows = test_n_components
+    n_cols = trial_n_components
+
+    element_mat_args = construct_element_matrix_names(n_rows, n_cols)
+    element_mat_args_str = print_element_matrix_args(n_rows, n_cols, element_mat_args)
+    element_mat_decs_str = print_element_matrix_decs(n_rows, n_cols, dim, element_mat_args, tab)
+
+    global_mat_args = construct_global_matrix_names(n_rows, n_cols)
+    global_mat_args_str = print_global_matrix_args(n_rows, n_cols, global_mat_args)
+    global_mat_decs_str = print_global_matrix_decs(n_rows, n_cols, global_mat_args, tab)
+    # ...
+
+    # ...
+    for i in range(0, dim):
+        tab += ' '*4
+
+    global_mat_update_str = print_global_matrix_update(n_rows, n_cols, dim,
+                                                       element_mat_args,
+                                                       global_mat_args,
+                                                       tab)
+    # ...
+
+    # ...
     code = template.format(__ASSEMBLY_NAME__=assembly_name,
                            __ARGS__=args,
                            __DOCSTRING__=docstring,
                            __FIELDS__=fields_str,
                            __FIELDS_COEFFS__=fields_coeffs_str,
+                           __GLOBAL_MAT_DEC__=global_mat_decs_str,
+                           __GLOBAL_MAT_ARGS__=global_mat_args_str,
+                           __ELEMENT_MAT_DEC__=element_mat_decs_str,
+                           __ELEMENT_MAT_ARGS__=element_mat_args_str,
+                           __GLOBAL_MAT_UPDATE__=global_mat_update_str,
                            __KERNEL_NAME__=kernel_name)
     # ...
 
