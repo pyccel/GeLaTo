@@ -47,7 +47,10 @@ from .space import TestFunction
 from .space import VectorTestFunction
 
 
-class LinearForm(Expr):
+class BasicForm(Expr):
+    pass
+
+class LinearForm(BasicForm):
     """
 
     Examples
@@ -130,7 +133,7 @@ class LinearForm(Expr):
         return LinearForm(test_functions, expr)
 
 
-class BilinearForm(Expr):
+class BilinearForm(BasicForm):
     """
 
     Examples
@@ -553,8 +556,8 @@ def matricize(expr):
 # ... TODO compute basis if not given
 def gelatize(a, basis=None, verbose=False):
 
-    if not isinstance(a, (BilinearForm, LinearForm, Add, Mul)):
-        raise TypeError('Expecting a BilinearForm, LinearForm, Add or Mul')
+    if not isinstance(a, (BasicForm, Add, Mul)):
+        raise TypeError('Expecting a BasicForm, Add or Mul')
 
     if isinstance(a, Add):
         args = [gelatize(i, basis=basis, verbose=verbose) for i in a.args]
