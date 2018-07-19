@@ -2,13 +2,18 @@
 
 from .utils import _convert_int_to_float
 
+def _element_matrix_name(i,j):
+    return 'mat_{i}{j}'.format(i=i,j=j)
+
+def _global_matrix_name(i,j):
+    return 'M_{i}{j}'.format(i=i,j=j)
 
 def construct_element_matrix_names(n_rows, n_cols):
     mat_args = []
     for i in range(0, n_rows):
         ls = []
         for j in range(0, n_cols):
-            mat = 'mat_{i}{j}'.format(i=i,j=j)
+            mat = _element_matrix_name(i,j)
             ls.append(mat)
         mat_args.append(ls)
 
@@ -144,7 +149,7 @@ def construct_global_matrix_names(n_rows, n_cols):
     for i in range(0, n_rows):
         ls = []
         for j in range(0, n_cols):
-            mat = 'M_{i}{j}'.format(i=i,j=j)
+            mat = _global_matrix_name(i,j)
             ls.append(mat)
         mat_args.append(ls)
 
@@ -159,7 +164,7 @@ def print_global_matrix_args(n_rows, n_cols, mat_args):
     return mat_args_str
 
 # TODO use spaces
-def print_global_matrix_decs(n_rows, n_cols, mat_args, tab):
+def print_global_matrix_decs(n_rows, n_cols, mat_args):
     pattern = 'StencilMatrix( test_space.vector_space, trial_space.vector_space )'
 
     lines = []
@@ -167,7 +172,6 @@ def print_global_matrix_decs(n_rows, n_cols, mat_args, tab):
         for j in range(0, n_cols):
             mat = mat_args[i][j]
             line = '{mat} = {pattern}'.format(mat=mat, pattern=pattern)
-            line = tab + line
             lines.append(line)
 
     decs = '\n'.join(i for i in lines)
@@ -212,3 +216,45 @@ def print_global_matrix_update(n_rows, n_cols, dim,
     decs = '\n'.join(i for i in lines)
     return decs
 
+def construct_argument_matrix_name(n_rows, n_cols):
+    if (n_rows == 1) and (n_cols == 1):
+        return _global_matrix_name(0,0)
+    else:
+        return 'd_matrix'
+
+def print_argument_matrix_kwargs(argument_mat):
+    return ', {}=None'.format(argument_mat)
+
+def print_import_stencil_matrix():
+    return 'from spl.linalg.stencil import StencilMatrix'
+
+_template_define_global_matrix = """
+if {__ARGUMENT_MAT__} is None:
+    {__IMPORT_STENCIL__}
+    {__DECS__}
+{__ELSE__}
+"""
+# TODO add comment to the generated code
+def print_define_global_matrix(n_rows, n_cols, global_mat_args, argument_mat, tab):
+    global_mat_decs_str = print_global_matrix_decs(n_rows, n_cols, global_mat_args)
+
+    pattern = _template_define_global_matrix
+
+    import_str = print_import_stencil_matrix()
+
+    # TODO in the case of block space
+    else_str = ''
+
+    code = pattern.format(__ARGUMENT_MAT__=argument_mat,
+                          __IMPORT_STENCIL__=import_str,
+                          __DECS__=global_mat_decs_str,
+                          __ELSE__=else_str)
+
+    lines = []
+    for line in code.split('\n'):
+        line = tab + line
+        lines.append(line)
+
+    code = '\n'.join(line for line in lines)
+
+    return code

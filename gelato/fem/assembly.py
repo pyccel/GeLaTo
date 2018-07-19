@@ -39,8 +39,10 @@ from .matrix import print_element_matrix_args
 from .matrix import print_element_matrix_decs
 from .matrix import construct_global_matrix_names
 from .matrix import print_global_matrix_args
-from .matrix import print_global_matrix_decs
 from .matrix import print_global_matrix_update
+from .matrix import construct_argument_matrix_name
+from .matrix import print_argument_matrix_kwargs
+from .matrix import print_define_global_matrix
 
 from .vector import construct_element_vector_names
 from .vector import print_element_vector_args
@@ -49,6 +51,9 @@ from .vector import construct_global_vector_names
 from .vector import print_global_vector_args
 from .vector import print_global_vector_decs
 from .vector import print_global_vector_update
+from .vector import construct_argument_vector_name
+from .vector import print_argument_vector_kwargs
+from .vector import print_define_global_vector
 
 # NOTE: test_n_components, trial_n_components  will be provided after calling compile_kernel
 def compile_assembly(name, a, kernel_name=None,
@@ -143,32 +148,41 @@ def compile_assembly(name, a, kernel_name=None,
     # ...
 
     # ...
-    element_mat_args = ''
-    element_mat_args_str = ''
-    element_mat_decs_str = ''
+    argument_mat = ''
+    argument_mat_kwargs = ''
 
     global_mat_args = ''
     global_mat_args_str = ''
     global_mat_decs_str = ''
     global_mat_update_str = ''
 
-    element_vec_args = ''
-    element_vec_args_str = ''
-    element_vec_decs_str = ''
+    element_mat_args = ''
+    element_mat_args_str = ''
+    element_mat_decs_str = ''
+
+    argument_vec = ''
+    argument_vec_kwargs = ''
 
     global_vec_args = ''
     global_vec_args_str = ''
     global_vec_decs_str = ''
     global_vec_update_str = ''
 
+    element_vec_args = ''
+    element_vec_args_str = ''
+    element_vec_decs_str = ''
+
     if is_bilinear_form:
-        element_mat_args = construct_element_matrix_names(n_rows, n_cols)
-        element_mat_args_str = print_element_matrix_args(n_rows, n_cols, element_mat_args)
-        element_mat_decs_str = print_element_matrix_decs(n_rows, n_cols, dim, element_mat_args, tab)
+        argument_mat = construct_argument_matrix_name(n_rows, n_cols)
+        argument_mat_kwargs = print_argument_matrix_kwargs(argument_mat)
 
         global_mat_args = construct_global_matrix_names(n_rows, n_cols)
         global_mat_args_str = print_global_matrix_args(n_rows, n_cols, global_mat_args)
-        global_mat_decs_str = print_global_matrix_decs(n_rows, n_cols, global_mat_args, tab)
+        global_mat_decs_str = print_define_global_matrix(n_rows, n_cols, global_mat_args, argument_mat, tab)
+
+        element_mat_args = construct_element_matrix_names(n_rows, n_cols)
+        element_mat_args_str = print_element_matrix_args(n_rows, n_cols, element_mat_args)
+        element_mat_decs_str = print_element_matrix_decs(n_rows, n_cols, dim, element_mat_args, tab)
 
         # ...
         for i in range(0, dim):
@@ -181,13 +195,16 @@ def compile_assembly(name, a, kernel_name=None,
         # ...
 
     elif is_linear_form:
-        element_vec_args = construct_element_vector_names(n_rows)
-        element_vec_args_str = print_element_vector_args(n_rows, element_vec_args)
-        element_vec_decs_str = print_element_vector_decs(n_rows, dim, element_vec_args, tab)
+        argument_vec = construct_argument_vector_name(n_rows)
+        argument_vec_kwargs = print_argument_vector_kwargs(argument_vec)
 
         global_vec_args = construct_global_vector_names(n_rows)
         global_vec_args_str = print_global_vector_args(n_rows, global_vec_args)
-        global_vec_decs_str = print_global_vector_decs(n_rows, global_vec_args, tab)
+        global_vec_decs_str = print_define_global_vector(n_rows, global_vec_args, argument_vec, tab)
+
+        element_vec_args = construct_element_vector_names(n_rows)
+        element_vec_args_str = print_element_vector_args(n_rows, element_vec_args)
+        element_vec_decs_str = print_element_vector_decs(n_rows, dim, element_vec_args, tab)
 
         # ...
         for i in range(0, dim):
@@ -206,11 +223,13 @@ def compile_assembly(name, a, kernel_name=None,
                            __DOCSTRING__=docstring,
                            __FIELDS__=fields_str,
                            __FIELDS_COEFFS__=fields_coeffs_str,
+                           __ARGUMENT_MAT_KWARGS__=argument_mat_kwargs,
                            __GLOBAL_MAT_DEC__=global_mat_decs_str,
                            __GLOBAL_MAT_ARGS__=global_mat_args_str,
                            __ELEMENT_MAT_DEC__=element_mat_decs_str,
                            __ELEMENT_MAT_ARGS__=element_mat_args_str,
                            __GLOBAL_MAT_UPDATE__=global_mat_update_str,
+                           __ARGUMENT_VEC_KWARGS__=argument_vec_kwargs,
                            __GLOBAL_VEC_DEC__=global_vec_decs_str,
                            __GLOBAL_VEC_ARGS__=global_vec_args_str,
                            __ELEMENT_VEC_DEC__=element_vec_decs_str,
@@ -222,6 +241,7 @@ def compile_assembly(name, a, kernel_name=None,
 #    print('--------------')
 #    print(code)
 #    print('--------------')
+#    import sys; sys.exit(0)
 
     # ...
     if context:

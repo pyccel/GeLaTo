@@ -2,11 +2,16 @@
 
 from .utils import _convert_int_to_float
 
+def _element_vector_name(i):
+    return 'vec_{i}'.format(i=i)
+
+def _global_vector_name(i):
+    return 'rhs_{i}'.format(i=i)
 
 def construct_element_vector_names(n_rows):
     vec_args = []
     for i in range(0, n_rows):
-        vec = 'vec_{i}'.format(i=i)
+        vec = _element_vector_name(i)
         vec_args.append(vec)
 
     return vec_args
@@ -33,7 +38,7 @@ def print_element_vector_init(n_rows, vec_args, size, tab):
 def print_accumulation_var_init(n_rows, tab):
     lines = []
     for i in range(0, n_rows):
-        line = 'v_{i} = 0.0'.format(i=i,)
+        line = 'v_{i} = 0.0'.format(i=i)
         line = tab + line
 
         lines.append(line)
@@ -129,7 +134,7 @@ def print_element_vector_decs(n_rows, dim, vec_args, tab):
 def construct_global_vector_names(n_rows):
     vec_args = []
     for i in range(0, n_rows):
-        vec = 'rhs_{i}'.format(i=i)
+        vec = _global_vector_name(i)
         vec_args.append(vec)
 
     return vec_args
@@ -186,3 +191,46 @@ def print_global_vector_update(n_rows, dim,
     decs = '\n'.join(i for i in lines)
     return decs
 
+def construct_argument_vector_name(n_rows):
+    if (n_rows == 1):
+        return _global_vector_name(0)
+    else:
+        return 'd_vector'
+
+def print_argument_vector_kwargs(argument_mat):
+    return ', {}=None'.format(argument_mat)
+
+def print_import_stencil_vector():
+    return 'from spl.linalg.stencil import StencilVector'
+
+_template_define_global_vector = """
+if {__ARGUMENT_MAT__} is None:
+    {__IMPORT_STENCIL__}
+    {__DECS__}
+{__ELSE__}
+"""
+# TODO add comment to the generated code
+def print_define_global_vector(n_rows, global_vec_args, argument_mat, tab):
+    global_vec_decs_str = print_global_vector_decs(n_rows,
+                                                   global_vec_args, tab='')
+
+    pattern = _template_define_global_vector
+
+    import_str = print_import_stencil_vector()
+
+    # TODO in the case of block space
+    else_str = ''
+
+    code = pattern.format(__ARGUMENT_MAT__=argument_mat,
+                          __IMPORT_STENCIL__=import_str,
+                          __DECS__=global_vec_decs_str,
+                          __ELSE__=else_str)
+
+    lines = []
+    for line in code.split('\n'):
+        line = tab + line
+        lines.append(line)
+
+    code = '\n'.join(line for line in lines)
+
+    return code

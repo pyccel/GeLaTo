@@ -287,4 +287,4 @@ if __name__ == '__main__':
     test_pde_2d_scalar_3()
     test_pde_2d_scalar_4()
 
-    test_pde_2d_block_1()
+#    test_pde_2d_block_1()

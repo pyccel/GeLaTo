@@ -4,7 +4,7 @@
 #          ASSEMBLY OF BILINEAR FORM 1D case
 # .............................................
 _assembly_bilinear_1d = """
-def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__} ):
+def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__}{__ARGUMENT_MAT_KWARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1] = test_space.vector_space.starts
@@ -23,8 +23,6 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__} ):
     test_basis_1   = test_space.quad_basis
     trial_basis_1  = trial_space.quad_basis
 
-    # Create global matrices
-    from spl.linalg.stencil import StencilMatrix
 {__GLOBAL_MAT_DEC__}
 
     # Create element matrices
@@ -60,7 +58,7 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__} ):
 #          ASSEMBLY OF BILINEAR FORM 2D case
 # .............................................
 _assembly_bilinear_2d = """
-def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__} ):
+def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__}{__ARGUMENT_MAT_KWARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1, s2] = test_space.vector_space.starts
@@ -79,8 +77,6 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__} ):
     [test_basis_1, test_basis_2] = [W.quad_basis for W in test_space.spaces]
     [trial_basis_1, trial_basis_2] = [W.quad_basis for W in trial_space.spaces]
 
-    # Create global matrices
-    from spl.linalg.stencil import StencilMatrix
 {__GLOBAL_MAT_DEC__}
 
     # Create element matrices
@@ -124,7 +120,7 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__} ):
 #          ASSEMBLY OF BILINEAR FORM 3D case
 # .............................................
 _assembly_bilinear_3d = """
-def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__} ):
+def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__}{__ARGUMENT_MAT_KWARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1, s2, s3] = test_space.vector_space.starts
@@ -143,9 +139,6 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__} ):
     [test_basis_1, test_basis_2, test_basis_3] = [W.quad_basis for W in test_space.spaces]
     [trial_basis_1, trial_basis_2, trial_basis_3] = [W.quad_basis for W in trial_space.spaces]
 
-    # Create global matrices
-    from spl.linalg.stencil import StencilMatrix
-    M = StencilMatrix( test_space.vector_space, trial_space.vector_space )
 {__GLOBAL_MAT_DEC__}
 
     # Create element matrices
@@ -195,7 +188,7 @@ def {__ASSEMBLY_NAME__}( self, test_space, trial_space{__ARGS__}{__FIELDS__} ):
 #          ASSEMBLY OF LINEAR FORM 1D case
 # .............................................
 _assembly_linear_1d = """
-def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
+def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_VEC_KWARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1] = test_space.vector_space.starts
@@ -212,8 +205,6 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
 
     test_basis_1   = test_space.quad_basis
 
-    # Create global matrices
-    from spl.linalg.stencil import StencilVector
 {__GLOBAL_VEC_DEC__}
 
     # Create element matrices
@@ -247,7 +238,7 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
 #          ASSEMBLY OF LINEAR FORM 2D case
 # .............................................
 _assembly_linear_2d = """
-def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
+def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_VEC_KWARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1, s2] = test_space.vector_space.starts
@@ -264,8 +255,6 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
 
     [test_basis_1, test_basis_2] = [W.quad_basis for W in test_space.spaces]
 
-    # Create global matrices
-    from spl.linalg.stencil import StencilVector
 {__GLOBAL_VEC_DEC__}
 
     # Create element matrices
@@ -305,7 +294,7 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
 #          ASSEMBLY OF LINEAR FORM 3D case
 # .............................................
 _assembly_linear_3d = """
-def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
+def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_VEC_KWARGS__} ):
     {__DOCSTRING__}
     # Sizes
     [s1, s2, s3] = test_space.vector_space.starts
@@ -322,8 +311,6 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__} ):
 
     [test_basis_1, test_basis_2, test_basis_3] = [W.quad_basis for W in test_space.spaces]
 
-    # Create global matrices
-    from spl.linalg.stencil import StencilVector
 {__GLOBAL_VEC_DEC__}
 
     # Create element matrices

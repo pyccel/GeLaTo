@@ -171,4 +171,4 @@ if __name__ == '__main__':
 
     test_assembly_linear_2d_scalar_1()
 
-    test_assembly_bilinear_2d_block_1()
+#    test_assembly_bilinear_2d_block_1()
