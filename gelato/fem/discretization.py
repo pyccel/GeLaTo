@@ -126,6 +126,8 @@ def discretize(a, spaces,
 
     # ...
     assembly = compile_assembly(assembly_name, a, kernel_name,
+                                test_n_components=a.n_rows,
+                                trial_n_components=a.n_cols,
                                 verbose=verbose,
                                 namespace=namespace,
                                 context=context,

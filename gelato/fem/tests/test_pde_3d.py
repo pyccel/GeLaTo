@@ -241,9 +241,61 @@ def test_pde_3d_scalar_4():
     # ...
 # ...
 
+# ...
+def test_pde_3d_block_1():
+    print('============ test_pde_3d_block_1 =============')
+
+    # ... abstract model
+    V = H1Space('V', ldim=3, is_block=True, shape=3)
+    U = H1Space('U', ldim=3, is_block=True, shape=3)
+
+    x,y,z = V.coordinates
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(U, name='u')
+
+    a = BilinearForm((v,u), div(u) * div(v) + 0.2 * dot(u, v))
+#    b = LinearForm(v, x*(1.-x)*y*(1.-y)*z*v)
+
+    print('> input bilinear-form  >>> {0}'.format(a))
+#    print('> input linear-form    >>> {0}'.format(b))
+    # ...
+
+    # ... discretization
+    # Input data: degree, number of elements
+    p1  = 2 ; p2  = 2 ; p3  = 2
+    ne1 = 2 ; ne2 = 2 ; ne3 = 2
+
+    # Create uniform grid
+    grid_1 = linspace( 0., 1., num=ne1+1 )
+    grid_2 = linspace( 0., 1., num=ne2+1 )
+    grid_3 = linspace( 0., 1., num=ne3+1 )
+
+    # Create 1D finite element spaces and precompute quadrature data
+    V1 = SplineSpace( p1, grid=grid_1 ); V1.init_fem()
+    V2 = SplineSpace( p2, grid=grid_2 ); V2.init_fem()
+    V3 = SplineSpace( p3, grid=grid_3 ); V3.init_fem()
+
+    # Create 3D tensor product finite element space
+    V = TensorFemSpace( V1, V2, V3 )
+    # ...
+
+    # ...
+    discretize( a, [V, V] )
+#    discretize( b, V )
+    # ...
+
+    # ...
+    M   = a.assemble()
+#    rhs = b.assemble()
+    # ...
+# ...
+
 # .....................................................
 if __name__ == '__main__':
-    test_pde_3d_scalar_1()
-    test_pde_3d_scalar_2()
-    test_pde_3d_scalar_3()
-    test_pde_3d_scalar_4()
+#    test_pde_3d_scalar_1()
+#    test_pde_3d_scalar_2()
+#    test_pde_3d_scalar_3()
+#    test_pde_3d_scalar_4()
+
+    test_pde_3d_block_1()

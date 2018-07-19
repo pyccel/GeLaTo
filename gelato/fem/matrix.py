@@ -68,13 +68,13 @@ def print_accumulation_var(n_rows, n_cols, expr, tab):
 
 def print_bilinear_accumulation_assign(n_rows, n_cols, dim, tab):
     if dim == 1:
-        e_pattern = 'mat_{i}{j}[il_1, p1 + jl_1 - il_1] = v_{i}{j}'
+        e_pattern = 'mat_{i}{j}[il_1, test_p1 + jl_1 - il_1] = v_{i}{j}'
 
     elif dim == 2:
-        e_pattern = 'mat_{i}{j}[il_1, il_2, p1 + jl_1 - il_1, p2 + jl_2 - il_2] = v_{i}{j}'
+        e_pattern = 'mat_{i}{j}[il_1, il_2, test_p1 + jl_1 - il_1, test_p2 + jl_2 - il_2] = v_{i}{j}'
 
     elif dim ==3:
-        e_pattern = 'mat_{i}{j}[il_1, il_2, il_3, p1 + jl_1 - il_1, p2 + jl_2 - il_2, p3 + jl_3 - il_3] = v_{i}{j}'
+        e_pattern = 'mat_{i}{j}[il_1, il_2, il_3, test_p1 + jl_1 - il_1, test_p2 + jl_2 - il_2, test_p3 + jl_3 - il_3] = v_{i}{j}'
 
     else:
         raise NotImplementedError('only 1d, 2d and 3d are available')
