@@ -161,14 +161,42 @@ def test_assembly_bilinear_2d_block_1():
     # ...
 # ...
 
+# ...
+def test_assembly_linear_2d_block_1():
+    print('============ test_assembly_linear_2d_block_1 =============')
+
+    V = H1Space('V', ldim=2, is_block=True, shape=2)
+
+    v = VectorTestFunction(V, name='v')
+
+    x,y = V.coordinates
+
+    b = Tuple(2, 3)
+    expr = v[0] + v[1] #dot(v, b)
+
+    a = LinearForm(v, expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    assembly_py  = compile_assembly('assembly_linear_2d_block_1', a,
+                                    test_n_components=2,
+                                    backend='python', verbose=True)
+    # ...
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
+    # ... scalar case
     test_assembly_bilinear_2d_scalar_1()
     test_assembly_bilinear_2d_scalar_2()
     test_assembly_bilinear_2d_scalar_3()
     test_assembly_bilinear_2d_scalar_4()
 
     test_assembly_linear_2d_scalar_1()
+    # ...
 
+    # ... block case
     test_assembly_bilinear_2d_block_1()
+    test_assembly_linear_2d_block_1()
+    # ...

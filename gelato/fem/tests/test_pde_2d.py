@@ -242,14 +242,16 @@ def test_pde_2d_block_1():
     V = H1Space('V', ldim=2, is_block=True, shape=2)
     U = H1Space('U', ldim=2, is_block=True, shape=2)
 
+    x,y = V.coordinates
+
     v = VectorTestFunction(V, name='v')
     u = VectorTestFunction(U, name='u')
 
     a = BilinearForm((v,u), div(v) * div(u) + rot(v) * rot(u))
-#    b = LinearForm(v, x*(1.-x)*y*(1.-y)*v)
+    b = LinearForm(v, x*(1.-y)*v[0] + (1.-x)*y*v[1])
 
     print('> input bilinear-form  >>> {0}'.format(a))
-#    print('> input linear-form    >>> {0}'.format(b))
+    print('> input linear-form    >>> {0}'.format(b))
     # ...
 
     # ... discretization
@@ -271,20 +273,24 @@ def test_pde_2d_block_1():
 
     # ...
     discretize( a, [V, V] )
-#    discretize( b, V )
+    discretize( b, V )
     # ...
 
     # ...
     M   = a.assemble()
-#    rhs = b.assemble()
+    rhs = b.assemble()
     # ...
 # ...
 
 # .....................................................
 if __name__ == '__main__':
+    # ... scalar case
     test_pde_2d_scalar_1()
     test_pde_2d_scalar_2()
     test_pde_2d_scalar_3()
     test_pde_2d_scalar_4()
+    # ...
 
+    # ... block case
     test_pde_2d_block_1()
+    # ...

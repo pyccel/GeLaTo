@@ -138,9 +138,11 @@ def test_assembly_linear_1d_scalar_1():
 
 # .....................................................
 if __name__ == '__main__':
+    # ... scalar case
     test_assembly_bilinear_1d_scalar_1()
     test_assembly_bilinear_1d_scalar_2()
     test_assembly_bilinear_1d_scalar_3()
     test_assembly_bilinear_1d_scalar_4()
 
     test_assembly_linear_1d_scalar_1()
+    # ...

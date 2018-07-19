@@ -182,12 +182,17 @@ def test_kernel_linear_3d_block_1():
 
 # .....................................................
 if __name__ == '__main__':
+    # ... scalar case
     test_kernel_bilinear_3d_scalar_1()
     test_kernel_bilinear_3d_scalar_2()
     test_kernel_bilinear_3d_scalar_3()
     test_kernel_bilinear_3d_scalar_4()
 
+    test_kernel_linear_3d_scalar_1()
+    # ...
+
+    # ... block case
     test_kernel_bilinear_3d_block_1()
 
-    test_kernel_linear_3d_scalar_1()
     test_kernel_linear_3d_block_1()
+    # ...

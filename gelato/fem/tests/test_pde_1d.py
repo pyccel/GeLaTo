@@ -229,7 +229,9 @@ def test_pde_1d_scalar_4():
 
 # .....................................................
 if __name__ == '__main__':
+    # ... scalar case
     test_pde_1d_scalar_1()
     test_pde_1d_scalar_2()
     test_pde_1d_scalar_3()
     test_pde_1d_scalar_4()
+    # ...

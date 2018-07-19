@@ -138,12 +138,65 @@ def test_assembly_linear_3d_scalar_1():
     # ...
 # ...
 
+# ...
+def test_assembly_bilinear_3d_block_1():
+    print('============ test_assembly_bilinear_3d_block_1 =============')
+
+    V = H1Space('V', ldim=3, is_block=True, shape=3)
+    U = H1Space('U', ldim=3, is_block=True, shape=3)
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(U, name='u')
+
+    expr = div(u) * div(v) + 0.2 * dot(u, v)
+
+    a = BilinearForm((v,u), expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    assembly_py  = compile_assembly('assembly_bilinear_3d_block_1', a,
+                                    test_n_components=3,
+                                    trial_n_components=3,
+                                    backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
+def test_assembly_linear_3d_block_1():
+    print('============ test_assembly_linear_3d_block_1 =============')
+
+    V = H1Space('V', ldim=3, is_block=True, shape=3)
+
+    v = VectorTestFunction(V, name='v')
+
+    x,y,z = V.coordinates
+
+    b = Tuple(2, 3, 5)
+    expr = v[0] - v[1] + v[2] #dot(v, b)
+
+    a = LinearForm(v, expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    assembly_py  = compile_assembly('assembly_linear_3d_block_1', a,
+                                    test_n_components=3,
+                                    backend='python', verbose=True)
+    # ...
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
+    # ... scalar case
     test_assembly_bilinear_3d_scalar_1()
     test_assembly_bilinear_3d_scalar_2()
     test_assembly_bilinear_3d_scalar_3()
     test_assembly_bilinear_3d_scalar_4()
 
     test_assembly_linear_3d_scalar_1()
+    # ...
+
+    # ... block case
+    test_assembly_bilinear_3d_block_1()
+    test_assembly_linear_3d_block_1()
+    # ...
