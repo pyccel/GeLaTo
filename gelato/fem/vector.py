@@ -144,14 +144,13 @@ def print_global_vector_args(n_rows, vec_args):
     return vec_args_str
 
 # TODO use spaces
-def print_global_vector_decs(n_rows, vec_args, tab):
+def print_global_vector_decs(n_rows, vec_args):
     pattern = 'StencilVector( test_space.vector_space )'
 
     lines = []
     for i in range(0, n_rows):
         vec = vec_args[i]
         line = '{vec} = {pattern}'.format(vec=vec, pattern=pattern)
-        line = tab + line
         lines.append(line)
 
     decs = '\n'.join(i for i in lines)
@@ -203,27 +202,85 @@ def print_argument_vector_kwargs(argument_mat):
 def print_import_stencil_vector():
     return 'from spl.linalg.stencil import StencilVector'
 
+def print_set_dict_vector(n_rows, argument_vec, vec_args):
+    if n_rows == 1:
+        return ''
+
+    lines = [argument_vec + ' = {}']
+    for i in range(0, n_rows):
+        M = _global_vector_name(i)
+        line = '{d}[{i}] = {M}'.format(d=argument_vec, i=i, M=M)
+        lines.append(line)
+
+    return '\n'.join(i for i in lines)
+
+def print_get_dict_vector(n_rows, argument_vec, vec_args):
+    if n_rows == 1:
+        return ''
+
+    lines = []
+    for i in range(0, n_rows):
+        M = _global_vector_name(i)
+        line = '{M} = {d}[{i}]'.format(d=argument_vec, i=i, M=M)
+        lines.append(line)
+
+    return '\n'.join(i for i in lines)
+
 _template_define_global_vector = """
-if {__ARGUMENT_MAT__} is None:
-    {__IMPORT_STENCIL__}
-    {__DECS__}
+if {__ARGUMENT_VEC__} is None:
+{__IMPORT_STENCIL__}
+{__DECS__}
+{__SET_DICT__}
 {__ELSE__}
+{__GET_DICT__}
 """
 # TODO add comment to the generated code
-def print_define_global_vector(n_rows, global_vec_args, argument_mat, tab):
-    global_vec_decs_str = print_global_vector_decs(n_rows,
-                                                   global_vec_args, tab='')
+def print_define_global_vector(n_rows, global_vec_args, argument_vec, tab):
+    # ...
+    def _indent_block(txt):
+        indent = ' '*4
+
+        lines = []
+        for line in txt.split('\n'):
+            line = indent + line
+            lines.append(line)
+
+        return '\n'.join(line for line in lines)
+    # ...
+
+    # ...
+    global_vec_decs_str = print_global_vector_decs(n_rows, global_vec_args)
+    global_vec_decs_str = _indent_block( global_vec_decs_str )
+    # ...
+
+    # ...
+    import_str = print_import_stencil_vector()
+    import_str = _indent_block( import_str )
+    # ...
+
+    # ...
+    set_dict_str = print_set_dict_vector(n_rows, argument_vec, global_vec_args)
+    set_dict_str = _indent_block( set_dict_str )
+    # ...
+
+    # ...
+    get_dict_str = print_get_dict_vector(n_rows, argument_vec, global_vec_args)
+    get_dict_str = _indent_block( get_dict_str )
+    # ...
+
+    # ...
+    if n_rows == 1:
+        else_str = ''
+    else:
+        else_str = 'else:'
+    # ...
 
     pattern = _template_define_global_vector
-
-    import_str = print_import_stencil_vector()
-
-    # TODO in the case of block space
-    else_str = ''
-
-    code = pattern.format(__ARGUMENT_MAT__=argument_mat,
+    code = pattern.format(__ARGUMENT_VEC__=argument_vec,
                           __IMPORT_STENCIL__=import_str,
                           __DECS__=global_vec_decs_str,
+                          __SET_DICT__=set_dict_str,
+                          __GET_DICT__=get_dict_str,
                           __ELSE__=else_str)
 
     lines = []

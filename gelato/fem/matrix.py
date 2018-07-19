@@ -228,26 +228,88 @@ def print_argument_matrix_kwargs(argument_mat):
 def print_import_stencil_matrix():
     return 'from spl.linalg.stencil import StencilMatrix'
 
+def print_set_dict_matrix(n_rows, n_cols, argument_mat, mat_args):
+    if (n_rows == 1) and (n_cols == 1):
+        return ''
+
+    lines = [argument_mat + ' = {}']
+    for i in range(0, n_rows):
+        for j in range(0, n_cols):
+            M = _global_matrix_name(i,j)
+            line = '{d}[{i},{j}] = {M}'.format(d=argument_mat, i=i, j=j, M=M)
+            lines.append(line)
+
+    return '\n'.join(i for i in lines)
+
+def print_get_dict_matrix(n_rows, n_cols, argument_mat, mat_args):
+    if (n_rows == 1) and (n_cols == 1):
+        return ''
+
+    lines = []
+    for i in range(0, n_rows):
+        for j in range(0, n_cols):
+            M = _global_matrix_name(i,j)
+            line = '{M} = {d}[{i},{j}]'.format(d=argument_mat, i=i, j=j, M=M)
+            lines.append(line)
+
+    return '\n'.join(i for i in lines)
+
+
 _template_define_global_matrix = """
 if {__ARGUMENT_MAT__} is None:
-    {__IMPORT_STENCIL__}
-    {__DECS__}
+{__IMPORT_STENCIL__}
+{__DECS__}
+{__SET_DICT__}
 {__ELSE__}
+{__GET_DICT__}
 """
 # TODO add comment to the generated code
 def print_define_global_matrix(n_rows, n_cols, global_mat_args, argument_mat, tab):
+    # ...
+    def _indent_block(txt):
+        indent = ' '*4
+
+        lines = []
+        for line in txt.split('\n'):
+            line = indent + line
+            lines.append(line)
+
+        return '\n'.join(line for line in lines)
+    # ...
+
+    # ...
     global_mat_decs_str = print_global_matrix_decs(n_rows, n_cols, global_mat_args)
+    global_mat_decs_str = _indent_block( global_mat_decs_str )
+    # ...
+
+    # ...
+    import_str = print_import_stencil_matrix()
+    import_str = _indent_block( import_str )
+    # ...
+
+    # ...
+    set_dict_str = print_set_dict_matrix(n_rows, n_cols, argument_mat, global_mat_args)
+    set_dict_str = _indent_block( set_dict_str )
+    # ...
+
+    # ...
+    get_dict_str = print_get_dict_matrix(n_rows, n_cols, argument_mat, global_mat_args)
+    get_dict_str = _indent_block( get_dict_str )
+    # ...
+
+    # ...
+    if (n_rows == 1) and (n_cols == 1):
+        else_str = ''
+    else:
+        else_str = 'else:'
+    # ...
 
     pattern = _template_define_global_matrix
-
-    import_str = print_import_stencil_matrix()
-
-    # TODO in the case of block space
-    else_str = ''
-
     code = pattern.format(__ARGUMENT_MAT__=argument_mat,
                           __IMPORT_STENCIL__=import_str,
                           __DECS__=global_mat_decs_str,
+                          __SET_DICT__=set_dict_str,
+                          __GET_DICT__=get_dict_str,
                           __ELSE__=else_str)
 
     lines = []
