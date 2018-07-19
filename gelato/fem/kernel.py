@@ -101,8 +101,8 @@ def compile_kernel(name, a,
         print('> gelatized  >>> {0}'.format(expr))
 
     is_block = isinstance(expr, Matrix)
-    test_n_components = None
-    trial_n_components = None
+    test_n_components = 1
+    trial_n_components = 1
     if is_block:
         if is_bilinear_form:
             test_n_components = expr.shape[0]
