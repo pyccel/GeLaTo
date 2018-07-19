@@ -1,8 +1,25 @@
 # coding: utf-8
 
+from spl.linalg.stencil import StencilVector, StencilMatrix
 
-def apply_homogeneous_dirichlet_bc_2d(V, matrix=None, rhs=None):
-    """ Apply homogeneous dirichlet boundary conditions """
+def apply_homogeneous_dirichlet_bc_1d(V, *args):
+    """ Apply homogeneous dirichlet boundary conditions in 1D """
+
+    # assumes a 1D spline space
+    # add asserts on the space if it is periodic
+
+    for a in args:
+        if isinstance(a, StencilVector):
+            a[0] = 0.
+            a[V.nbasis-1] = 0.
+        elif isinstance(a, StencilMatrix):
+            a[ 0,:] = 0.
+            a[-1,:] = 0.
+        else:
+            TypeError('> Expecting StencilVector or StencilMatrix')
+
+def apply_homogeneous_dirichlet_bc_2d(V, *args):
+    """ Apply homogeneous dirichlet boundary conditions in 2D """
 
     # assumes a 2D Tensor space
     # add asserts on the space if it is periodic
@@ -12,44 +29,133 @@ def apply_homogeneous_dirichlet_bc_2d(V, matrix=None, rhs=None):
     s1, s2 = V.vector_space.starts
     e1, e2 = V.vector_space.ends
 
-    if not V1.periodic:
-        # left  bc at x=0.
-        if s1 == 0:
-            matrix[0,:,:,:] = 0.
-            rhs[0,:] = 0.
-        # right bc at x=1.
-        if e1 == V1.nbasis-1:
-            matrix[e1,:,:,:] = 0.
-            rhs [e1,:]     = 0.
+    for a in args:
+        if not V1.periodic:
+            if isinstance(a, StencilVector):
+                # left  bc at x=0.
+                if s1 == 0:
+                    a[0,:] = 0.
 
-    if not V2.periodic:
-        # lower bc at y=0.
-        if s2 == 0:
-            matrix[:,0,:,:] = 0.
-            rhs [:,0]     = 0.
-        # upper bc at y=1.
-        if e2 == V2.nbasis-1:
-            matrix[:,e2,:,:] = 0.
-            rhs [:,e2] = 0.
+                # right bc at x=1.
+                if e1 == V1.nbasis-1:
+                    a [e1,:] = 0.
 
-    outputs = []
-    if matrix:
-        outputs.append(matrix)
-    if rhs:
-        outputs.append(rhs)
+            elif isinstance(a, StencilMatrix):
+                # left  bc at x=0.
+                if s1 == 0:
+                    a[0,:,:,:] = 0.
 
-    if len(outputs) == 1:
-        return outputs[0]
+                # right bc at x=1.
+                if e1 == V1.nbasis-1:
+                    a[e1,:,:,:] = 0.
 
-    else:
-        return outputs
+            else:
+                TypeError('> Expecting StencilVector or StencilMatrix')
 
-def apply_homogeneous_dirichlet_bc(V, matrix=None, rhs=None):
+        if not V2.periodic:
+            if isinstance(a, StencilVector):
+                # lower bc at y=0.
+                if s2 == 0:
+                    a [:,0] = 0.
+
+                # upper bc at y=1.
+                if e2 == V2.nbasis-1:
+                    a [:,e2] = 0.
+
+            elif isinstance(a, StencilMatrix):
+                # lower bc at y=0.
+                if s2 == 0:
+                    a[:,0,:,:] = 0.
+                # upper bc at y=1.
+                if e2 == V2.nbasis-1:
+                    a[:,e2,:,:] = 0.
+
+            else:
+                TypeError('> Expecting StencilVector or StencilMatrix')
+
+def apply_homogeneous_dirichlet_bc_3d(V, *args):
+    """ Apply homogeneous dirichlet boundary conditions in 3D """
+
+    # assumes a 3D Tensor space
+    # add asserts on the space if it is periodic
+
+    V1,V2,V3 = V.spaces
+
+    s1, s2, s3 = V.vector_space.starts
+    e1, e2, e3 = V.vector_space.ends
+
+    for a in args:
+        if not V1.periodic:
+            if isinstance(a, StencilVector):
+                # left  bc at x=0.
+                if s1 == 0:
+                    a[0,:,:] = 0.
+
+                # right bc at x=1.
+                if e1 == V1.nbasis-1:
+                    a [e1,:,:] = 0.
+
+            elif isinstance(a, StencilMatrix):
+                # left  bc at x=0.
+                if s1 == 0:
+                    a[0,:,:,:,:,:] = 0.
+
+                # right bc at x=1.
+                if e1 == V1.nbasis-1:
+                    a[e1,:,:,:,:,:] = 0.
+
+            else:
+                TypeError('> Expecting StencilVector or StencilMatrix')
+
+        if not V2.periodic:
+            if isinstance(a, StencilVector):
+                # lower bc at y=0.
+                if s2 == 0:
+                    a [:,0,:] = 0.
+
+                # upper bc at y=1.
+                if e2 == V2.nbasis-1:
+                    a [:,e2,:] = 0.
+
+            elif isinstance(a, StencilMatrix):
+                # lower bc at y=0.
+                if s2 == 0:
+                    a[:,0,:,:,:,:] = 0.
+                # upper bc at y=1.
+                if e2 == V2.nbasis-1:
+                    a[:,e2,:,:,:,:] = 0.
+
+            else:
+                TypeError('> Expecting StencilVector or StencilMatrix')
+
+        if not V3.periodic:
+            if isinstance(a, StencilVector):
+                # lower bc at z=0.
+                if s3 == 0:
+                    a [:,:,0] = 0.
+
+                # upper bc at z=1.
+                if e3 == V3.nbasis-1:
+                    a [:,:,e3] = 0.
+
+            elif isinstance(a, StencilMatrix):
+                # lower bc at z=0.
+                if s3 == 0:
+                    a[:,:,0,:,:,:] = 0.
+                # upper bc at z=1.
+                if e3 == V3.nbasis-1:
+                    a[:,:,e3,:,:,:] = 0.
+
+            else:
+                TypeError('> Expecting StencilVector or StencilMatrix')
+
+
+def apply_homogeneous_dirichlet_bc(V, *args):
     if V.ldim == 1:
-        raise NotImplementedError('')
+        apply_homogeneous_dirichlet_bc_1d(V, *args)
 
     elif V.ldim == 2:
-        return apply_homogeneous_dirichlet_bc_2d(V, matrix=matrix, rhs=rhs)
+        apply_homogeneous_dirichlet_bc_2d(V, *args)
 
     elif V.ldim == 3:
-        raise NotImplementedError('')
+        apply_homogeneous_dirichlet_bc_3d(V, *args)
