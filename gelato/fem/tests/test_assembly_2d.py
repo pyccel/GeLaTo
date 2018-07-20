@@ -15,7 +15,7 @@ from gelato.core import grad, dot, inner, cross, rot, curl, div
 from gelato.core import H1Space
 from gelato.core import TestFunction
 from gelato.core import VectorTestFunction
-from gelato.core import BilinearForm, LinearForm
+from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import atomize, normalize
 from gelato.core import gelatize
 
@@ -139,6 +139,27 @@ def test_assembly_linear_2d_scalar_1():
 # ...
 
 # ...
+def test_assembly_function_2d_scalar_1():
+    print('============ test_assembly_function_2d_scalar_1 =============')
+
+    V = H1Space('V', ldim=2)
+
+    F = Field('F', space=V)
+
+    x,y = V.coordinates
+
+    expr = F-x*(1.-x)*y*(1.-y)
+
+    a = FunctionForm(expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    assembly_py  = compile_assembly('assembly_function_2d_scalar_1', a,
+                                    backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
 def test_assembly_bilinear_2d_block_1():
     print('============ test_assembly_bilinear_2d_block_1 =============')
 
@@ -194,6 +215,8 @@ if __name__ == '__main__':
     test_assembly_bilinear_2d_scalar_4()
 
     test_assembly_linear_2d_scalar_1()
+
+    test_assembly_function_2d_scalar_1()
     # ...
 
     # ... block case

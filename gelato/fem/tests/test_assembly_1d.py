@@ -123,7 +123,6 @@ def test_assembly_linear_1d_scalar_1():
 
     x = V.coordinates
 
-    #expr = cos(2*pi*x)*v
     expr = x*(1.-x)*v
 
     a = LinearForm(v, expr)
@@ -145,7 +144,7 @@ def test_assembly_function_1d_scalar_1():
 
     x = V.coordinates
 
-    expr = F-cos(2*pi*x)
+    expr = F-x*(1.-x)
 
     a = FunctionForm(expr)
     print('> input      >>> {0}'.format(a))
@@ -160,12 +159,12 @@ def test_assembly_function_1d_scalar_1():
 # .....................................................
 if __name__ == '__main__':
     # ... scalar case
-#    test_assembly_bilinear_1d_scalar_1()
-#    test_assembly_bilinear_1d_scalar_2()
-#    test_assembly_bilinear_1d_scalar_3()
-#    test_assembly_bilinear_1d_scalar_4()
-#
-#    test_assembly_linear_1d_scalar_1()
+    test_assembly_bilinear_1d_scalar_1()
+    test_assembly_bilinear_1d_scalar_2()
+    test_assembly_bilinear_1d_scalar_3()
+    test_assembly_bilinear_1d_scalar_4()
+
+    test_assembly_linear_1d_scalar_1()
 
     test_assembly_function_1d_scalar_1()
     # ...
