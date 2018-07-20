@@ -200,6 +200,8 @@ def compile_assembly(name, a, kernel_name=None,
     element_arr_args_str = ''
     element_arr_decs_str = ''
 
+    element_wise_str = ''
+
     if is_bilinear_form:
         argument_mat = construct_argument_matrix_name(n_rows, n_cols)
         argument_mat_kwargs = print_argument_matrix_kwargs(argument_mat)
@@ -265,6 +267,10 @@ def compile_assembly(name, a, kernel_name=None,
                                                            global_arr_args,
                                                            tab)
         # ...
+
+        element_wise_str = ', element_wise=False'
+        # TODO improve, not sure this can be pyccelized!!
+        argument_arr = '{arg} if element_wise else sum({arg})'.format(arg=argument_arr)
     # ...
 
     # ...
@@ -294,6 +300,8 @@ def compile_assembly(name, a, kernel_name=None,
                            __ELEMENT_ARR_DEC__=element_arr_decs_str,
                            __ELEMENT_ARR_ARGS__=element_arr_args_str,
                            __GLOBAL_ARR_UPDATE__=global_arr_update_str,
+
+                           __ELEMENT_WISE__=element_wise_str,
 
                            __KERNEL_NAME__=kernel_name)
     # ...

@@ -36,9 +36,9 @@ import types
 
 # TODO change target to meta var, and update spaces_str
 _template ="""
-def {__NAME__}( target{__ARGS__}{__FIELDS__} ):
+def {__NAME__}( target{__ARGS__}{__FIELDS__}{__ELEMENT_WISE__} ):
     {__DOCSTRING__}
-    return {__ASSEMBLY_NAME__}( target, {__SPACE_ARGS__}{__ARGS__}{__FIELDS__} )
+    return {__ASSEMBLY_NAME__}( target, {__SPACE_ARGS__}{__ARGS__}{__FIELDS__}{__ELEMENT_WISE_KWARG__} )
 """
 
 _template_docstring = """
@@ -62,17 +62,31 @@ _pattern_docstring_argument = """
    {__LABEL__}
 """
 
-def docstring_arguments(constants, d_args):
-    if len(constants) == 0:
+# TODO add element_wise to docstring
+def docstring_arguments(constants, d_args, is_function_form=False):
+    if len(constants) == 0 and not is_function_form:
         return ''
 
     pattern = _pattern_docstring_argument
 
     lines = []
+
+    # ... constants
     for c in constants:
         dtype = d_args[c.name]
         arg = pattern.format(__ARG__=c.name, __TYPE__=dtype, __LABEL__=c.label)
         lines += [arg]
+    # ...
+
+    # ... element wise for FunctionForm
+    if is_function_form:
+        label = 'Assemble FunctionForm on every element if True. [Default: False]'
+
+        arg = pattern.format(__ARG__='element_wise',
+                             __TYPE__='bool',
+                             __LABEL__=label)
+        lines += [arg]
+    # ...
 
     code = '\n'.join(line for line in lines)
 
@@ -166,7 +180,14 @@ def discretize(a, spaces,
     # ...
 
     # ...
-    args_docstring = docstring_arguments(a.constants, d_args)
+    args_docstring = docstring_arguments(a.constants, d_args,
+                                         is_function_form=is_function_form)
+    # ...
+
+    # ...
+    if is_function_form:
+        element_wise_str = ', element_wise=False'
+        element_wise_kwarg_str = ', element_wise=element_wise'
     # ...
 
     # ...
@@ -189,6 +210,8 @@ def discretize(a, spaces,
                             __SPACE_ARGS__=spaces_str,
                             __ARGS__=args,
                             __FIELDS__=fields_str,
+                            __ELEMENT_WISE__=element_wise_str,
+                            __ELEMENT_WISE_KWARG__=element_wise_kwarg_str,
                             __DOCSTRING__=docstring)
     # ...
 

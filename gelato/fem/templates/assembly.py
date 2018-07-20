@@ -355,7 +355,7 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_VEC_K
 #          ASSEMBLY OF FUNCTION FORM 1D case
 # .............................................
 _assembly_function_1d = """
-def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_ARR_KWARGS__} ):
+def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_ARR_KWARGS__}{__ELEMENT_WISE__} ):
     {__DOCSTRING__}
     # Sizes
     [s1] = test_space.vector_space.starts
@@ -403,7 +403,7 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_ARR_K
 #          ASSEMBLY OF FUNCTION FORM 2D case
 # .............................................
 _assembly_function_2d = """
-def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_ARR_KWARGS__} ):
+def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_ARR_KWARGS__}{__ELEMENT_WISE__} ):
     {__DOCSTRING__}
     # Sizes
     [s1, s2] = test_space.vector_space.starts
@@ -458,7 +458,7 @@ def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_ARR_K
 #          ASSEMBLY OF FUNCTION FORM 3D case
 # .............................................
 _assembly_function_3d = """
-def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_ARR_KWARGS__} ):
+def {__ASSEMBLY_NAME__}( self, test_space{__ARGS__}{__FIELDS__}{__ARGUMENT_ARR_KWARGS__}{__ELEMENT_WISE__} ):
     {__DOCSTRING__}
     # Sizes
     [s1, s2, s3] = test_space.vector_space.starts
