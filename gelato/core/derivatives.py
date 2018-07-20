@@ -26,7 +26,7 @@ from sympy.core.singleton import S
 from sympy.simplify.simplify import nsimplify
 from sympy.utilities.lambdify import implemented_function
 from sympy.matrices.dense import MutableDenseMatrix
-from sympy import Mul, Add
+from sympy import Mul, Add, Pow
 from sympy import postorder_traversal
 from sympy import preorder_traversal
 
@@ -152,6 +152,9 @@ def find_partial_derivatives(expr):
     """
     if isinstance(expr, (Add, Mul)):
         return find_partial_derivatives(expr.args)
+
+    elif isinstance(expr, Pow):
+        return find_partial_derivatives(expr.base)
 
     elif isinstance(expr, (list, tuple, Tuple)):
         args = []

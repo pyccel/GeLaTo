@@ -507,6 +507,13 @@ def normalize(expr, basis=None, enable_fields=False):
 
         return Mul(i, j)
 
+    elif isinstance(expr, Pow):
+
+        b = normalize(expr.base, basis=basis, enable_fields=enable_fields)
+        e = expr.exp
+
+        return Pow(b, e)
+
     elif isinstance(expr, _partial_derivatives):
         ops = sort_partial_derivatives(expr)
 
@@ -694,11 +701,4 @@ def gelatize(a, basis=None, verbose=False):
         print('> matricized >>> {0}'.format(expr))
 
     return expr
-
-#    if isinstance(a, BilinearForm):
-#        return BilinearForm(expr, trial_space=a.trial_space, test_space=a.test_space)
-#
-#    elif isinstance(a, LinearForm):
-#        raise NotImplementedError('not implemented yet for LinearForm')
-##        return LinearForm(expr, test_space=a.test_space)
 # ...

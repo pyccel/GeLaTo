@@ -165,11 +165,6 @@ def print_assign_field(expr, dim, fields, field_coeffs, field_values, tab,
     else:
         raise NotImplementedError('only 1d, 2d and 3d are available')
 
-    tab_base = tab
-    # ... update identation to be inside the loop
-    for i in range(0, 3*dim):
-        tab += ' '*4
-
     lines = []
     for k, fs in list(field_values.items()):
         coeff = field_coeffs[k]

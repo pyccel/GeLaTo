@@ -18,7 +18,7 @@ from gelato.core import grad, dot, inner, cross, rot, curl, div
 from gelato.core import H1Space
 from gelato.core import TestFunction
 from gelato.core import VectorTestFunction
-from gelato.core import BilinearForm, LinearForm
+from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import atomize, normalize, matricize
 from gelato.core import gelatize
 
@@ -159,6 +159,118 @@ def test_kernel_linear_3d_scalar_1():
 # ...
 
 # ...
+def test_kernel_linear_3d_scalar_2():
+    print('============ test_kernel_linear_3d_scalar_2 =============')
+
+    V = H1Space('V', ldim=3)
+
+    v = TestFunction(V, name='v')
+
+    c = Constant('c', real=True, label='mass stabilization')
+
+    x,y,z = V.coordinates
+
+    expr = c*cos(2*pi*x)*cos(4*pi*y)*cos(5*pi*z)*v
+
+    a = LinearForm(v, expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_linear_3d_scalar_2', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
+def test_kernel_linear_3d_scalar_3():
+    print('============ test_kernel_linear_3d_scalar_3 =============')
+
+    V = H1Space('V', ldim=3)
+
+    v = TestFunction(V, name='v')
+
+    F = Field('F', space=V)
+
+    x,y,z = V.coordinates
+
+    expr = F*v
+
+    a = LinearForm(v, expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_linear_3d_scalar_3', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
+def test_kernel_linear_3d_scalar_4():
+    print('============ test_kernel_linear_3d_scalar_4 =============')
+
+    V = H1Space('V', ldim=3)
+
+    v = TestFunction(V, name='v')
+
+    F = Field('F', space=V)
+
+    x,y,z = V.coordinates
+
+    expr = dx(F)*v
+
+    a = LinearForm(v, expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_linear_3d_scalar_4', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
+def test_kernel_function_3d_scalar_1():
+    print('============ test_kernel_function_3d_scalar_1 =============')
+
+    V = H1Space('V', ldim=3)
+
+    F = Field('F', space=V)
+
+    x,y,z = V.coordinates
+
+    expr = F-(x*y+z)
+
+    a = FunctionForm(expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_function_3d_scalar_1', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
+def test_kernel_function_3d_scalar_2():
+    print('============ test_kernel_function_3d_scalar_2 =============')
+
+    V = H1Space('V', ldim=3)
+
+    F = Field('F', space=V)
+
+    x,y,z = V.coordinates
+
+    e = x*y+z
+    expr = dot(grad(F-e), grad(F-e))
+
+    a = FunctionForm(expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    kernel_py  = compile_kernel('kernel_function_3d_scalar_2', a,
+                                backend='python', verbose=True)
+    # ...
+# ...
+
+# ...
 def test_kernel_linear_3d_block_1():
     print('============ test_kernel_linear_3d_block_1 =============')
 
@@ -189,6 +301,12 @@ if __name__ == '__main__':
     test_kernel_bilinear_3d_scalar_4()
 
     test_kernel_linear_3d_scalar_1()
+    test_kernel_linear_3d_scalar_2()
+    test_kernel_linear_3d_scalar_3()
+    test_kernel_linear_3d_scalar_4()
+
+    test_kernel_function_3d_scalar_1()
+    test_kernel_function_3d_scalar_2()
     # ...
 
     # ... block case

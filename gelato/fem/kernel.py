@@ -5,6 +5,7 @@
 #       - define templates as proper python functions
 #       - use redbaron to modify the template
 #       - check what are the free_symbols of expr,
+#       - _convert_int_to_float(expr.evalf()) must be done only for int
 
 #     NOTE: THE PATH OF TEMPLATES IS HARD CODED!
 
@@ -21,7 +22,7 @@ import os
 import importlib
 
 from gelato.core import gelatize, normalize
-from gelato.core import BilinearForm, LinearForm
+from gelato.core import BilinearForm, LinearForm, FunctionForm, BasicForm
 from gelato.core import Constant
 from gelato.core import Field
 
@@ -58,8 +59,8 @@ def compile_kernel(name, a,
                    backend='python',
                    export_pyfile=True):
     """."""
-    if not isinstance(a, (BilinearForm, LinearForm)):
-           raise TypeError('Expecting BilinearForm, LinearForm')
+    if not isinstance(a, BasicForm):
+           raise TypeError('Expecting a BasicForm')
 
     # TODO: nderiv must be computed from the weak form
     nderiv = 1
@@ -69,6 +70,7 @@ def compile_kernel(name, a,
     fields = a.fields
     is_bilinear_form = isinstance(a, BilinearForm)
     is_linear_form = isinstance(a, LinearForm)
+    is_function_form = isinstance(a, FunctionForm)
 
     if verbose:
         print('> dim    = ', dim)
@@ -92,8 +94,8 @@ def compile_kernel(name, a,
         U = a.test_spaces[0]
         d_basis = {U: TEST_BASIS}
 
-    else:
-        raise NotImplementedError('Only Bilinear and Linear forms are available')
+    elif not is_function_form:
+        raise NotImplementedError('Only Bilinear, Linear and Function forms are available')
 
     expr = gelatize(a, basis=d_basis)
 
@@ -152,8 +154,13 @@ def compile_kernel(name, a,
     # ... get name of the template to be used
     if is_bilinear_form:
         template_str = '_bilinear_form_{dim}d_{pattern}'.format(dim=dim, pattern=pattern)
+
     elif is_linear_form:
         template_str = '_linear_form_{dim}d_{pattern}'.format(dim=dim, pattern=pattern)
+
+    elif is_function_form:
+        template_str = '_function_form_{dim}d_{pattern}'.format(dim=dim, pattern=pattern)
+
     else:
         raise NotImplementedError('Only Bilinear and Linear forms are available')
     # ...
@@ -163,8 +170,13 @@ def compile_kernel(name, a,
     try:
         if is_bilinear_form:
             package = importlib.import_module("gelato.fem.templates.bilinear_form")
+
         elif is_linear_form:
             package = importlib.import_module("gelato.fem.templates.linear_form")
+
+        elif is_function_form:
+            package = importlib.import_module("gelato.fem.templates.function_form")
+
         else:
             raise ValueError('only linear and bilinear form are available')
 
@@ -175,7 +187,8 @@ def compile_kernel(name, a,
     # ...
 
     # ... identation (def function body)
-    tab = ' '*4
+    tab_base = ' '*4
+    tab = tab_base
     # ...
 
     # ... field coeffs
@@ -191,11 +204,29 @@ def compile_kernel(name, a,
                                           field_coeffs,
                                           field_values,
                                           verbose=verbose)
+
+
+        # ... update identation to be inside the loop
+        if is_bilinear_form:
+            for i in range(0, 3*dim):
+                tab += ' '*4
+
+        elif is_linear_form:
+            for i in range(0, 2*dim):
+                tab += ' '*4
+
+        elif is_function_form:
+            for i in range(0, dim):
+                tab += ' '*4
+
         field_value_str = print_assign_field(expr, dim,
                                              fields,
                                              field_coeffs,
                                              field_values,
                                              tab, verbose=verbose)
+
+        tab = tab_base
+        # ...
 
     else:
         field_coeffs_str = ''
@@ -212,7 +243,6 @@ def compile_kernel(name, a,
     # ...
 
     # ... compute indentation
-    tab_base = tab
     if is_bilinear_form:
         # dim loops for test functions
         # and dim loops for trial functions
@@ -289,9 +319,13 @@ def compile_kernel(name, a,
         # test functions and trial functions
         if is_bilinear_form:
             size = 2*dim
+
         # test functions
         elif is_linear_form:
             size = dim
+
+        elif is_function_form:
+            raise NotImplementedError('')
 
         n_rows = test_n_components
         n_cols = trial_n_components
@@ -361,6 +395,7 @@ def compile_kernel(name, a,
 #    print('--------------')
 #    print(code)
 #    print('--------------')
+#    import sys; sys.exit(0)
 
     # ...
     if context:
