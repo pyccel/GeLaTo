@@ -14,7 +14,7 @@ from numpy import zeros
 from sympy.core import Basic
 from sympy.core import Symbol
 from sympy.core import Function
-from sympy.core import Expr, Add, Mul
+from sympy.core import Expr, Add, Mul, Pow
 from sympy import S
 from sympy.core.containers import Tuple
 from sympy import preorder_traversal
@@ -49,6 +49,82 @@ from .space import VectorTestFunction
 
 class BasicForm(Expr):
     pass
+
+
+# TODO we should check that the only free symbols are fields, constants or coordinates
+class FunctionForm(BasicForm):
+    """
+
+    Examples
+
+    """
+    _ldim = None
+    _coordinates = None
+    def __new__(cls, expr, coordinates=None):
+
+        # ... check that there are no test functions in the expression
+        ls = [a for a in expr.free_symbols if isinstance(a, (TestFunction, VectorTestFunction))]
+        if not(len(ls) == 0):
+            raise TypeError('Cannot use test functions in FunctionForm')
+        # ...
+
+        # ... compute dim from fields if available
+        ls = [a for a in expr.free_symbols if isinstance(a, Field)]
+        if ls:
+            F = ls[0]
+            ldim = F.space.ldim
+
+            if coordinates is None:
+                coordinates = F.space.coordinates
+
+        else:
+            if coordinates is None:
+                raise ValueError('> Coordinates must be provided if the expression has no fields')
+
+            ldim = len(coordinates)
+            if ldim == 1:
+                coordinates = coordinates[0]
+        # ...
+
+        obj = Basic.__new__(cls, expr)
+        obj._ldim = ldim
+        obj._coordinates = coordinates
+
+        return obj
+
+    @property
+    def expr(self):
+        return self._args[0]
+
+    @property
+    def ldim(self):
+        return self._ldim
+
+    @property
+    def coordinates(self):
+        return self._coordinates
+
+    @property
+    def fields(self):
+        ls = [a for a in self.expr.free_symbols if isinstance(a, Field)]
+        # no redanduncy
+        return sorted(list(set(ls)))
+
+    @property
+    def constants(self):
+        ls = [a for a in self.expr.free_symbols if isinstance(a, Constant)]
+        # no redanduncy
+        return list(set(ls))
+
+    def _sympystr(self, printer):
+        sstr = printer.doprint
+        expr = self.expr
+        return sstr(expr)
+
+    # TODO how to implement this?
+    def __call__(self, *args):
+        raise NotImplementedError('')
+
 
 class LinearForm(BasicForm):
     """
@@ -284,7 +360,17 @@ class BilinearForm(BasicForm):
 def atomize(expr, dim=None):
     """
     """
-    if not isinstance(expr, (Add, Mul,
+#    if not isinstance(expr, (Add, Mul,
+#                             _partial_derivatives, _generic_ops,
+#                             TestFunction, VectorTestFunction, Indexed,
+#                             Field, Constant, Symbol, Function,
+#                             Integer, Float, Matrix, ImmutableDenseMatrix,
+#                             list, tuple, Tuple)):
+#        msg = ('> Wrong input type.')
+#
+#        raise TypeError(msg, ', given ', expr, type(expr))
+
+    if not isinstance(expr, (Expr,
                              _partial_derivatives, _generic_ops,
                              TestFunction, VectorTestFunction, Indexed,
                              Field, Constant, Symbol, Function,
@@ -335,6 +421,13 @@ def atomize(expr, dim=None):
             j = Mul(*args)
 
         return Mul(i, j)
+
+    elif isinstance(expr, Pow):
+
+        b = atomize(expr.base, dim=dim)
+        e = expr.exp
+
+        return Pow(b, e)
 
     elif isinstance(expr, (Dot, Inner, Cross, Grad, Rot, Curl, Div)):
         # if i = Dot(...) then type(i) is Grad
