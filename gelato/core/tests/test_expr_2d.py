@@ -10,7 +10,7 @@ from sympy import symbols
 from sympy import IndexedBase
 from sympy import Matrix
 from sympy import Function
-from sympy import pi, cos
+from sympy import pi, cos, sin
 
 from gelato.core import dx, dy, dz
 from gelato.core import Constant
@@ -19,7 +19,7 @@ from gelato.core import grad, dot, inner, cross, rot, curl, div
 from gelato.core import H1Space
 from gelato.core import TestFunction
 from gelato.core import VectorTestFunction
-from gelato.core import BilinearForm, LinearForm
+from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import atomize, normalize, matricize
 from gelato.core import gelatize
 
@@ -511,6 +511,58 @@ def test_linear_form_2d_10():
 # ...
 
 # ...
+def test_function_form_2d_10():
+    print('============ test_function_form_2d_10 =============')
+
+    V = H1Space('V', ldim=2)
+
+    F = Field('F', space=V)
+
+    x,y = V.coordinates
+
+    f = Function('f')
+    g = Function('g')
+
+    Ni, Ni_x, Ni_y = symbols('Ni Ni_x Ni_y')
+    Nj, Nj_x, Nj_y = symbols('Nj Nj_x Nj_y')
+
+    c1 = Symbol('c1')
+    c2 = Symbol('c2')
+
+    bx, by = symbols('bx by')
+    b = Tuple(bx, by)
+    fg = Tuple(f(x,y), g(x,y))
+
+    # ...
+    expected = 4*pi**2*sin(2*pi*x)**2*cos(3*pi*y)**2 + 9*pi**2*sin(3*pi*y)**2*cos(2*pi*x)**2
+    e = cos(2*pi*x)*cos(3*pi*y)
+    assert(gelatize(FunctionForm(dot(grad(e), grad(e)), coordinates=[x,y])) == expected)
+    # ...
+
+    # ...
+    expected = F - cos(2*pi*x)*cos(3*pi*y)
+    assert(gelatize(FunctionForm(F-cos(2*pi*x)*cos(3*pi*y))) == expected)
+    # ...
+
+    # ...
+    expected = (F - cos(2*pi*x)*cos(3*pi*y))**2
+    assert(gelatize(FunctionForm((F - cos(2*pi*x)*cos(3*pi*y))**2)) == expected)
+    # ...
+
+    # ...
+    expected = (dx(F) + 2*pi*sin(2*pi*x)*cos(3*pi*y))**2 + (dy(F) + 3*pi*sin(3*pi*y)*cos(2*pi*x))**2
+    e = F -cos(2*pi*x)*cos(3*pi*y)
+    assert(gelatize(FunctionForm(dot(grad(e), grad(e)))) == expected)
+    # ...
+
+#    e = F -cos(2*pi*x)*cos(3*pi*y)
+#    expr = FunctionForm(dot(grad(e), grad(e)))
+#    print('> input      >>> {0}'.format(expr))
+#    print('> gelatized  >>> {0}'.format(gelatize(expr) ))
+#    print('')
+# ...
+
+# ...
 def test_linear_form_2d_1():
     print('============ test_linear_form_2d_1 =============')
 
@@ -582,6 +634,7 @@ if __name__ == '__main__':
 
     test_bilinear_form_2d_10()
     test_linear_form_2d_10()
+    test_function_form_2d_10()
 
     test_linear_form_2d_1()
 

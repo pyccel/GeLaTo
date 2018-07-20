@@ -10,7 +10,7 @@ from sympy import symbols
 from sympy import IndexedBase
 from sympy import Matrix
 from sympy import Function
-from sympy import pi, cos
+from sympy import pi, cos, sin
 
 from gelato.core import dx, dy, dz
 from gelato.core import Constant
@@ -19,7 +19,7 @@ from gelato.core import grad, dot, inner, cross, rot, curl, div
 from gelato.core import H1Space
 from gelato.core import TestFunction
 from gelato.core import VectorTestFunction
-from gelato.core import BilinearForm, LinearForm
+from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import atomize, normalize, matricize
 from gelato.core import gelatize
 
@@ -586,6 +586,76 @@ def test_linear_form_3d_10():
 # ...
 
 # ...
+def test_function_form_3d_10():
+    print('============ test_function_form_3d_10 =============')
+
+    V = H1Space('V', ldim=3)
+
+    F = Field('F', space=V)
+
+    x,y,z = V.coordinates
+
+    f = Function('f')
+    g = Function('g')
+    r = Function('r')
+
+    Ni, Ni_x, Ni_y, Ni_z = symbols('Ni Ni_x Ni_y Ni_z')
+    Nj, Nj_x, Nj_y, Nj_z = symbols('Nj Nj_x Nj_y Nj_z')
+
+    c1 = Symbol('c1')
+    c2 = Symbol('c2')
+
+    bx, by, bz = symbols('bx by bz')
+    b = Tuple(bx, by, bz)
+    fgr = Tuple(f(x,y,z), g(x,y,z), r(x,y,z))
+
+    # ...
+    expected = cos(2*pi*x)*cos(3*pi*y)*cos(5*pi*z)
+    assert(gelatize(FunctionForm(cos(2*pi*x)*cos(3*pi*y)*cos(5*pi*z), coordinates=[x,y,z])) == expected)
+    # ...
+
+    # ...
+    expected = x**2 + y**2 + 1
+    e = x*y + z
+    assert(gelatize(FunctionForm(dot(grad(e), grad(e)), coordinates=[x,y,z])) == expected)
+    # ...
+
+    # ...
+    expected = F - cos(2*pi*x)*cos(3*pi*y)*cos(5*pi*z)
+    assert(gelatize(FunctionForm(F-cos(2*pi*x)*cos(3*pi*y)*cos(5*pi*z))) == expected)
+    # ...
+
+    # ...
+    expected = (F - x*y - z)**2
+    assert(gelatize(FunctionForm((F - x*y - z)**2)) == expected)
+    # ...
+
+    # ...
+    expected = dx(F)**2 + dy(F)**2 + dz(F)**2
+    assert(gelatize(FunctionForm(dot(grad(F), grad(F)))) == expected)
+    # ...
+
+    # ...
+    expected = (-x + dy(F))**2 + (-y + dx(F))**2 + (dz(F) - 1)**2
+    e = F - (x*y + z)
+    assert(gelatize(FunctionForm(dot(grad(e), grad(e)), coordinates=[x,y,z])) == expected)
+    # ...
+
+    # ... TODO debug. => infinite recursion!!! why?
+    #          must be a problem with Mul treatements
+#    e = cos(2*pi*x)*cos(3*pi*y)*cos(5*pi*z)
+#    e = cos(2*pi*x)*cos(3*pi*y)*z
+#    e = x*y*z
+    # ...
+
+#    e = F - (x*y + z)
+#    expr = FunctionForm(dot(grad(e), grad(e)), coordinates=[x,y,z])
+#    print('> input      >>> {0}'.format(expr))
+#    print('> gelatized  >>> {0}'.format(gelatize(expr) ))
+#    print('')
+# ...
+
+# ...
 def test_linear_form_3d_1():
     print('============ test_linear_form_3d_1 =============')
 
@@ -658,6 +728,7 @@ if __name__ == '__main__':
 
     test_bilinear_form_3d_10()
     test_linear_form_3d_10()
+    test_function_form_3d_10()
 
     test_linear_form_3d_1()
 

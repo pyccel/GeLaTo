@@ -8,6 +8,7 @@
 #      - add is_symmetric property for BilinearForm
 #      - treat Function atom in atomize, normalize, matricize
 #      - treat Field atom in atomize, normalize, matricize
+#      - shall we matricize a FunctionForm or not?
 
 from numpy import zeros
 
@@ -683,6 +684,10 @@ def gelatize(a, basis=None, verbose=False):
     expr = normalize(expr, basis=basis)
     if verbose:
         print('> normalized >>> {0}'.format(expr))
+
+    # TODO is it ok to keep this?
+    if isinstance(a, FunctionForm):
+        return expr
 
     expr = matricize(expr)
     if verbose:
