@@ -15,7 +15,7 @@ from gelato.core import grad, dot, inner, cross, rot, curl, div
 from gelato.core import H1Space
 from gelato.core import TestFunction
 from gelato.core import VectorTestFunction
-from gelato.core import BilinearForm, LinearForm
+from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import atomize, normalize
 from gelato.core import gelatize
 
@@ -37,14 +37,18 @@ def test_pde_2d_scalar_1():
 
     x,y = V.coordinates
 
+    F = Field('F', space=V)
+
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
 
     a = BilinearForm((v,u), dot(grad(v), grad(u)))
     b = LinearForm(v, x*(1.-x)*y*(1.-y)*v)
+    norm = FunctionForm(F-x**2-y**2)
 
     print('> input bilinear-form  >>> {0}'.format(a))
     print('> input linear-form    >>> {0}'.format(b))
+    print('> input function-form  >>> {0}'.format(norm))
     # ...
 
     # ... discretization
@@ -67,11 +71,21 @@ def test_pde_2d_scalar_1():
     # ...
     discretize( a, [V, V] )
     discretize( b, V )
+    discretize( norm, V )
     # ...
 
     # ...
     M   = a.assemble()
     rhs = b.assemble()
+    # ...
+
+    # ...
+    # Define a field
+    phi = FemField( V, 'phi' )
+    phi._coeffs[:,:] = 1.
+
+    err = norm.assemble(phi)
+    print(err)
     # ...
 # ...
 
@@ -286,11 +300,11 @@ def test_pde_2d_block_1():
 if __name__ == '__main__':
     # ... scalar case
     test_pde_2d_scalar_1()
-    test_pde_2d_scalar_2()
-    test_pde_2d_scalar_3()
-    test_pde_2d_scalar_4()
-    # ...
-
-    # ... block case
-    test_pde_2d_block_1()
-    # ...
+#    test_pde_2d_scalar_2()
+#    test_pde_2d_scalar_3()
+#    test_pde_2d_scalar_4()
+#    # ...
+#
+#    # ... block case
+#    test_pde_2d_block_1()
+#    # ...

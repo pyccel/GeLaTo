@@ -20,7 +20,7 @@ import os
 import importlib
 
 from gelato.core import gelatize
-from gelato.core import BilinearForm, LinearForm
+from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import Constant
 from gelato.core import Field
 
@@ -55,6 +55,17 @@ from .vector import construct_argument_vector_name
 from .vector import print_argument_vector_kwargs
 from .vector import print_define_global_vector
 
+from .array import construct_element_array_names
+from .array import print_element_array_args
+from .array import print_element_array_decs
+from .array import construct_global_array_names
+from .array import print_global_array_args
+from .array import print_global_array_decs
+from .array import print_global_array_update
+from .array import construct_argument_array_name
+from .array import print_argument_array_kwargs
+from .array import print_define_global_array
+
 # NOTE: test_n_components, trial_n_components  will be provided after calling compile_kernel
 def compile_assembly(name, a, kernel_name=None,
                      verbose=False,
@@ -78,11 +89,16 @@ def compile_assembly(name, a, kernel_name=None,
     fields = a.fields
     is_bilinear_form = isinstance(a, BilinearForm)
     is_linear_form = isinstance(a, LinearForm)
+    is_function_form = isinstance(a, FunctionForm)
 
     if is_bilinear_form:
         form = 'bilinear'
+
     elif is_linear_form:
         form = 'linear'
+
+    elif is_function_form:
+        form = 'function'
     # ...
 
     # ... contants
@@ -172,6 +188,18 @@ def compile_assembly(name, a, kernel_name=None,
     element_vec_args_str = ''
     element_vec_decs_str = ''
 
+    argument_arr = ''
+    argument_arr_kwargs = ''
+
+    global_arr_args = ''
+    global_arr_args_str = ''
+    global_arr_decs_str = ''
+    global_arr_update_str = ''
+
+    element_arr_args = ''
+    element_arr_args_str = ''
+    element_arr_decs_str = ''
+
     if is_bilinear_form:
         argument_mat = construct_argument_matrix_name(n_rows, n_cols)
         argument_mat_kwargs = print_argument_matrix_kwargs(argument_mat)
@@ -215,6 +243,28 @@ def compile_assembly(name, a, kernel_name=None,
                                                            global_vec_args,
                                                            tab)
         # ...
+
+    elif is_function_form:
+        argument_arr = construct_argument_array_name(n_rows)
+        argument_arr_kwargs = print_argument_array_kwargs(argument_arr)
+
+        global_arr_args = construct_global_array_names(n_rows)
+        global_arr_args_str = print_global_array_args(n_rows, global_arr_args)
+        global_arr_decs_str = print_define_global_array(n_rows, dim, global_arr_args, argument_arr, tab)
+
+        element_arr_args = construct_element_array_names(n_rows)
+        element_arr_args_str = print_element_array_args(n_rows, element_arr_args)
+        element_arr_decs_str = print_element_array_decs(n_rows, dim, element_arr_args, tab)
+
+        # ...
+        for i in range(0, dim):
+            tab += ' '*4
+
+        global_arr_update_str = print_global_array_update(n_rows, dim,
+                                                           element_arr_args,
+                                                           global_arr_args,
+                                                           tab)
+        # ...
     # ...
 
     # ...
@@ -223,18 +273,28 @@ def compile_assembly(name, a, kernel_name=None,
                            __DOCSTRING__=docstring,
                            __FIELDS__=fields_str,
                            __FIELDS_COEFFS__=fields_coeffs_str,
+
                            __ARGUMENT_MAT_KWARGS__=argument_mat_kwargs,
                            __GLOBAL_MAT_DEC__=global_mat_decs_str,
                            __GLOBAL_MAT_ARGS__=argument_mat,
                            __ELEMENT_MAT_DEC__=element_mat_decs_str,
                            __ELEMENT_MAT_ARGS__=element_mat_args_str,
                            __GLOBAL_MAT_UPDATE__=global_mat_update_str,
+
                            __ARGUMENT_VEC_KWARGS__=argument_vec_kwargs,
                            __GLOBAL_VEC_DEC__=global_vec_decs_str,
                            __GLOBAL_VEC_ARGS__=argument_vec,
                            __ELEMENT_VEC_DEC__=element_vec_decs_str,
                            __ELEMENT_VEC_ARGS__=element_vec_args_str,
                            __GLOBAL_VEC_UPDATE__=global_vec_update_str,
+
+                           __ARGUMENT_ARR_KWARGS__=argument_arr_kwargs,
+                           __GLOBAL_ARR_DEC__=global_arr_decs_str,
+                           __GLOBAL_ARR_ARGS__=argument_arr,
+                           __ELEMENT_ARR_DEC__=element_arr_decs_str,
+                           __ELEMENT_ARR_ARGS__=element_arr_args_str,
+                           __GLOBAL_ARR_UPDATE__=global_arr_update_str,
+
                            __KERNEL_NAME__=kernel_name)
     # ...
 

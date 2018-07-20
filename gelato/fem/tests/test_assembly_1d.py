@@ -15,7 +15,7 @@ from gelato.core import grad, dot, inner, cross, rot, curl, div
 from gelato.core import H1Space
 from gelato.core import TestFunction
 from gelato.core import VectorTestFunction
-from gelato.core import BilinearForm, LinearForm
+from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import atomize, normalize
 from gelato.core import gelatize
 
@@ -135,14 +135,37 @@ def test_assembly_linear_1d_scalar_1():
     # ...
 # ...
 
+# ...
+def test_assembly_function_1d_scalar_1():
+    print('============ test_assembly_function_1d_scalar_1 =============')
+
+    V = H1Space('V', ldim=1)
+
+    F = Field('F', space=V)
+
+    x = V.coordinates
+
+    expr = F-cos(2*pi*x)
+
+    a = FunctionForm(expr)
+    print('> input      >>> {0}'.format(a))
+
+    # ...
+    assembly_py  = compile_assembly('assembly_function_1d_scalar_1', a,
+                                    backend='python', verbose=True)
+    # ...
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
     # ... scalar case
-    test_assembly_bilinear_1d_scalar_1()
-    test_assembly_bilinear_1d_scalar_2()
-    test_assembly_bilinear_1d_scalar_3()
-    test_assembly_bilinear_1d_scalar_4()
+#    test_assembly_bilinear_1d_scalar_1()
+#    test_assembly_bilinear_1d_scalar_2()
+#    test_assembly_bilinear_1d_scalar_3()
+#    test_assembly_bilinear_1d_scalar_4()
+#
+#    test_assembly_linear_1d_scalar_1()
 
-    test_assembly_linear_1d_scalar_1()
+    test_assembly_function_1d_scalar_1()
     # ...

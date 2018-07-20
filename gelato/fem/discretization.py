@@ -15,7 +15,7 @@ import os
 import importlib
 
 from gelato.core import gelatize
-from gelato.core import BilinearForm, LinearForm
+from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import Constant
 from gelato.core import Field
 
@@ -95,11 +95,16 @@ def discretize(a, spaces,
     fields = a.fields
     is_bilinear_form = isinstance(a, BilinearForm)
     is_linear_form = isinstance(a, LinearForm)
+    is_function_form = isinstance(a, FunctionForm)
 
     if is_bilinear_form:
         form = 'bilinear'
+
     elif is_linear_form:
         form = 'linear'
+
+    elif is_function_form:
+        form = 'function'
     # ...
 
     # ...
@@ -141,6 +146,9 @@ def discretize(a, spaces,
 
     elif is_linear_form:
         spaces_str = 'target.discrete_spaces'
+
+    elif is_function_form:
+        spaces_str = 'target.discrete_spaces'
     # ...
 
     # ... contants
@@ -152,6 +160,7 @@ def discretize(a, spaces,
     if fields:
         fields_str = ', '.join(i.name for i in fields)
         fields_str = ', {}'.format(fields_str)
+
     else:
         fields_str = ''
     # ...
