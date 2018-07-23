@@ -9,6 +9,12 @@ from collections import OrderedDict
 
 from gelato.core import get_index_derivatives_atom
 
+def construct_field_names(fields):
+    fields_str = ', '.join(i.name for i in fields)
+    fields_str = ', {}'.format(fields_str)
+
+    return fields_str
+
 def construct_field_coeffs_names(fields):
     field_coeffs = OrderedDict()
     for f in fields:
@@ -23,6 +29,29 @@ def print_field_coeffs(field_coeffs):
     # add ',' for kernel signature
     field_coeffs_str = ', {}'.format(field_coeffs_str)
     return field_coeffs_str
+
+def print_field_coeffs_slices(fields, dim):
+    # ...
+    if dim == 1:
+        slices = 'is1-test_p1:is1+1'
+
+    elif dim == 2:
+        slices = 'is1-test_p1:is1+1,is2-test_p2:is2+1'
+
+    elif dim == 3:
+        slices = 'is1-test_p1:is1+1,is2-test_p2:is2+1,is3-test_p3:is3+1'
+
+    coeffs = []
+    for F in fields:
+        coeff_str = '{field}.coeffs[{slices}]'.format(field=F.name,
+                                                      slices=slices)
+        coeffs.append(coeff_str)
+    # ...
+
+    fields_coeffs_str = ', '.join(c for c in coeffs)
+    fields_coeffs_str = ', {}'.format(fields_coeffs_str)
+
+    return fields_coeffs_str
 
 def print_field_coeffs_types(field_coeffs, dim):
     field_types = []

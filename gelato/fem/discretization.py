@@ -171,12 +171,10 @@ def discretize(a, spaces,
     # ...
 
     # ... fields
+    fields_str = ''
     if fields:
         fields_str = ', '.join(i.name for i in fields)
         fields_str = ', {}'.format(fields_str)
-
-    else:
-        fields_str = ''
     # ...
 
     # ...
@@ -185,6 +183,8 @@ def discretize(a, spaces,
     # ...
 
     # ...
+    element_wise_str = ''
+    element_wise_kwarg_str = ''
     if is_function_form:
         element_wise_str = ', element_wise=False'
         element_wise_kwarg_str = ', element_wise=element_wise'

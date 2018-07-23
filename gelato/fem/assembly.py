@@ -66,6 +66,9 @@ from .array import construct_argument_array_name
 from .array import print_argument_array_kwargs
 from .array import print_define_global_array
 
+from .field import construct_field_names
+from .field import print_field_coeffs_slices
+
 # NOTE: test_n_components, trial_n_components  will be provided after calling compile_kernel
 def compile_assembly(name, a, kernel_name=None,
                      verbose=False,
@@ -107,35 +110,11 @@ def compile_assembly(name, a, kernel_name=None,
     # ...
 
     # ... fields
+    fields_str = ''
+    fields_coeffs_str = ''
     if fields:
-        fields_str = ', '.join(i.name for i in fields)
-        fields_str = ', {}'.format(fields_str)
-
-        # ...
-        # TODO must use span, to use local index in kernel
-        slices = None
-        if dim == 1:
-            slices = 's1:s1+test_p1+1'
-
-        elif dim == 2:
-            slices = 's1:s1+test_p1+1,s2:s2+test_p2+1'
-
-        elif dim == 3:
-            slices = 's1:s1+test_p1+1,s2:s2+test_p2+1,s3:s3+test_p3+1'
-
-        coeffs = []
-        for F in fields:
-            coeff_str = '{field}.coeffs[{slices}]'.format(field=F.name,
-                                                          slices=slices)
-            coeffs.append(coeff_str)
-        # ...
-
-        fields_coeffs_str = ', '.join(c for c in coeffs)
-        fields_coeffs_str = ', {}'.format(fields_coeffs_str)
-
-    else:
-        fields_str = ''
-        fields_coeffs_str = ''
+        fields_str = construct_field_names(fields)
+        fields_coeffs_str = print_field_coeffs_slices(fields, dim)
     # ...
 
     # ... get name of the template to be used
@@ -270,7 +249,7 @@ def compile_assembly(name, a, kernel_name=None,
 
         element_wise_str = ', element_wise=False'
         # TODO improve, not sure this can be pyccelized!!
-        argument_arr = '{arg} if element_wise else sum({arg})'.format(arg=argument_arr)
+        argument_arr = '{arg} if element_wise else {arg}.sum()'.format(arg=argument_arr)
     # ...
 
     # ...

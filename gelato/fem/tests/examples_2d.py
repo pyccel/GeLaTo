@@ -13,13 +13,13 @@ from gelato.core import grad, dot, inner, cross, rot, curl, div
 from gelato.core import H1Space
 from gelato.core import TestFunction
 from gelato.core import VectorTestFunction
-from gelato.core import BilinearForm, LinearForm
+from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import atomize, normalize
 from gelato.core import gelatize
 
 from gelato.fem  import discretize
 
-from numpy import linspace, array
+from numpy import linspace, array, sqrt
 
 from spl.fem.splines import SplineSpace
 from spl.fem.tensor  import TensorFemSpace
@@ -40,17 +40,21 @@ def test_poisson_2d_scalar_1():
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
 
+    F = Field('F', space=V)
+
     a = BilinearForm((v,u), dot(grad(v), grad(u)))
-    b = LinearForm(v, x*(1.-x)*y*(1.-y)*v)
+    b = LinearForm(v, 4.*v)
+    norm = FunctionForm((F-x*(1.-x)*y*(1.-y))**2)
 
     print('> input bilinear-form  >>> {0}'.format(a))
     print('> input linear-form    >>> {0}'.format(b))
+    print('> input function-form  >>> {0}'.format(norm))
     # ...
 
     # ... discretization
     # Input data: degree, number of elements
-    p1  = 3  ; p2  = 3
-    ne1 = 4 ; ne2 = 4
+    p1  = 3 ; p2  = 3
+    ne1 = 2**4 ; ne2 = 2**4
 
     # Create uniform grid
     grid_1 = linspace( 0., 1., num=ne1+1 )
@@ -67,6 +71,7 @@ def test_poisson_2d_scalar_1():
     # ...
     discretize( a, [V, V] )
     discretize( b, V )
+    discretize( norm, V )
     # ...
 
     # ...
@@ -89,6 +94,10 @@ def test_poisson_2d_scalar_1():
     phi = FemField( V, 'phi' )
     phi.coeffs[:,:] = x[:,:]
     phi.coeffs.update_ghost_regions()
+
+    # compute L2 error norm
+    err = norm.assemble(phi)
+    print('> L2 error =  ', sqrt(err))
 
     # Plot solution on refined grid
     xx = linspace( grid_1[0], grid_1[-1], num=101 )
