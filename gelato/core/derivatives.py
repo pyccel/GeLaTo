@@ -111,6 +111,7 @@ class DifferentialOperator(LinearOperator):
             V = S.One
             if vectors:
                 if len(vectors) == 1:
+                    # do we need to use Mul?
                     V = cls(Mul(vectors[0]), evaluate=True)
 
                 elif len(vectors) == 2:
@@ -121,13 +122,15 @@ class DifferentialOperator(LinearOperator):
                     fb = cls(b, evaluate=True)
 
                     V = a * fb + fa * b
-#                    print('a  = ', a )
-#                    print('fa = ', fa)
-#                    print('b  = ', b )
-#                    print('fb = ', fb)
 
                 else:
-                    V = cls(Mul(*vectors), evaluate=True)
+                    a = vectors[0]
+                    b = Mul(*vectors[1:])
+
+                    fa = cls(a, evaluate=True)
+                    fb = cls(b, evaluate=True)
+
+                    V = a * fb + fa * b
 
             return Mul(c, V)
 

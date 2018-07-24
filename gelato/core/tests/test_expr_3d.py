@@ -22,6 +22,8 @@ from gelato.core import VectorTestFunction
 from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import atomize, normalize, matricize
 from gelato.core import gelatize
+from gelato.core import tensorize
+from gelato.core import Mass, Stiffness, Advection, AdvectionT
 
 
 # ...
@@ -709,6 +711,97 @@ def test():
 #    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
 #    print('> matricize     >>> {0}'.format(matricize(expr)))
 
+# ...
+def test_tensorize_3d_1():
+    print('============ test_tensorize_3d_1 =============')
+
+    V = H1Space('V', ldim=3)
+    V_0 = H1Space('V_0', ldim=1, coordinates=['x'])
+    V_1 = H1Space('V_1', ldim=1, coordinates=['y'])
+    V_2 = H1Space('V_2', ldim=1, coordinates=['z'])
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(V, name='u')
+
+    v0 = TestFunction(V_0, name='v0')
+    u0 = TestFunction(V_0, name='u0')
+
+    v1 = TestFunction(V_1, name='v1')
+    u1 = TestFunction(V_1, name='u1')
+
+    v2 = TestFunction(V_2, name='v2')
+    u2 = TestFunction(V_2, name='u2')
+
+    c = Constant('c')
+
+    bx = Constant('bx')
+    by = Constant('by')
+    bz = Constant('bz')
+    b = Tuple(bx, by, bz)
+
+    # ...
+    expected =  Mass(v2,u2)*Mass(v1,u1)*Mass(v0,u0)
+    assert(tensorize(BilinearForm((v,u), u*v)) == expected)
+    # ...
+
+    # ...
+    expected =  Mass(v2,u2)*Mass(v1,u1)*Stiffness(v0,u0)
+    assert(tensorize(BilinearForm((v,u), dx(u)*dx(v))) == expected)
+    # ...
+
+    # ...
+    expected = Mass(v2,u2)*Advection(v1,u1)*Mass(v0,u0)
+    assert(tensorize(BilinearForm((v,u), dy(u) * v)) == expected)
+    # ...
+
+    # ...
+    expected =  Mass(v2,u2)*Mass(v1,u1)*Advection(v0,u0)
+    assert(tensorize(BilinearForm((v,u), dx(u) * v)) == expected)
+    # ...
+
+    # ...
+    expected = (Mass(v2,u2)*Mass(v1,u1)*Stiffness(v0,u0) +
+                Mass(v2,u2)*Stiffness(v1,u1)*Mass(v0,u0) +
+                Stiffness(v2,u2)*Mass(v1,u1)*Mass(v0,u0))
+    assert(tensorize(BilinearForm((v,u), dot(grad(v), grad(u)))) == expected)
+    # ...
+
+    # ...
+    expected = (Mass(v2,u2)*Advection(v1,u1)*Mass(v0,u0) +
+                Mass(v2,u2)*Mass(v1,u1)*Advection(v0,u0) +
+                Mass(v2,u2)*Mass(v1,u1)*Stiffness(v0,u0) +
+                Mass(v2,u2)*Stiffness(v1,u1)*Mass(v0,u0) +
+                Stiffness(v2,u2)*Mass(v1,u1)*Mass(v0,u0))
+    assert(tensorize(BilinearForm((v,u), dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v)) == expected)
+    # ...
+
+    # ...
+    expected = (bx*Mass(v2,u2)*Mass(v1,u1)*AdvectionT(v0,u0) +
+                by*Mass(v2,u2)*AdvectionT(v1,u1)*Mass(v0,u0) +
+                bz*AdvectionT(v2,u2)*Mass(v1,u1)*Mass(v0,u0))
+    assert(tensorize(BilinearForm((v,u), dot(b, grad(v)) * u)) == expected)
+    # ...
+
+    # ...
+    expected = (bx**2*Mass(v2,u2)*Mass(v1,u1)*Stiffness(v0,u0) +
+                bx*by*Mass(v2,u2)*Advection(v1,u1)*AdvectionT(v0,u0) +
+                bx*by*Mass(v2,u2)*AdvectionT(v1,u1)*Advection(v0,u0) +
+                bx*bz*Advection(v2,u2)*Mass(v1,u1)*AdvectionT(v0,u0) +
+                bx*bz*AdvectionT(v2,u2)*Mass(v1,u1)*Advection(v0,u0) +
+                by**2*Mass(v2,u2)*Stiffness(v1,u1)*Mass(v0,u0) +
+                by*bz*Advection(v2,u2)*AdvectionT(v1,u1)*Mass(v0,u0) +
+                by*bz*AdvectionT(v2,u2)*Advection(v1,u1)*Mass(v0,u0) +
+                bz**2*Stiffness(v2,u2)*Mass(v1,u1)*Mass(v0,u0))
+    assert(tensorize(BilinearForm((v,u), dot(b, grad(v)) * dot(b, grad(u)))) == expected)
+    # ...
+
+#    expr = dot(b, grad(v)) * dot(b, grad(u))
+#    expr = BilinearForm((v,u), expr)
+#
+#    print('> input         >>> {0}'.format(expr))
+#    print('> tensorized    >>> {0}'.format(tensorize(expr)))
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
@@ -733,3 +826,5 @@ if __name__ == '__main__':
     test_linear_form_3d_1()
 
     test()
+
+    test_tensorize_3d_1()
