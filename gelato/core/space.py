@@ -22,7 +22,8 @@ class BasicSobolevSpace(Basic):
     _shape = None
     _is_vector = False
     _is_block = False
-    def __new__(cls, name, ldim=None, shape=None, is_vector=False, is_block=False):
+    def __new__(cls, name, ldim=None, shape=None, is_vector=False,
+                is_block=False, coordinates=None):
         if is_vector or is_block:
             if shape is None:
                 raise ValueError('shape must be provided for a vector/block space')
@@ -33,9 +34,19 @@ class BasicSobolevSpace(Basic):
         obj._is_vector = is_vector
         obj._is_block = is_block
 
-        _coordinates = []
-        if ldim:
-            _coordinates = [Symbol(name) for name in ['x', 'y', 'z'][:ldim]]
+        if coordinates is None:
+            _coordinates = []
+            if ldim:
+                _coordinates = [Symbol(name) for name in ['x', 'y', 'z'][:ldim]]
+        else:
+            if not isinstance(coordinates, (list, tuple, Tuple)):
+                raise TypeError('> Expecting list, tuple, Tuple')
+
+            for a in coordinates:
+                if not isinstance(a, (str, Symbol)):
+                    raise TypeError('> Expecting str or Symbol')
+
+            _coordinates = [Symbol(name) for name in coordinates]
 
         obj._coordinates = _coordinates
 

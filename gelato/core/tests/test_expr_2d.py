@@ -11,6 +11,7 @@ from sympy import IndexedBase
 from sympy import Matrix
 from sympy import Function
 from sympy import pi, cos, sin
+from sympy import srepr
 
 from gelato.core import dx, dy, dz
 from gelato.core import Constant
@@ -22,6 +23,7 @@ from gelato.core import VectorTestFunction
 from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import atomize, normalize, matricize
 from gelato.core import gelatize
+from gelato.core import tensorize
 
 
 # ...
@@ -616,26 +618,50 @@ def test():
 #    expr = normalize(expr, basis={V: 'Ni', U: 'Nj'})
 #    print('> matricize     >>> {0}'.format(matricize(expr)))
 
+# ...
+def test_tensorize_2d_1():
+    print('============ test_tensorize_2d_1 =============')
+
+    V = H1Space('V', ldim=2)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(V, name='u')
+    c = Constant('c')
+
+#    expr = u * v
+#    expr = dx(u) * v
+#    expr = dy(u) * v # TODO not working yet
+#    expr = dx(u) * dx(v)
+#    expr = dot(grad(v), grad(u))
+    expr = dot(grad(v), grad(u)) #+ dx(u)*v #+ dy(u)*v
+
+    print('> input         >>> {0}'.format(expr))
+    print('> tensorized    >>> {0}'.format(tensorize(expr)))
+#    print(srepr(tensorize(expr, dim=2)))
+# ...
+
 
 # .....................................................
 if __name__ == '__main__':
-    test_atomize_2d_1()
-    test_normalize_2d_1()
-    test_gelatize_2d_1()
+#    test_atomize_2d_1()
+#    test_normalize_2d_1()
+#    test_gelatize_2d_1()
+#
+#    test_atomize_2d_2()
+#    test_normalize_2d_2()
+#    test_matricize_2d_2()
+#
+###    test_bilinear_form_2d_1()
+###    test_bilinear_form_2d_2()
+###    test_bilinear_form_2d_3()
+###    test_bilinear_form_2d_4()
+#
+#    test_bilinear_form_2d_10()
+#    test_linear_form_2d_10()
+#    test_function_form_2d_10()
+#
+#    test_linear_form_2d_1()
+#
+#    test()
 
-    test_atomize_2d_2()
-    test_normalize_2d_2()
-    test_matricize_2d_2()
-
-##    test_bilinear_form_2d_1()
-##    test_bilinear_form_2d_2()
-##    test_bilinear_form_2d_3()
-##    test_bilinear_form_2d_4()
-
-    test_bilinear_form_2d_10()
-    test_linear_form_2d_10()
-    test_function_form_2d_10()
-
-    test_linear_form_2d_1()
-
-    test()
+    test_tensorize_2d_1()

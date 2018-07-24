@@ -65,9 +65,24 @@ class DifferentialOperator(LinearOperator):
 
         expr = _args[0]
 
-        if isinstance(expr, (Field, TestFunction,
-                             IndexedTestTrial, DifferentialOperator)):
+        # TODO use coordinates for IndexedTestTrial?
+        if isinstance(expr, (IndexedTestTrial, DifferentialOperator)):
             return cls(expr, evaluate=False)
+
+        elif isinstance(expr, (Field, TestFunction)):
+
+            coord = cls.coordinate
+            coordinates = expr.space.coordinates
+            # 1d case
+            if not isinstance(coordinates, (list, tuple, Tuple)):
+                coordinates = [coordinates]
+
+            names = [c.name for c in coordinates]
+            if coord in names:
+                return cls(expr, evaluate=False)
+
+            else:
+                return S.Zero
 
         elif isinstance(expr, VectorTestFunction):
             n = expr.shape[0]

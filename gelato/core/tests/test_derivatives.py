@@ -11,6 +11,7 @@ from gelato.core import (dx, dy, dz)
 from gelato.core import grad, dot, inner
 from gelato.core import Field
 from gelato.core import get_index_derivatives_atom
+from gelato.core import H1Space
 
 
 # ...
@@ -20,11 +21,12 @@ def test_partial_derivatives_1():
     x, y, z = symbols('x y z')
     alpha, beta = symbols('alpha beta')
 
-    F = Field('F')
+    V = H1Space('V', ldim=2)
+    F = Field('F', space=V)
 
-    u = Field('u')
-    v = Field('v')
-    w = Field('w')
+    u = Field('u', space=V)
+    v = Field('v', space=V)
+    w = Field('w', space=V)
     uvw = Tuple(u,v,w)
 
     # ...
@@ -58,7 +60,8 @@ def test_partial_derivatives_2():
     x, y, z = symbols('x y z')
     alpha, beta = symbols('alpha beta')
 
-    F = Field('F')
+    V = H1Space('V', ldim=2)
+    F = Field('F', space=V)
 
     expr = alpha * dx(F) + beta * dy(F) + dx(dy(F))
 #    expr = alpha * dx(F)

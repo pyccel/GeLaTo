@@ -23,6 +23,7 @@ from sympy import Indexed, IndexedBase, Matrix, ImmutableDenseMatrix
 from sympy.physics.quantum import TensorProduct
 from sympy import expand
 from sympy import Integer, Float
+from sympy.core.expr import AtomicExpr
 
 from .derivatives import _partial_derivatives
 from .derivatives import partial_derivative_as_symbol
@@ -356,6 +357,113 @@ class BilinearForm(BasicForm):
 
         return BilinearForm(test_trial, expr)
 
+
+class BilinearAtomicForm(BilinearForm, AtomicExpr):
+    """
+
+    Examples
+
+    """
+    _name = None
+
+    @property
+    def name(self):
+        return self._name
+
+    def _sympystr(self, printer):
+        sstr = printer.doprint
+        name = sstr(self.name)
+
+        test = [sstr(i) for i in self.test_functions]
+        test = ','.join(i for i in test)
+
+        trial = [sstr(i) for i in self.trial_functions]
+        trial = ','.join(i for i in trial)
+
+        return '{name}({trial}, {test})'.format(name=name, trial=trial, test=test)
+
+class Mass(BilinearAtomicForm):
+    """
+
+    Examples
+
+    """
+    _name = 'Mass'
+    def __new__(cls, test_trial):
+
+        test, trial = test_trial[:]
+        expr = test * trial
+
+        return BilinearForm.__new__(cls, test_trial, expr)
+
+class Stiffness(BilinearAtomicForm):
+    """
+
+    Examples
+
+    """
+    _name = 'Stiffness'
+    def __new__(cls, test_trial):
+
+        test, trial = test_trial[:]
+
+        coordl = test.space.coordinates.name
+        coordr = trial.space.coordinates.name
+        if not(coordl == coordr):
+            raise ValueError('> Incompatible coordinates')
+
+        ops = {'x': dx, 'y': dy, 'z': dz}
+        d = ops[coordl]
+
+        expr = d(test) * d(trial)
+
+        return BilinearForm.__new__(cls, test_trial, expr)
+
+class Advection(BilinearAtomicForm):
+    """
+
+    Examples
+
+    """
+    _name = 'Advection'
+    def __new__(cls, test_trial):
+
+        test, trial = test_trial[:]
+
+        coordl = test.space.coordinates.name
+        coordr = trial.space.coordinates.name
+        if not(coordl == coordr):
+            raise ValueError('> Incompatible coordinates')
+
+        ops = {'x': dx, 'y': dy, 'z': dz}
+        d = ops[coordl]
+
+        expr = test * d(trial)
+
+        return BilinearForm.__new__(cls, test_trial, expr)
+
+class AdvectionT(BilinearAtomicForm):
+    """
+
+    Examples
+
+    """
+    _name = 'Advection'
+    def __new__(cls, test_trial):
+
+        test, trial = test_trial[:]
+
+        coordl = test.space.coordinates.name
+        coordr = trial.space.coordinates.name
+        if not(coordl == coordr):
+            raise ValueError('> Incompatible coordinates')
+
+        ops = {'x': dx, 'y': dy, 'z': dz}
+        d = ops[coordl]
+
+        expr = d(test) * trial
+
+        return BilinearForm.__new__(cls, test_trial, expr)
 
 # ...
 def atomize(expr, dim=None):
@@ -702,3 +810,97 @@ def gelatize(a, basis=None, verbose=False):
 
     return expr
 # ...
+
+# TODO - get dim from atoms
+#      - check coefficinets/functions
+def tensorize(expr, dim=None):
+
+    expr = atomize(expr)
+
+    # ... compute dim if None
+    #     [copied from atomize]
+    if dim is None:
+        ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction,
+                                                             VectorTestFunction,
+                                                             Field))]
+
+        if ls:
+            atom = ls[0]
+            if atom.space is None:
+                raise ValueError('Expecting atom to be associated to a space')
+
+            dim = atom.space.ldim
+    # ...
+
+    if isinstance(expr, Add):
+        args = [tensorize(i, dim=dim) for i in expr.args]
+        return Add(*args)
+
+    elif isinstance(expr, Mul):
+        args = expr.args
+        tests = [i for i in expr.free_symbols if isinstance(i, TestFunction)]
+
+        d_atoms = {}
+        _coordinates = ['x', 'y', 'z']
+        for a in tests:
+            d_atoms[a] = []
+
+            new = S.One
+            for i in range(0, dim):
+                coord = _coordinates[i]
+                Vi = BasicSobolevSpace('V_{}'.format(i),
+                                       ldim=1,
+                                       coordinates=[coord])
+
+                ai = TestFunction(Vi, '{test}{i}'.format(test=a.name, i=i))
+                d_atoms[a].append(ai)
+
+                new *= ai
+
+            expr = expr.subs({a: new})
+
+        # ...
+        # TODO - improve this later
+        #      - must distinguish between test/trial
+        assert(len(tests) == 2)
+
+        # u :: test
+        # v :: trial
+        u, v = tests[:]
+
+        ops = {'x': dx, 'y': dy, 'z': dz}
+        for ui,vi in zip(d_atoms[u], d_atoms[v]):
+            coord = ui.space.coordinates.name
+            d = ops[coord]
+
+            # ... Mass
+            old = ui * vi
+            new = Mass((vi, ui))
+
+            expr = expr.subs({old: new})
+            # ...
+
+            # ... Stiffness
+            old = d(ui) * d(vi)
+            new = Stiffness((vi, ui))
+
+            expr = expr.subs({old: new})
+            # ...
+
+            # ... Advection
+            old = ui * d(vi)
+            new = Advection((vi, ui))
+
+            expr = expr.subs({old: new})
+            # ...
+
+            # ... Transpose of Advection
+            old = d(ui) * vi
+            new = AdvectionT((vi, ui))
+
+            expr = expr.subs({old: new})
+            # ...
+        # ...
+
+    return expr
+
