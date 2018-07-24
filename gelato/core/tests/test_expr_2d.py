@@ -24,6 +24,7 @@ from gelato.core import BilinearForm, LinearForm, FunctionForm
 from gelato.core import atomize, normalize, matricize
 from gelato.core import gelatize
 from gelato.core import tensorize
+from gelato.core import Mass, Stiffness, Advection, AdvectionT
 
 
 # ...
@@ -623,21 +624,55 @@ def test_tensorize_2d_1():
     print('============ test_tensorize_2d_1 =============')
 
     V = H1Space('V', ldim=2)
+    V_0 = H1Space('V_0', ldim=1, coordinates=['x'])
+    V_1 = H1Space('V_1', ldim=1, coordinates=['y'])
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
+
+    v0 = TestFunction(V_0, name='v0')
+    u0 = TestFunction(V_0, name='u0')
+
+    v1 = TestFunction(V_1, name='v1')
+    u1 = TestFunction(V_1, name='u1')
+
     c = Constant('c')
 
-#    expr = u * v
-#    expr = dx(u) * v
-#    expr = dy(u) * v # TODO not working yet
-#    expr = dx(u) * dx(v)
-#    expr = dot(grad(v), grad(u))
-    expr = dot(grad(v), grad(u)) #+ dx(u)*v #+ dy(u)*v
+    # ...
+    expected = Mass(v1, u1)*Mass(v0, u0)
+    assert(tensorize(BilinearForm((v,u), u*v)) == expected)
+    # ...
 
-    print('> input         >>> {0}'.format(expr))
-    print('> tensorized    >>> {0}'.format(tensorize(expr)))
-#    print(srepr(tensorize(expr, dim=2)))
+    # ...
+    expected = Mass(v1, u1)*Stiffness(v0, u0)
+    assert(tensorize(BilinearForm((v,u), dx(u)*dx(v))) == expected)
+    # ...
+
+    # ...
+    expected = Advection(v1, u1)*Mass(v0, u0)
+    assert(tensorize(BilinearForm((v,u), dy(u) * v)) == expected)
+    # ...
+
+    # ...
+    expected =  Mass(v1,u1)*Advection(v0,u0)
+    assert(tensorize(BilinearForm((v,u), dx(u) * v)) == expected)
+    # ...
+
+    # ...
+    expected = Mass(v1,u1)*Stiffness(v0,u0) + Stiffness(v1,u1)*Mass(v0,u0)
+    assert(tensorize(BilinearForm((v,u), dot(grad(v), grad(u)))) == expected)
+    # ...
+
+    # ...
+    expected = Advection(v1,u1)*Mass(v0,u0) + Mass(v1,u1)*Advection(v0,u0) + Mass(v1,u1)*Stiffness(v0,u0) + Stiffness(v1,u1)*Mass(v0,u0)
+    assert(tensorize(BilinearForm((v,u), dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v)) == expected)
+    # ...
+
+#    expr = dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v
+#    expr = BilinearForm((v,u), expr)
+#
+#    print('> input         >>> {0}'.format(expr))
+#    print('> tensorized    >>> {0}'.format(tensorize(expr)))
 # ...
 
 

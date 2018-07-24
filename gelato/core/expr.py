@@ -380,7 +380,7 @@ class BilinearAtomicForm(BilinearForm, AtomicExpr):
         trial = [sstr(i) for i in self.trial_functions]
         trial = ','.join(i for i in trial)
 
-        return '{name}({trial}, {test})'.format(name=name, trial=trial, test=test)
+        return '{name}({test},{trial})'.format(name=name, trial=trial, test=test)
 
 class Mass(BilinearAtomicForm):
     """
@@ -389,9 +389,9 @@ class Mass(BilinearAtomicForm):
 
     """
     _name = 'Mass'
-    def __new__(cls, test_trial):
+    def __new__(cls, test, trial):
 
-        test, trial = test_trial[:]
+        test_trial = [test, trial]
         expr = test * trial
 
         return BilinearForm.__new__(cls, test_trial, expr)
@@ -403,9 +403,9 @@ class Stiffness(BilinearAtomicForm):
 
     """
     _name = 'Stiffness'
-    def __new__(cls, test_trial):
+    def __new__(cls, test, trial):
 
-        test, trial = test_trial[:]
+        test_trial = [test, trial]
 
         coordl = test.space.coordinates.name
         coordr = trial.space.coordinates.name
@@ -426,9 +426,9 @@ class Advection(BilinearAtomicForm):
 
     """
     _name = 'Advection'
-    def __new__(cls, test_trial):
+    def __new__(cls, test, trial):
 
-        test, trial = test_trial[:]
+        test_trial = [test, trial]
 
         coordl = test.space.coordinates.name
         coordr = trial.space.coordinates.name
@@ -449,9 +449,9 @@ class AdvectionT(BilinearAtomicForm):
 
     """
     _name = 'Advection'
-    def __new__(cls, test_trial):
+    def __new__(cls, test, trial):
 
-        test, trial = test_trial[:]
+        test_trial = [test, trial]
 
         coordl = test.space.coordinates.name
         coordr = trial.space.coordinates.name
@@ -813,36 +813,19 @@ def gelatize(a, basis=None, verbose=False):
 
 # TODO - get dim from atoms
 #      - check coefficinets/functions
-def tensorize(expr, dim=None):
-
-    expr = atomize(expr)
-
-    # ... compute dim if None
-    #     [copied from atomize]
-    if dim is None:
-        ls = [i for i in expr.free_symbols if isinstance(i, (TestFunction,
-                                                             VectorTestFunction,
-                                                             Field))]
-
-        if ls:
-            atom = ls[0]
-            if atom.space is None:
-                raise ValueError('Expecting atom to be associated to a space')
-
-            dim = atom.space.ldim
-    # ...
+def _tensorize_core(expr, dim, tests, trials):
 
     if isinstance(expr, Add):
-        args = [tensorize(i, dim=dim) for i in expr.args]
+        args = [_tensorize_core(i, dim, tests, trials) for i in expr.args]
         return Add(*args)
 
     elif isinstance(expr, Mul):
         args = expr.args
-        tests = [i for i in expr.free_symbols if isinstance(i, TestFunction)]
 
         d_atoms = {}
         _coordinates = ['x', 'y', 'z']
-        for a in tests:
+        test_trial = list(tests) + list(trials)
+        for a in test_trial:
             d_atoms[a] = []
 
             new = S.One
@@ -862,11 +845,12 @@ def tensorize(expr, dim=None):
         # ...
         # TODO - improve this later
         #      - must distinguish between test/trial
-        assert(len(tests) == 2)
+        assert(len(test_trial) == 2)
 
         # u :: test
         # v :: trial
-        u, v = tests[:]
+        u = tests[0]
+        v = trials[0]
 
         ops = {'x': dx, 'y': dy, 'z': dz}
         for ui,vi in zip(d_atoms[u], d_atoms[v]):
@@ -875,28 +859,28 @@ def tensorize(expr, dim=None):
 
             # ... Mass
             old = ui * vi
-            new = Mass((vi, ui))
+            new = Mass(ui,vi)
 
             expr = expr.subs({old: new})
             # ...
 
             # ... Stiffness
             old = d(ui) * d(vi)
-            new = Stiffness((vi, ui))
+            new = Stiffness(ui,vi)
 
             expr = expr.subs({old: new})
             # ...
 
             # ... Advection
             old = ui * d(vi)
-            new = Advection((vi, ui))
+            new = Advection(ui,vi)
 
             expr = expr.subs({old: new})
             # ...
 
             # ... Transpose of Advection
             old = d(ui) * vi
-            new = AdvectionT((vi, ui))
+            new = AdvectionT(ui,vi)
 
             expr = expr.subs({old: new})
             # ...
@@ -904,3 +888,17 @@ def tensorize(expr, dim=None):
 
     return expr
 
+def tensorize(a):
+
+    if not isinstance(a, BilinearForm):
+        raise TypeError('Expecting a BilinearForm')
+
+    dim = a.ldim
+    expr = a.expr
+    tests = a.test_functions
+    trials = a.trial_functions
+
+    expr = atomize(expr)
+    expr = _tensorize_core(expr, dim, tests, trials)
+
+    return expr
