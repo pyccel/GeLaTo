@@ -448,7 +448,7 @@ class AdvectionT(BilinearAtomicForm):
     Examples
 
     """
-    _name = 'Advection'
+    _name = 'AdvectionT'
     def __new__(cls, test, trial):
 
         test_trial = [test, trial]
@@ -820,7 +820,8 @@ def _tensorize_core(expr, dim, tests, trials):
         return Add(*args)
 
     elif isinstance(expr, Mul):
-        args = expr.args
+        coeffs  = [i for i in expr.args if isinstance(i, _coeffs_registery)]
+        args = [i for i in expr.args if not(i in coeffs)]
 
         d_atoms = {}
         _coordinates = ['x', 'y', 'z']
@@ -842,15 +843,17 @@ def _tensorize_core(expr, dim, tests, trials):
 
             expr = expr.subs({a: new})
 
+        # make sure we have sum of products
+        expr = expand(expr)
+
         # ...
         # TODO - improve this later
         #      - must distinguish between test/trial
-        assert(len(test_trial) == 2)
+        assert(len(tests) == 1)
+        assert(len(trials) == 1)
 
-        # u :: test
-        # v :: trial
-        u = tests[0]
-        v = trials[0]
+        v = tests[0]
+        u = trials[0]
 
         ops = {'x': dx, 'y': dy, 'z': dz}
         for ui,vi in zip(d_atoms[u], d_atoms[v]):
@@ -858,33 +861,34 @@ def _tensorize_core(expr, dim, tests, trials):
             d = ops[coord]
 
             # ... Mass
-            old = ui * vi
-            new = Mass(ui,vi)
+            old = vi*ui
+            new = Mass(vi,ui)
 
             expr = expr.subs({old: new})
             # ...
 
             # ... Stiffness
-            old = d(ui) * d(vi)
-            new = Stiffness(ui,vi)
+            old = d(vi)*d(ui)
+            new = Stiffness(vi,ui)
 
             expr = expr.subs({old: new})
             # ...
 
             # ... Advection
-            old = ui * d(vi)
-            new = Advection(ui,vi)
+            old = vi*d(ui)
+            new = Advection(vi,ui)
 
             expr = expr.subs({old: new})
             # ...
 
             # ... Transpose of Advection
-            old = d(ui) * vi
-            new = AdvectionT(ui,vi)
+            old = d(vi)*ui
+            new = AdvectionT(vi,ui)
 
             expr = expr.subs({old: new})
             # ...
         # ...
+
 
     return expr
 

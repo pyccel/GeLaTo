@@ -638,6 +638,10 @@ def test_tensorize_2d_1():
 
     c = Constant('c')
 
+    bx = Constant('bx')
+    by = Constant('by')
+    b = Tuple(bx, by)
+
     # ...
     expected = Mass(v1, u1)*Mass(v0, u0)
     assert(tensorize(BilinearForm((v,u), u*v)) == expected)
@@ -668,7 +672,20 @@ def test_tensorize_2d_1():
     assert(tensorize(BilinearForm((v,u), dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v)) == expected)
     # ...
 
-#    expr = dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v
+    # ...
+    expected = bx*Mass(v1,u1)*AdvectionT(v0,u0) + by*AdvectionT(v1,u1)*Mass(v0,u0)
+    assert(tensorize(BilinearForm((v,u), dot(b, grad(v)) * u)) == expected)
+    # ...
+
+    # ...
+    expected = (bx**2*Mass(v1,u1)*Stiffness(v0,u0) +
+                bx*by*Advection(v1,u1)*AdvectionT(v0,u0) +
+                bx*by*AdvectionT(v1,u1)*Advection(v0,u0) +
+                by**2*Stiffness(v1,u1)*Mass(v0,u0))
+    assert(tensorize(BilinearForm((v,u), dot(b, grad(v)) * dot(b, grad(u)))) == expected)
+    # ...
+
+#    expr = dot(b, grad(v)) * u
 #    expr = BilinearForm((v,u), expr)
 #
 #    print('> input         >>> {0}'.format(expr))
@@ -678,25 +695,25 @@ def test_tensorize_2d_1():
 
 # .....................................................
 if __name__ == '__main__':
-#    test_atomize_2d_1()
-#    test_normalize_2d_1()
-#    test_gelatize_2d_1()
-#
-#    test_atomize_2d_2()
-#    test_normalize_2d_2()
-#    test_matricize_2d_2()
-#
-###    test_bilinear_form_2d_1()
-###    test_bilinear_form_2d_2()
-###    test_bilinear_form_2d_3()
-###    test_bilinear_form_2d_4()
-#
-#    test_bilinear_form_2d_10()
-#    test_linear_form_2d_10()
-#    test_function_form_2d_10()
-#
-#    test_linear_form_2d_1()
-#
-#    test()
+    test_atomize_2d_1()
+    test_normalize_2d_1()
+    test_gelatize_2d_1()
+
+    test_atomize_2d_2()
+    test_normalize_2d_2()
+    test_matricize_2d_2()
+
+##    test_bilinear_form_2d_1()
+##    test_bilinear_form_2d_2()
+##    test_bilinear_form_2d_3()
+##    test_bilinear_form_2d_4()
+
+    test_bilinear_form_2d_10()
+    test_linear_form_2d_10()
+    test_function_form_2d_10()
+
+    test_linear_form_2d_1()
+
+    test()
 
     test_tensorize_2d_1()
