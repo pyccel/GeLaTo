@@ -7,18 +7,12 @@ from sympy import lambdify
 from numpy import linspace, pi
 from matplotlib import pyplot as plt
 
-from .glt import (glt_symbol_m,
-                  glt_symbol_s,
-                  glt_symbol_a,
-                  glt_symbol_b)
+from .glt import Stiffness
 
 
-def plot_stiffness_symbols(n, degrees=[2, 3], nx=100):
+def plot_stiffness_symbols(degrees=[2, 3], nx=100):
     """
     Plots the stiffness symbol for different degrees on a given number of elements.
-
-    n: int
-        number of elements of the grid
 
     degrees: list, tuple
         a list/tuple of spline degrees
@@ -33,7 +27,7 @@ def plot_stiffness_symbols(n, degrees=[2, 3], nx=100):
 
         t = Symbol('t')
 
-        symbol = glt_symbol_s(p, t, n)
+        symbol = Stiffness(p, t)
 
         # ... make the symbol a numeric function, that can be evaluated
         f = lambdify(t, symbol, "numpy")

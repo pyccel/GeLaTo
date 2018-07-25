@@ -23,16 +23,53 @@ from itertools import product
 # TODO add it to glt_function
 TOLERANCE    = 1.e-10
 
+class BasicGlt(Function):
+    """
+
+    Examples
+
+    """
+    nargs = None
+
+    def __new__(cls, *args, **options):
+        # (Try to) sympify args first
+
+        if options.pop('evaluate', True):
+            r = cls.eval(*args)
+        else:
+            r = None
+
+        if r is None:
+            return Basic.__new__(cls, *args, **options)
+        else:
+            return r
+
+    @property
+    def name(self):
+        return self._name
+
+    def _sympystr(self, printer):
+        sstr = printer.doprint
+
+        name = sstr(self.name)
+        p = sstr(self.args[0])
+        t = sstr(self.args[1])
+
+        return '{name}({p},{t})'.format(name=name, p=p, t=t)
+#        return '{name}_{p}({t})'.format(name=name, p=p, t=t)
 
 # ...
-class glt_symbol_m(Function):
+class Mass(BasicGlt):
     """
     A class for the mass symbol
     """
-    nargs = 3
+    nargs = 2
+    _name = 'Mass'
 
     @classmethod
-    def eval(cls, p, t, n=None):
+    def eval(cls, p, t):
+        if isinstance(p, Symbol):
+            return Mass(p,t, evaluate=False)
 
         # ...
         r  = Symbol('r')
@@ -59,27 +96,21 @@ class glt_symbol_m(Function):
             m += 2 * phi[i] * cos(i * t)
         # ...
 
-        # ... scaling
-        if not( n is None ):
-            if isinstance(n, Symbol):
-                m = m/n
-
-            else:
-                m *= Rational(1,n)
-        # ...
-
         return m
 # ...
 
 # ...
-class glt_symbol_s(Function):
+class Stiffness(BasicGlt):
     """
     A class for the stiffness symbol
     """
-    nargs = 3
+    nargs = 2
+    _name = 'Stiffness'
 
     @classmethod
-    def eval(cls, p, t, n=None):
+    def eval(cls, p, t):
+        if isinstance(p, Symbol):
+            return Stiffness(p,t, evaluate=False)
 
         # ...
         r  = Symbol('r')
@@ -108,23 +139,21 @@ class glt_symbol_s(Function):
             m += -2 * phi[i] * cos(i * t)
         # ...
 
-        # ... scaling
-        if not( n is None ):
-            m *= n
-        # ...
-
         return m
 # ...
 
 # ...
-class glt_symbol_a(Function):
+class Advection(BasicGlt):
     """
     A class for the advection symbol
     """
-    nargs = 3
+    nargs = 2
+    _name = 'Advection'
 
     @classmethod
-    def eval(cls, p, t, n=None):
+    def eval(cls, p, t):
+        if isinstance(p, Symbol):
+            return Advection(p,t, evaluate=False)
 
         # ...
         r  = Symbol('r')
@@ -156,14 +185,17 @@ class glt_symbol_a(Function):
 # ...
 
 # ...
-class glt_symbol_b(Function):
+class Bilaplacian(BasicGlt):
     """
     A class for the bilaplacian symbol
     """
-    nargs = 3
+    nargs = 2
+    _name = 'Bilaplacian'
 
     @classmethod
-    def eval(cls, p, t, n=None):
+    def eval(cls, p, t):
+        if isinstance(p, Symbol):
+            return Bilaplacian(p,t, evaluate=False)
 
         # ...
         r  = Symbol('r')
@@ -192,11 +224,6 @@ class glt_symbol_b(Function):
         m = phi[0] * cos(S.Zero)
         for i in range(1, p+1):
             m += 2 * phi[i] * cos(i * t)
-        # ...
-
-        # ... scaling
-        if not( n is None ):
-            m *= n**3
         # ...
 
         return m

@@ -1,6 +1,6 @@
 # coding: utf-8
 
-
+from sympy import Function
 from sympy.core import Add, Mul
 from sympy import I as sympy_I
 from sympy import Symbol
@@ -10,13 +10,16 @@ from sympy.core import Expr, Basic, AtomicExpr
 
 from symfe.core import BilinearForm, BilinearAtomicForm
 from symfe.core import tensorize
-from symfe.core import Mass, Stiffness, Advection, AdvectionT
+from symfe.core import Mass as MassForm
+from symfe.core import Stiffness as StiffnessForm
+from symfe.core import Advection as AdvectionForm
+from symfe.core import AdvectionT as AdvectionTForm
 from symfe.core.basic import _coeffs_registery
 
-from .glt import (glt_symbol_m,
-                  glt_symbol_s,
-                  glt_symbol_a,
-                  glt_symbol_b)
+from .glt import (Mass,
+                  Stiffness,
+                  Advection,
+                  Bilaplacian)
 
 
 # ...
@@ -73,44 +76,26 @@ def gelatize(a, degrees=None, evaluate=False, verbose=False):
                 degrees = [degrees]
 
             p = degrees[index]
-            evaluate = True
+        else:
+            p_name = 'p{}'.format(coord)
+            p = Symbol(p_name, integer=True)
         # ...
 
-        if isinstance(expr, Mass):
-            if evaluate:
-                return glt_symbol_m(p, t, n)
+        if isinstance(expr, MassForm):
+            symbol = Mass(p, t, evaluate=evaluate)
+            return symbol / n
 
-            else:
-                name = 'm_{}'.format(index)
-                symbol = Symbol(name, real=True)
-                return symbol / n
+        elif isinstance(expr, StiffnessForm):
+            symbol = Stiffness(p, t, evaluate=evaluate)
+            return symbol * n
 
-        elif isinstance(expr, Stiffness):
-            if evaluate:
-                return glt_symbol_s(p, t, n)
+        elif isinstance(expr, AdvectionForm):
+            symbol = sympy_I * Advection(p, t, evaluate=evaluate)
+            return symbol
 
-            else:
-                name = 's_{}'.format(index)
-                symbol = Symbol(name, real=True)
-                return symbol * n
-
-        elif isinstance(expr, Advection):
-            if evaluate:
-                return   sympy_I * glt_symbol_a(p, t, n)
-
-            else:
-                name = 'a_{}'.format(index)
-                symbol = Symbol(name, real=True)
-                return symbol
-
-        elif isinstance(expr, AdvectionT):
-            if evaluate:
-                return - sympy_I * glt_symbol_a(p, t, n)
-
-            else:
-                name = 'a_{}'.format(index)
-                symbol = - Symbol(name, real=True)
-                return symbol
+        elif isinstance(expr, AdvectionTForm):
+            symbol = - sympy_I * Advection(p, t, evaluate=evaluate)
+            return symbol
 
         else:
             raise NotImplementedError('TODO')
@@ -119,28 +104,39 @@ def gelatize(a, degrees=None, evaluate=False, verbose=False):
 # ...
 
 
-class Glt(AtomicExpr):
+class Glt(Function):
     """
 
     Examples
 
     """
     _bilinear_form = None
-    def __new__(cls, a, degrees=None, evaluate=False):
+    nargs = None
+
+    def __new__(cls, *args, **options):
+        # (Try to) sympify args first
+
+        if options.pop('evaluate', True):
+            r = cls.eval(*args)
+        else:
+            r = None
+
+        if r is None:
+            return Basic.__new__(cls, *args, **options)
+        else:
+            return r
+
+    @classmethod
+    def eval(cls, a, degrees=None, evaluate=False):
 
         if not isinstance(a, BilinearForm):
             raise TypeError('> Expecting a BilinearForm')
 
         expr = gelatize(a, degrees=degrees, evaluate=evaluate)
 
-        obj = Basic.__new__(cls, expr)
-        obj._bilinear_form = a
+        cls._bilinear_form = a
 
-        return obj
-
-    @property
-    def expr(self):
-        return self._args[0]
+        return expr
 
     @property
     def bilinear_form(self):
