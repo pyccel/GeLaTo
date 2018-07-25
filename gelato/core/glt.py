@@ -32,7 +32,7 @@ class glt_symbol_m(Function):
     nargs = 3
 
     @classmethod
-    def eval(cls, p, n, t):
+    def eval(cls, p, t, n=None):
 
         # ...
         r  = Symbol('r')
@@ -60,10 +60,12 @@ class glt_symbol_m(Function):
         # ...
 
         # ... scaling
-        if isinstance(n, Symbol):
-            m = m/n
-        else:
-            m *= Rational(1,n)
+        if not( n is None ):
+            if isinstance(n, Symbol):
+                m = m/n
+
+            else:
+                m *= Rational(1,n)
         # ...
 
         return m
@@ -77,7 +79,7 @@ class glt_symbol_s(Function):
     nargs = 3
 
     @classmethod
-    def eval(cls, p, n, t):
+    def eval(cls, p, t, n=None):
 
         # ...
         r  = Symbol('r')
@@ -107,7 +109,8 @@ class glt_symbol_s(Function):
         # ...
 
         # ... scaling
-        m *= n
+        if not( n is None ):
+            m *= n
         # ...
 
         return m
@@ -121,7 +124,7 @@ class glt_symbol_a(Function):
     nargs = 3
 
     @classmethod
-    def eval(cls, p, n, t):
+    def eval(cls, p, t, n=None):
 
         # ...
         r  = Symbol('r')
@@ -149,10 +152,6 @@ class glt_symbol_a(Function):
             m += -2 * phi[i] * sin(i * t)
         # ...
 
-#        # ... make it pure imaginary
-#        m *= sympy_I
-#        # ...
-
         return m
 # ...
 
@@ -164,7 +163,7 @@ class glt_symbol_b(Function):
     nargs = 3
 
     @classmethod
-    def eval(cls, p, n, t):
+    def eval(cls, p, t, n=None):
 
         # ...
         r  = Symbol('r')
@@ -196,7 +195,8 @@ class glt_symbol_b(Function):
         # ...
 
         # ... scaling
-        m *= n**3
+        if not( n is None ):
+            m *= n**3
         # ...
 
         return m

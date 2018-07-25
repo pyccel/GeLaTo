@@ -33,7 +33,7 @@ def plot_stiffness_symbols(n, degrees=[2, 3], nx=100):
 
         t = Symbol('t')
 
-        symbol = glt_symbol_s(p, n, t)
+        symbol = glt_symbol_s(p, t, n)
 
         # ... make the symbol a numeric function, that can be evaluated
         f = lambdify(t, symbol, "numpy")
