@@ -16,6 +16,7 @@ from symfe.core import VectorTestFunction
 from symfe.core import BilinearForm
 
 from gelato.core import gelatize
+from gelato.core import Glt
 
 
 # ...
@@ -23,8 +24,6 @@ def test_gelatize_2d_1():
     print('============ test_gelatize_2d_1 =============')
 
     V = H1Space('V', ldim=2)
-    V_0 = H1Space('V_0', ldim=1, coordinates=['x'])
-    V_1 = H1Space('V_1', ldim=1, coordinates=['y'])
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -93,7 +92,26 @@ def test_gelatize_2d_1():
 #    print('> gelatized >>> {0}'.format(gelatize(expr, degrees, evaluate=evaluate)))
 # ...
 
+# ...
+def test_gelatize_2d_2():
+    print('============ test_gelatize_2d_2 =============')
+
+    V = H1Space('V', ldim=2)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(V, name='u')
+
+    mass = BilinearForm((v,u), u*v)
+    laplace = BilinearForm((v,u), dot(grad(v), grad(u)))
+
+    symbol_m = Glt(mass, degrees=[1,1])
+    symbol_l = Glt(laplace, degrees=[2,2])
+    from sympy import simplify
+    print(symbol_l*symbol_m)
+
+# ...
 
 # .....................................................
 if __name__ == '__main__':
     test_gelatize_2d_1()
+    test_gelatize_2d_2()

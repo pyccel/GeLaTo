@@ -6,6 +6,7 @@ from sympy import I as sympy_I
 from sympy import Symbol
 from sympy.core.containers import Tuple
 from sympy import S
+from sympy.core import Expr, Basic, AtomicExpr
 
 from symfe.core import BilinearForm, BilinearAtomicForm
 from symfe.core import tensorize
@@ -19,7 +20,7 @@ from .glt import (glt_symbol_m,
 
 
 # ...
-def gelatize(a, degrees=None, evaluate=True, verbose=False):
+def gelatize(a, degrees=None, evaluate=False, verbose=False):
     if isinstance(a, BilinearForm) and not(isinstance(a, BilinearAtomicForm)):
         expr = tensorize(a)
         if verbose:
@@ -72,6 +73,7 @@ def gelatize(a, degrees=None, evaluate=True, verbose=False):
                 degrees = [degrees]
 
             p = degrees[index]
+            evaluate = True
         # ...
 
         if isinstance(expr, Mass):
@@ -115,3 +117,31 @@ def gelatize(a, degrees=None, evaluate=True, verbose=False):
 
     return expr
 # ...
+
+
+class Glt(AtomicExpr):
+    """
+
+    Examples
+
+    """
+    _bilinear_form = None
+    def __new__(cls, a, degrees=None, evaluate=False):
+
+        if not isinstance(a, BilinearForm):
+            raise TypeError('> Expecting a BilinearForm')
+
+        expr = gelatize(a, degrees=degrees, evaluate=evaluate)
+
+        obj = Basic.__new__(cls, expr)
+        obj._bilinear_form = a
+
+        return obj
+
+    @property
+    def expr(self):
+        return self._args[0]
+
+    @property
+    def bilinear_form(self):
+        return self._bilinear_form
