@@ -23,55 +23,6 @@ from itertools import product
 # TODO add it to glt_function
 TOLERANCE    = 1.e-10
 
-# ...
-class glt_function(Function):
-    """
-
-    Examples
-    ========
-
-    """
-
-    nargs = None
-
-    def __new__(cls, *args, **options):
-
-        if options.pop('evaluate', True):
-            r = cls.eval(*args)
-        else:
-            r = None
-
-        if r is None:
-            return Basic.__new__(cls, *args, **options)
-        else:
-            return r
-
-    @classmethod
-    def eval(cls, *_args):
-        """."""
-
-        if not _args:
-            return
-
-        f = _args[0]
-        n = _args[1]
-        p = _args[2]
-
-        if isinstance(n, (Tuple, list, tuple)):
-            dim = len(n)
-        else:
-            dim = 1
-            n = [n]
-            p = [p]
-        discretization = {"n_elements": n, "degrees": p}
-
-        F = glt_symbol(f, dim=dim,
-                       discretization=discretization,
-                       evaluate=True,
-                       verbose=False)
-
-        return F
-# ...
 
 # ...
 class glt_symbol_m(Function):
@@ -81,13 +32,7 @@ class glt_symbol_m(Function):
     nargs = 3
 
     @classmethod
-    def eval(cls, n, p, t):
-        # ...
-        if not 0 <= p:
-            raise ValueError("must have 0 <= p")
-        if not 0 <= n:
-            raise ValueError("must have 0 <= n")
-        # ...
+    def eval(cls, p, n, t):
 
         # ...
         r  = Symbol('r')
@@ -115,7 +60,10 @@ class glt_symbol_m(Function):
         # ...
 
         # ... scaling
-        m *= Rational(1,n)
+        if isinstance(n, Symbol):
+            m = m/n
+        else:
+            m *= Rational(1,n)
         # ...
 
         return m
@@ -129,13 +77,7 @@ class glt_symbol_s(Function):
     nargs = 3
 
     @classmethod
-    def eval(cls, n, p, t):
-        # ...
-        if not 0 <= p:
-            raise ValueError("must have 0 <= p")
-        if not 0 <= n:
-            raise ValueError("must have 0 <= n")
-        # ...
+    def eval(cls, p, n, t):
 
         # ...
         r  = Symbol('r')
@@ -179,13 +121,7 @@ class glt_symbol_a(Function):
     nargs = 3
 
     @classmethod
-    def eval(cls, n, p, t):
-        # ...
-        if not 0 <= p:
-            raise ValueError("must have 0 <= p")
-        if not 0 <= n:
-            raise ValueError("must have 0 <= n")
-        # ...
+    def eval(cls, p, n, t):
 
         # ...
         r  = Symbol('r')
@@ -228,13 +164,7 @@ class glt_symbol_b(Function):
     nargs = 3
 
     @classmethod
-    def eval(cls, n, p, t):
-        # ...
-        if not 0 <= p:
-            raise ValueError("must have 0 <= p")
-        if not 0 <= n:
-            raise ValueError("must have 0 <= n")
-        # ...
+    def eval(cls, p, n, t):
 
         # ...
         r  = Symbol('r')
