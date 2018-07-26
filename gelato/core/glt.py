@@ -68,35 +68,41 @@ class Mass(BasicGlt):
 
     @classmethod
     def eval(cls, p, t):
-        if isinstance(p, Symbol):
-            return Mass(p,t, evaluate=False)
 
-        # ...
-        r  = Symbol('r')
+        if p is S.Infinity:
+            raise NotImplementedError('Add symbol limit for p -> oo')
 
-        pp = 2*p + 1
-        N = pp + 1
-        L = list(range(0, N + pp + 1))
+        elif isinstance(p, Symbol):
+            return Mass(p, t, evaluate=False)
 
-        b0 = bspline_basis(pp, L, 0, r)
-        bsp = lambdify(r, b0)
-        # ...
+        elif isinstance(p, int):
 
-        # ... we use nsimplify to get the rational number
-        phi = []
-        for i in range(0, p+1):
-            y = bsp(p+1-i)
-            y = nsimplify(y, tolerance=TOLERANCE, rational=True)
-            phi.append(y)
-        # ...
+            # ...
+            r  = Symbol('r')
 
-        # ...
-        m = phi[0] * cos(S.Zero)
-        for i in range(1, p+1):
-            m += 2 * phi[i] * cos(i * t)
-        # ...
+            pp = 2*p + 1
+            N = pp + 1
+            L = list(range(0, N + pp + 1))
 
-        return m
+            b0 = bspline_basis(pp, L, 0, r)
+            bsp = lambdify(r, b0)
+            # ...
+
+            # ... we use nsimplify to get the rational number
+            phi = []
+            for i in range(0, p+1):
+                y = bsp(p+1-i)
+                y = nsimplify(y, tolerance=TOLERANCE, rational=True)
+                phi.append(y)
+            # ...
+
+            # ...
+            m = phi[0] * cos(S.Zero)
+            for i in range(1, p+1):
+                m += 2 * phi[i] * cos(i * t)
+            # ...
+
+            return m
 # ...
 
 # ...
@@ -109,37 +115,43 @@ class Stiffness(BasicGlt):
 
     @classmethod
     def eval(cls, p, t):
-        if isinstance(p, Symbol):
-            return Stiffness(p,t, evaluate=False)
 
-        # ...
-        r  = Symbol('r')
+        if p is S.Infinity:
+            raise NotImplementedError('Add symbol limit for p -> oo')
 
-        pp = 2*p + 1
-        N = pp + 1
-        L = list(range(0, N + pp + 1))
+        elif isinstance(p, Symbol):
+            return Stiffness(p, t, evaluate=False)
 
-        b0    = bspline_basis(pp, L, 0, r)
-        b0_r  = diff(b0, r)
-        b0_rr = diff(b0_r, r)
-        bsp   = lambdify(r, b0_rr)
-        # ...
+        elif isinstance(p, int):
 
-        # ... we use nsimplify to get the rational number
-        phi = []
-        for i in range(0, p+1):
-            y = bsp(p+1-i)
-            y = nsimplify(y, tolerance=TOLERANCE, rational=True)
-            phi.append(y)
-        # ...
+            # ...
+            r  = Symbol('r')
 
-        # ...
-        m = -phi[0] * cos(S.Zero)
-        for i in range(1, p+1):
-            m += -2 * phi[i] * cos(i * t)
-        # ...
+            pp = 2*p + 1
+            N = pp + 1
+            L = list(range(0, N + pp + 1))
 
-        return m
+            b0    = bspline_basis(pp, L, 0, r)
+            b0_r  = diff(b0, r)
+            b0_rr = diff(b0_r, r)
+            bsp   = lambdify(r, b0_rr)
+            # ...
+
+            # ... we use nsimplify to get the rational number
+            phi = []
+            for i in range(0, p+1):
+                y = bsp(p+1-i)
+                y = nsimplify(y, tolerance=TOLERANCE, rational=True)
+                phi.append(y)
+            # ...
+
+            # ...
+            m = -phi[0] * cos(S.Zero)
+            for i in range(1, p+1):
+                m += -2 * phi[i] * cos(i * t)
+            # ...
+
+            return m
 # ...
 
 # ...
@@ -152,36 +164,42 @@ class Advection(BasicGlt):
 
     @classmethod
     def eval(cls, p, t):
-        if isinstance(p, Symbol):
-            return Advection(p,t, evaluate=False)
 
-        # ...
-        r  = Symbol('r')
+        if p is S.Infinity:
+            raise NotImplementedError('Add symbol limit for p -> oo')
 
-        pp = 2*p + 1
-        N = pp + 1
-        L = list(range(0, N + pp + 1))
+        elif isinstance(p, Symbol):
+            return Advection(p, t, evaluate=False)
 
-        b0   = bspline_basis(pp, L, 0, r)
-        b0_r = diff(b0, r)
-        bsp  = lambdify(r, b0_r)
-        # ...
+        elif isinstance(p, int):
 
-        # ... we use nsimplify to get the rational number
-        phi = []
-        for i in range(0, p+1):
-            y = bsp(p+1-i)
-            y = nsimplify(y, tolerance=TOLERANCE, rational=True)
-            phi.append(y)
-        # ...
+            # ...
+            r  = Symbol('r')
 
-        # ...
-        m = -phi[0] * cos(S.Zero)
-        for i in range(1, p+1):
-            m += -2 * phi[i] * sin(i * t)
-        # ...
+            pp = 2*p + 1
+            N = pp + 1
+            L = list(range(0, N + pp + 1))
 
-        return m
+            b0   = bspline_basis(pp, L, 0, r)
+            b0_r = diff(b0, r)
+            bsp  = lambdify(r, b0_r)
+            # ...
+
+            # ... we use nsimplify to get the rational number
+            phi = []
+            for i in range(0, p+1):
+                y = bsp(p+1-i)
+                y = nsimplify(y, tolerance=TOLERANCE, rational=True)
+                phi.append(y)
+            # ...
+
+            # ...
+            m = -phi[0] * cos(S.Zero)
+            for i in range(1, p+1):
+                m += -2 * phi[i] * sin(i * t)
+            # ...
+
+            return m
 # ...
 
 # ...
@@ -194,37 +212,43 @@ class Bilaplacian(BasicGlt):
 
     @classmethod
     def eval(cls, p, t):
-        if isinstance(p, Symbol):
-            return Bilaplacian(p,t, evaluate=False)
 
-        # ...
-        r  = Symbol('r')
+        if p is S.Infinity:
+            raise NotImplementedError('Add symbol limit for p -> oo')
 
-        pp = 2*p + 1
-        N = pp + 1
-        L = list(range(0, N + pp + 1))
+        elif isinstance(p, Symbol):
+            return Bilaplacian(p, t, evaluate=False)
 
-        b0    = bspline_basis(pp, L, 0, r)
-        b0_r  = diff(b0, r)
-        b0_rr = diff(b0_r, r)
-        b0_rrr = diff(b0_rr, r)
-        b0_rrrr = diff(b0_rrr, r)
-        bsp   = lambdify(r, b0_rrrr)
-        # ...
+        elif isinstance(p, int):
 
-        # ... we use nsimplify to get the rational number
-        phi = []
-        for i in range(0, p+1):
-            y = bsp(p+1-i)
-            y = nsimplify(y, tolerance=TOLERANCE, rational=True)
-            phi.append(y)
-        # ...
+            # ...
+            r  = Symbol('r')
 
-        # ...
-        m = phi[0] * cos(S.Zero)
-        for i in range(1, p+1):
-            m += 2 * phi[i] * cos(i * t)
-        # ...
+            pp = 2*p + 1
+            N = pp + 1
+            L = list(range(0, N + pp + 1))
 
-        return m
+            b0    = bspline_basis(pp, L, 0, r)
+            b0_r  = diff(b0, r)
+            b0_rr = diff(b0_r, r)
+            b0_rrr = diff(b0_rr, r)
+            b0_rrrr = diff(b0_rrr, r)
+            bsp   = lambdify(r, b0_rrrr)
+            # ...
+
+            # ... we use nsimplify to get the rational number
+            phi = []
+            for i in range(0, p+1):
+                y = bsp(p+1-i)
+                y = nsimplify(y, tolerance=TOLERANCE, rational=True)
+                phi.append(y)
+            # ...
+
+            # ...
+            m = phi[0] * cos(S.Zero)
+            for i in range(1, p+1):
+                m += 2 * phi[i] * cos(i * t)
+            # ...
+
+            return m
 # ...

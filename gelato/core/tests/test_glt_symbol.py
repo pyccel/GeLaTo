@@ -43,9 +43,22 @@ def test_glt_symbol_1():
 #    print(Stiffness(p, t))
 #    print(Advection(p, t))
 #    print(Bilaplacian(p, t))
+# ...
 
 # ...
+def test_glt_symbol_2():
+    print('============ test_glt_symbol_2 ==============')
+
+    from sympy import limit, sin, Symbol, oo
+    from sympy.abc import x
+
+    t = Symbol('t')
+    p = Symbol('p')
+
+    l = limit(Mass(p, t), p, oo)
+    print(l)
 
 # .....................................................
 if __name__ == '__main__':
     test_glt_symbol_1()
+#    test_glt_symbol_2()
