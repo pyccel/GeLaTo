@@ -7,6 +7,7 @@ from sympy import Symbol
 from sympy.core.containers import Tuple
 from sympy import S
 from sympy.core import Expr, Basic, AtomicExpr
+from sympy import simplify
 
 from symfe.core import BilinearForm, BilinearAtomicForm
 from symfe.core import tensorize
@@ -111,33 +112,35 @@ class Glt(Function):
 
     """
     _bilinear_form = None
-    nargs = None
+    nargs = 3
 
-    def __new__(cls, *args, **options):
-        # (Try to) sympify args first
-
-        if options.pop('evaluate', True):
-            r = cls.eval(*args)
-        else:
-            r = None
-
-        if r is None:
-            return Basic.__new__(cls, *args, **options)
-        else:
-            return r
+    def __new__(cls, a, degrees=None, n_elements=None):
+        return cls.eval(a, degrees, n_elements)
 
     @classmethod
-    def eval(cls, a, degrees=None, evaluate=False):
+    def eval(cls, a, degrees, n_elements):
 
         if not isinstance(a, BilinearForm):
             raise TypeError('> Expecting a BilinearForm')
 
+        evaluate = False
+        if not( degrees is None ):
+            evaluate = True
+
         expr = gelatize(a, degrees=degrees, evaluate=evaluate)
 
-        cls._bilinear_form = a
+        if not( n_elements is None ):
+            dim = a.ldim
+            ns = ['nx', 'ny', 'nz'][:dim]
+            ns = [Symbol(i, integer=True) for i in ns]
 
-        return expr
+            if isinstance(n_elements, int):
+                n_elements = [n_elements]*dim
 
-    @property
-    def bilinear_form(self):
-        return self._bilinear_form
+            if not( len(ns) == len(n_elements) ):
+                raise ValueError('Wrong size for n_elements')
+
+            for n,v in zip(ns, n_elements):
+                expr = expr.subs({n: v})
+
+        return simplify(expr)

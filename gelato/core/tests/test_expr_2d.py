@@ -112,14 +112,26 @@ def test_gelatize_2d_2():
     mass = BilinearForm((v,u), u*v)
     laplace = BilinearForm((v,u), dot(grad(v), grad(u)))
 
-    symbol_m = Glt(mass, degrees=[1,1])
-    symbol_l = Glt(laplace, degrees=[2,2])
-    from sympy import simplify
-    print(symbol_l/symbol_m)
+    # ...
+    degrees = [1,1]
+#    degrees = None
+    symbol_m = Glt(mass, degrees=degrees, n_elements=[4,4])
+    print(symbol_m)
+    # ...
+
+    # ...
+    degrees = [2,2]
+    degrees = None
+    symbol_l = Glt(laplace, degrees=degrees)
+    print(symbol_l)
+    # ...
+
+#    from sympy import simplify
+#    print(symbol_l/symbol_m)
 
 # ...
 
 # .....................................................
 if __name__ == '__main__':
     test_gelatize_2d_1()
-#    test_gelatize_2d_2()
+    test_gelatize_2d_2()
