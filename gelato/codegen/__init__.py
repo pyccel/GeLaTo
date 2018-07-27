@@ -1,1 +1,2 @@
-from discretization import *
+from .symbol import *
+from .discretization import *

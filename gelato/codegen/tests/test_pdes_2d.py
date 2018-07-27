@@ -17,6 +17,7 @@ from symfe.core import TestFunction
 from symfe.core import VectorTestFunction
 from symfe.core import BilinearForm
 
+from gelato.codegen import compile_symbol
 from gelato.codegen import discretize
 
 from spl.fem.splines import SplineSpace
@@ -26,21 +27,25 @@ from spl.fem.tensor  import TensorFemSpace
 def test_pdes_2d_1():
     print('============ test_pdes_2d_1 =============')
 
-    # ... abstract model
     V = H1Space('V', ldim=2)
-    V_0 = H1Space('V_0', ldim=1, coordinates=['x'])
-    V_1 = H1Space('V_1', ldim=1, coordinates=['y'])
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
 
-    a = BilinearForm((v,u), u*v)
+    mass = BilinearForm((v,u), u*v)
+    laplace = BilinearForm((v,u), dot(grad(v), grad(u)))
+
+    # ...
+    degrees = [1,1]
+#    degrees = None
+    compile_symbol('mass', mass)
+    print(mass.symbol_expr)
     # ...
 
     # ... discretization
     # Input data: degree, number of elements
-    p1  = 3 ; p2  = 3
-    ne1 = 2**4 ; ne2 = 2**4
+    p1  = 3  ; p2  = 3
+    ne1 = 4 ; ne2 = 4
 
     # Create uniform grid
     grid_1 = linspace( 0., 1., num=ne1+1 )
@@ -54,7 +59,10 @@ def test_pdes_2d_1():
     V = TensorFemSpace( V1, V2 )
     # ...
 
-    discretize( a, [p1, p2] )
+    # ...
+    discretize( mass, [V,V] )
+#    print(mass.symbol.__doc__)
+    # ...
 
 # ...
 

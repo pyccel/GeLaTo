@@ -126,7 +126,6 @@ def test_gelatize_2d_2():
     print(symbol_l)
     # ...
 
-#    from sympy import simplify
 #    print(symbol_l/symbol_m)
 
 # ...
