@@ -48,9 +48,12 @@ def test_symbol_2d_1():
     x1 = linspace(0.,1., n1)
     x2 = linspace(0.,1., n2)
 
+    xs = [x1, x2]
+    ts = [t1, t2]
+
     e = zeros((n1, n2))
-    symbol(x1,x2,t1,t2,e)
-    print(e)
+    symbol(*xs, *ts, e)
+    print('> ', e.min(), e.max())
     # ...
 # ...
 
@@ -82,19 +85,22 @@ def test_symbol_2d_2():
     x1 = linspace(0.,1., n1)
     x2 = linspace(0.,1., n2)
 
+    xs = [x1, x2]
+    ts = [t1, t2]
+
     e = zeros((n1, n2))
     # ...
 
     # ...
     n_elements = [4, 4]
-    symbol(x1,x2,t1,t2,e, *n_elements)
-    print(e)
+    symbol(*xs, *ts, e, *n_elements)
+    print('> ', e.min(), e.max())
     # ...
 
     # ...
     n_elements = [4, 8]
-    symbol(x1,x2,t1,t2,e, *n_elements)
-    print(e)
+    symbol(*xs, *ts, e, *n_elements)
+    print('> ', e.min(), e.max())
     # ...
 
 # ...

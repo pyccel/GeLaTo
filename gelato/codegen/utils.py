@@ -31,6 +31,16 @@ def print_fourier_args(t_args):
 def print_mat_args():
     return ', mat'
 
+_docstring_header = """
+Parameters
+----------
+"""
+
+_pattern_docstring_argument = """
+{__ARG__} : {__TYPE__}
+   {__LABEL__}
+"""
+
 def docstring_arguments(constants, d_args):
     if len(constants) == 0:
         return ''

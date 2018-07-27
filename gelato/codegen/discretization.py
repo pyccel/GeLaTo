@@ -46,7 +46,7 @@ _template ="""
 def {__NAME__}( target, {__X_ARGS__}{__T_ARGS__}{__ARGS__}{__FIELDS__}{__MAT_KWARGS__} ):
     {__DOCSTRING__}
     {__MAT_DEC__}
-    {__SYMBOL_NAME__}( {__X_ARGS__}{__T_ARGS__}{__ARGS__}{__FIELDS__}, {__MAT_ARGS__} )
+    {__SYMBOL_NAME__}( {__X_ARGS__}{__T_ARGS__}, {__MAT_ARGS__}{__ARGS__}{__FIELDS__} )
     return {__MAT_ARGS__}
 """
 

@@ -50,9 +50,12 @@ def test_symbol_3d_1():
     x2 = linspace(0.,1., n2)
     x3 = linspace(0.,1., n3)
 
+    xs = [x1, x2, x3]
+    ts = [t1, t2, t3]
+
     e = zeros((n1, n2, n3))
-    symbol(x1,x2,x3,t1,t2,t3,e)
-    print(e)
+    symbol(*xs, *ts, e)
+    print('> ', e.min(), e.max())
     # ...
 # ...
 
@@ -86,19 +89,22 @@ def test_symbol_3d_2():
     x2 = linspace(0.,1., n2)
     x3 = linspace(0.,1., n3)
 
+    xs = [x1, x2, x3]
+    ts = [t1, t2, t3]
+
     e = zeros((n1, n2, n3))
     # ...
 
     # ...
     n_elements = [4, 4, 4]
-    symbol(x1,x2,x3,t1,t2,t3,e, *n_elements)
-    print(e)
+    symbol(*xs, *ts, e, *n_elements)
+    print('> ', e.min(), e.max())
     # ...
 
     # ...
     n_elements = [4, 8, 8]
-    symbol(x1,x2,x3,t1,t2,t3,e, *n_elements)
-    print(e)
+    symbol(*xs, *ts, e, *n_elements)
+    print('> ', e.min(), e.max())
     # ...
 
 # ...
