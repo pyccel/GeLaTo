@@ -8,9 +8,11 @@ from symfe.codegen import arguments_datatypes_split
 from symfe.codegen.utils import _convert_int_to_float
 from symfe.codegen.utils import write_code
 
-from gelato.core import Glt
+from gelato.core import gelatize
 
 def compile_symbol(name, a,
+                   degrees,
+                   n_elements=None,
                    verbose=False,
                    namespace=globals(),
                    context=None,
@@ -77,15 +79,30 @@ def compile_symbol(name, a,
     # ...
 
     # ...
-    degrees = [1,1]
-    n_elements = [4,4]
-    expr = Glt(a, degrees=degrees, n_elements=n_elements)
-    setattr(a, 'symbol_expr', expr)
+    expr = gelatize(a, degrees=degrees, n_elements=n_elements)
+    # ...
+
+    # ... TODO add an attribute called symbol_expr to the BilinearForm?
+#    setattr(a, 'symbol_expr', expr)
     # ...
 
     # ... identation (def function body)
     tab_base = ' '*4
     tab = tab_base
+    # ...
+
+    # ... append n_elements as argument of the generated symbol function
+    if n_elements:
+        n_elements_str = ''
+        n_elements_types_str = ''
+
+    else:
+        ns = ['nx', 'ny', 'nz'][:dim]
+        n_elements_str = ', '.join(n for n in ns)
+        n_elements_str = ', {}'.format(n_elements_str)
+
+        n_elements_types_str = ', '.join('int' for n in ns)
+        n_elements_types_str = ', {}'.format(n_elements_types_str)
     # ...
 
     # ... field coeffs
@@ -209,6 +226,7 @@ def compile_symbol(name, a,
 
         code = template.format(__KERNEL_NAME__=name,
                                __MAT_ARGS__=mat_args_str,
+                               __N_ELEMENTS__=n_elements_str,
                                __FIELD_COEFFS__=field_coeffs_str,
                                __FIELD_EVALUATION__=eval_field_str,
                                __MAT_INIT__=mat_init_str,
@@ -227,6 +245,7 @@ def compile_symbol(name, a,
         e = _convert_int_to_float(expr.evalf())
         code = template.format(__SYMBOL_NAME__=name,
                                __SYMBOL_EXPR__=e.evalf(),
+                               __N_ELEMENTS__=n_elements_str,
                                __FIELD_COEFFS__=field_coeffs_str,
                                __FIELD_EVALUATION__=eval_field_str,
                                __FIELD_VALUE__=field_value_str,
@@ -265,3 +284,5 @@ def compile_symbol(name, a,
     if export_pyfile:
         write_code(name, code, ext='py', folder='.pyccel')
     # ...
+
+    return kernel

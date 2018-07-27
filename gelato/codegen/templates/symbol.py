@@ -4,7 +4,7 @@
 #          SYMBOL     1D case - scalar
 # .............................................
 _symbol_1d_scalar ="""
-def {__SYMBOL_NAME__}(arr_x1, arr_t1, mat{__ARGS__}{__FIELD_COEFFS__}):
+def {__SYMBOL_NAME__}(arr_x1, arr_t1, mat{__ARGS__}{__FIELD_COEFFS__}{__N_ELEMENTS__}):
     from numpy import sin
     from numpy import cos
 {__FIELD_EVALUATION__}
@@ -17,14 +17,14 @@ def {__SYMBOL_NAME__}(arr_x1, arr_t1, mat{__ARGS__}{__FIELD_COEFFS__}):
         mat[i1] = {__SYMBOL_EXPR__}
 """
 
-_symbol_header_1d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:]{__TYPES__}{__FIELD_TYPES__})'
+_symbol_header_1d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:]{__TYPES__}{__FIELD_TYPES__}{__N_ELEMENTS_TYPES__})'
 # .............................................
 
 # .............................................
 #          SYMBOL     2D case - scalar
 # .............................................
 _symbol_2d_scalar ="""
-def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_t1, arr_t2, mat{__ARGS__}{__FIELD_COEFFS__}):
+def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_t1, arr_t2, mat{__ARGS__}{__FIELD_COEFFS__}{__N_ELEMENTS__}):
     from numpy import sin
     from numpy import cos
 {__FIELD_EVALUATION__}
@@ -41,14 +41,14 @@ def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_t1, arr_t2, mat{__ARGS__}{__FIELD_COEF
             mat[i1, i2] = {__SYMBOL_EXPR__}
 """
 
-_symbol_header_2d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:], double [:], double [:,:]{__TYPES__}{__FIELD_TYPES__})'
+_symbol_header_2d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:], double [:], double [:,:]{__TYPES__}{__FIELD_TYPES__}{__N_ELEMENTS_TYPES__})'
 # .............................................
 
 # .............................................
 #          SYMBOL     3D case - scalar
 # .............................................
 _symbol_3d_scalar ="""
-def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_x3, arr_t1, arr_t2, arr_t3, mat{__ARGS__}{__FIELD_COEFFS__}):
+def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_x3, arr_t1, arr_t2, arr_t3, mat{__ARGS__}{__FIELD_COEFFS__}{__N_ELEMENTS__}):
     from numpy import sin
     from numpy import cos
 {__FIELD_EVALUATION__}
@@ -69,14 +69,14 @@ def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_x3, arr_t1, arr_t2, arr_t3, mat{__ARGS
                 mat[i1, i2, i3] = {__SYMBOL_EXPR__}
 """
 
-_symbol_header_3d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:], double [:], double [:], double [:], double [:,:,:]{__TYPES__}{__FIELD_TYPES__})'
+_symbol_header_3d_scalar = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:], double [:], double [:], double [:], double [:,:,:]{__TYPES__}{__FIELD_TYPES__}{__N_ELEMENTS_TYPES__})'
 # .............................................
 
 # .............................................
 #          SYMBOL     1D case - block
 # .............................................
 _symbol_1d_block ="""
-def {__SYMBOL_NAME__}(arr_x1, arr_t1, mat{__ARGS__}{__FIELD_COEFFS__}):
+def {__SYMBOL_NAME__}(arr_x1, arr_t1, mat{__ARGS__}{__FIELD_COEFFS__}{__N_ELEMENTS__}):
     from numpy import sin
     from numpy import cos
 {__FIELD_EVALUATION__}
@@ -89,14 +89,14 @@ def {__SYMBOL_NAME__}(arr_x1, arr_t1, mat{__ARGS__}{__FIELD_COEFFS__}):
 {__SYMBOL_EXPR__}
 """
 
-_symbol_header_1d_block = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:,:,:]{__TYPES__}{__FIELD_TYPES__})'
+_symbol_header_1d_block = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:,:,:]{__TYPES__}{__FIELD_TYPES__}{__N_ELEMENTS_TYPES__})'
 # .............................................
 
 # .............................................
 #          SYMBOL     2D case - block
 # .............................................
 _symbol_2d_block ="""
-def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_t1, arr_t2, mat{__ARGS__}{__FIELD_COEFFS__}):
+def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_t1, arr_t2, mat{__ARGS__}{__FIELD_COEFFS__}{__N_ELEMENTS__}):
     from numpy import sin
     from numpy import cos
 {__FIELD_EVALUATION__}
@@ -113,14 +113,14 @@ def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_t1, arr_t2, mat{__ARGS__}{__FIELD_COEF
 {__SYMBOL_EXPR__}
 """
 
-_symbol_header_2d_block = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:], double [:], double [:,:,:,:]{__TYPES__}{__FIELD_TYPES__})'
+_symbol_header_2d_block = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:], double [:], double [:,:,:,:]{__TYPES__}{__FIELD_TYPES__}{__N_ELEMENTS_TYPES__})'
 # .............................................
 
 # .............................................
 #          SYMBOL     3D case - block
 # .............................................
 _symbol_3d_block ="""
-def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_x3, arr_t1, arr_t2, arr_t3, mat{__ARGS__}{__FIELD_COEFFS__}):
+def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_x3, arr_t1, arr_t2, arr_t3, mat{__ARGS__}{__FIELD_COEFFS__}{__N_ELEMENTS__}):
     from numpy import sin
     from numpy import cos
 {__FIELD_EVALUATION__}
@@ -141,5 +141,5 @@ def {__SYMBOL_NAME__}(arr_x1, arr_x2, arr_x3, arr_t1, arr_t2, arr_t3, mat{__ARGS
 {__SYMBOL_EXPR__}
 """
 
-_symbol_header_3d_block = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:], double [:], double [:], double [:], double [:,:,:,:,:]{__TYPES__}{__FIELD_TYPES__})'
+_symbol_header_3d_block = '#$ header procedure {__SYMBOL_NAME__}(double [:], double [:], double [:], double [:], double [:], double [:], double [:,:,:,:,:]{__TYPES__}{__FIELD_TYPES__}{__N_ELEMENTS_TYPES__})'
 # .............................................

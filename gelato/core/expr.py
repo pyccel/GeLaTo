@@ -24,7 +24,7 @@ from .glt import (Mass,
 
 
 # ...
-def gelatize(a, degrees=None, evaluate=False, verbose=False):
+def _gelatize(a, degrees=None, evaluate=False, verbose=False):
     if isinstance(a, BilinearForm) and not(isinstance(a, BilinearAtomicForm)):
         expr = tensorize(a)
         if verbose:
@@ -33,7 +33,7 @@ def gelatize(a, degrees=None, evaluate=False, verbose=False):
         expr = a
 
     if isinstance(expr, Add):
-        args = [gelatize(i, degrees=degrees, evaluate=evaluate) for i in expr.args]
+        args = [_gelatize(i, degrees=degrees, evaluate=evaluate) for i in expr.args]
         return Add(*args)
 
     elif isinstance(expr, Mul):
@@ -46,7 +46,7 @@ def gelatize(a, degrees=None, evaluate=False, verbose=False):
 
         j = S.One
         if vectors:
-            args = [gelatize(i, degrees=degrees, evaluate=evaluate) for i in vectors]
+            args = [_gelatize(i, degrees=degrees, evaluate=evaluate) for i in vectors]
             j = Mul(*args)
 
         return Mul(i, j)
@@ -105,42 +105,30 @@ def gelatize(a, degrees=None, evaluate=False, verbose=False):
 # ...
 
 
-class Glt(Function):
-    """
+def gelatize(a, degrees=None, n_elements=None):
 
-    Examples
+    if not isinstance(a, BilinearForm):
+        raise TypeError('> Expecting a BilinearForm')
 
-    """
-    _bilinear_form = None
-    nargs = 3
+    evaluate = False
+    if not( degrees is None ):
+        evaluate = True
 
-    def __new__(cls, a, degrees=None, n_elements=None):
-        return cls.eval(a, degrees, n_elements)
+    expr = _gelatize(a, degrees=degrees, evaluate=evaluate)
 
-    @classmethod
-    def eval(cls, a, degrees, n_elements):
+    if not( n_elements is None ):
+        dim = a.ldim
+        ns = ['nx', 'ny', 'nz'][:dim]
+        ns = [Symbol(i, integer=True) for i in ns]
 
-        if not isinstance(a, BilinearForm):
-            raise TypeError('> Expecting a BilinearForm')
+        if isinstance(n_elements, int):
+            n_elements = [n_elements]*dim
 
-        evaluate = False
-        if not( degrees is None ):
-            evaluate = True
+        if not( len(ns) == len(n_elements) ):
+            raise ValueError('Wrong size for n_elements')
 
-        expr = gelatize(a, degrees=degrees, evaluate=evaluate)
+        for n,v in zip(ns, n_elements):
+            expr = expr.subs({n: v})
 
-        if not( n_elements is None ):
-            dim = a.ldim
-            ns = ['nx', 'ny', 'nz'][:dim]
-            ns = [Symbol(i, integer=True) for i in ns]
-
-            if isinstance(n_elements, int):
-                n_elements = [n_elements]*dim
-
-            if not( len(ns) == len(n_elements) ):
-                raise ValueError('Wrong size for n_elements')
-
-            for n,v in zip(ns, n_elements):
-                expr = expr.subs({n: v})
-
-        return simplify(expr)
+    return expr
+#    return simplify(expr)

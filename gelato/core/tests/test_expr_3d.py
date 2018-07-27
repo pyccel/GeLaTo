@@ -17,7 +17,6 @@ from symfe.core import VectorTestFunction
 from symfe.core import BilinearForm
 
 from gelato.core import gelatize
-from gelato.core import Glt
 from gelato.core import (Mass,
                          Stiffness,
                          Advection,
@@ -45,29 +44,29 @@ def test_gelatize_3d_1():
 
     # ...
     expected = Mass(px,tx)*Mass(py,ty)*Mass(pz,tz)/(nx*ny*nz)
-    assert(gelatize(BilinearForm((v,u), u*v), evaluate=False) == expected)
+    assert(gelatize(BilinearForm((v,u), u*v)) == expected)
     # ...
 
     # ...
     expected = nx*Mass(py,ty)*Mass(pz,tz)*Stiffness(px,tx)/(ny*nz)
-    assert(gelatize(BilinearForm((v,u), dx(u)*dx(v)), evaluate=False) == expected)
+    assert(gelatize(BilinearForm((v,u), dx(u)*dx(v))) == expected)
     # ...
 
     # ...
     expected = I*Advection(py,ty)*Mass(px,tx)*Mass(pz,tz)/(nx*nz)
-    assert(gelatize(BilinearForm((v,u), dy(u) * v), evaluate=False) == expected)
+    assert(gelatize(BilinearForm((v,u), dy(u) * v)) == expected)
     # ...
 
     # ...
     expected = I*Advection(px,tx)*Mass(py,ty)*Mass(pz,tz)/(ny*nz)
-    assert(gelatize(BilinearForm((v,u), dx(u) * v), evaluate=False) == expected)
+    assert(gelatize(BilinearForm((v,u), dx(u) * v)) == expected)
     # ...
 
     # ...
     expected = ( nx*Mass(py,ty)*Mass(pz,tz)*Stiffness(px,tx)/(ny*nz) +
                 ny*Mass(px,tx)*Mass(pz,tz)*Stiffness(py,ty)/(nx*nz) +
                 nz*Mass(px,tx)*Mass(py,ty)*Stiffness(pz,tz)/(nx*ny))
-    assert(gelatize(BilinearForm((v,u), dot(grad(v), grad(u))), evaluate=False) == expected)
+    assert(gelatize(BilinearForm((v,u), dot(grad(v), grad(u)))) == expected)
     # ...
 
     # ...
@@ -76,14 +75,14 @@ def test_gelatize_3d_1():
                 ny*Mass(px,tx)*Mass(pz,tz)*Stiffness(py,ty)/(nx*nz) +
                 I*Advection(py,ty)*Mass(px,tx)*Mass(pz,tz)/(nx*nz) +
                 nz*Mass(px,tx)*Mass(py,ty)*Stiffness(pz,tz)/(nx*ny))
-    assert(gelatize(BilinearForm((v,u), dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v), evaluate=False) == expected)
+    assert(gelatize(BilinearForm((v,u), dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v)) == expected)
     # ...
 
     # ...
     expected = (-bx*I*Advection(px,tx)*Mass(py,ty)*Mass(pz,tz)/(ny*nz) -
                 by*I*Advection(py,ty)*Mass(px,tx)*Mass(pz,tz)/(nx*nz) -
                 bz*I*Advection(pz,tz)*Mass(px,tx)*Mass(py,ty)/(nx*ny))
-    assert(gelatize(BilinearForm((v,u), dot(b, grad(v)) * u), evaluate=False) == expected)
+    assert(gelatize(BilinearForm((v,u), dot(b, grad(v)) * u)) == expected)
     # ...
 
     # ...
@@ -93,7 +92,7 @@ def test_gelatize_3d_1():
                 by**2*ny*Mass(px,tx)*Mass(pz,tz)*Stiffness(py,ty)/(nx*nz) +
                 2*by*bz*Advection(py,ty)*Advection(pz,tz)*Mass(px,tx)/nx +
                 bz**2*nz*Mass(px,tx)*Mass(py,ty)*Stiffness(pz,tz)/(nx*ny))
-    assert(gelatize(BilinearForm((v,u), dot(b, grad(v)) * dot(b, grad(u))), evaluate=False) == expected)
+    assert(gelatize(BilinearForm((v,u), dot(b, grad(v)) * dot(b, grad(u)))) == expected)
     # ...
 
     degrees = None
