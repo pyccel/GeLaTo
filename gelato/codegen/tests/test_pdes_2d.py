@@ -65,8 +65,7 @@ def test_pdes_2d_1():
     x1 = linspace(0.,1., n1)
     x2 = linspace(0.,1., n2)
 
-    e = zeros((n1, n2))
-    a.symbol(x1,x2,t1,t2,e)
+    e = a.symbol(x1,x2,t1,t2)
     print(e)
     # ...
 # ...

@@ -10,7 +10,10 @@ from symfe.codegen.utils import write_code
 
 from gelato.core import gelatize
 
-from .utils import (print_position_args, print_fourier_args, print_mat_args)
+from .utils import (print_position_args, print_fourier_args,
+                    construct_x_args_names,
+                    construct_t_args_names,
+                    print_mat_args)
 
 def compile_symbol(name, a,
                    degrees,
@@ -163,8 +166,11 @@ def compile_symbol(name, a,
     # ...
 
     # ...
-    x_args_str = print_position_args(dim)
-    t_args_str = print_fourier_args(dim)
+    x_args = construct_x_args_names(dim)
+    t_args = construct_t_args_names(dim)
+
+    x_args_str = print_position_args(x_args)
+    t_args_str = print_fourier_args(t_args)
     # ...
 
     # ... TODO be careful of conflict when adding block case
