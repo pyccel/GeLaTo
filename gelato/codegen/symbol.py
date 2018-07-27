@@ -10,6 +10,8 @@ from symfe.codegen.utils import write_code
 
 from gelato.core import gelatize
 
+from .utils import (print_position_args, print_fourier_args, print_mat_args)
+
 def compile_symbol(name, a,
                    degrees,
                    n_elements=None,
@@ -160,6 +162,15 @@ def compile_symbol(name, a,
         expr = normalize(expr, enable_fields=True)
     # ...
 
+    # ...
+    x_args_str = print_position_args(dim)
+    t_args_str = print_fourier_args(dim)
+    # ...
+
+    # ... TODO be careful of conflict when adding block case
+    mat_args_str = print_mat_args()
+    # ...
+
     # ... compute indentation
     # TODO
 #    tab += ' '*4
@@ -225,6 +236,8 @@ def compile_symbol(name, a,
         # ...
 
         code = template.format(__KERNEL_NAME__=name,
+                               __X_ARGS__=x_args_str,
+                               __T_ARGS__=t_args_str,
                                __MAT_ARGS__=mat_args_str,
                                __N_ELEMENTS__=n_elements_str,
                                __FIELD_COEFFS__=field_coeffs_str,
@@ -245,6 +258,9 @@ def compile_symbol(name, a,
         e = _convert_int_to_float(expr.evalf())
         code = template.format(__SYMBOL_NAME__=name,
                                __SYMBOL_EXPR__=e.evalf(),
+                               __X_ARGS__=x_args_str,
+                               __T_ARGS__=t_args_str,
+                               __MAT_ARGS__=mat_args_str,
                                __N_ELEMENTS__=n_elements_str,
                                __FIELD_COEFFS__=field_coeffs_str,
                                __FIELD_EVALUATION__=eval_field_str,
