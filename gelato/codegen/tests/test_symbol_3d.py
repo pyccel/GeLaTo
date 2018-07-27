@@ -19,11 +19,11 @@ from symfe.core import BilinearForm
 from gelato.codegen import compile_symbol
 
 # ...
-def test_symbol_2d_1():
-    print('============ test_symbol_2d_1 =============')
+def test_symbol_3d_1():
+    print('============ test_symbol_3d_1 =============')
 
     # ... abstract model
-    V = H1Space('V', ldim=2)
+    V = H1Space('V', ldim=3)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -33,33 +33,35 @@ def test_symbol_2d_1():
     # ...
 
     # ...
-    degrees = [1,1]
-    n_elements = [4,4]
+    degrees = [1,1,1]
+    n_elements = [4,4,4]
 
     symbol = compile_symbol('mass_symbol', mass, degrees,
                             n_elements=n_elements)
     # ...
 
     # ...
-    n1 = 101 ; n2 = 101
+    n1 = 21 ; n2 = 21 ; n3 = 21
 
     t1 = linspace(-pi, pi, n1)
     t2 = linspace(-pi, pi, n2)
+    t3 = linspace(-pi, pi, n3)
     x1 = linspace(0.,1., n1)
     x2 = linspace(0.,1., n2)
+    x3 = linspace(0.,1., n3)
 
-    e = zeros((n1, n2))
-    symbol(x1,x2,t1,t2,e)
+    e = zeros((n1, n2, n3))
+    symbol(x1,x2,x3,t1,t2,t3,e)
     print(e)
     # ...
 # ...
 
 # ...
-def test_symbol_2d_2():
-    print('============ test_symbol_2d_2 =============')
+def test_symbol_3d_2():
+    print('============ test_symbol_3d_2 =============')
 
     # ... abstract model
-    V = H1Space('V', ldim=2)
+    V = H1Space('V', ldim=3)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -69,31 +71,33 @@ def test_symbol_2d_2():
     # ...
 
     # ...
-    degrees = [1,1]
+    degrees = [1,1,1]
 
     symbol = compile_symbol('mass_symbol', mass, degrees)
     # ...
 
     # ...
-    n1 = 5 ; n2 = 5
+    n1 = 21 ; n2 = 21 ; n3 = 21
 
     t1 = linspace(-pi, pi, n1)
     t2 = linspace(-pi, pi, n2)
+    t3 = linspace(-pi, pi, n3)
     x1 = linspace(0.,1., n1)
     x2 = linspace(0.,1., n2)
+    x3 = linspace(0.,1., n3)
 
-    e = zeros((n1, n2))
+    e = zeros((n1, n2, n3))
     # ...
 
     # ...
-    n_elements = [4, 4]
-    symbol(x1,x2,t1,t2,e, *n_elements)
+    n_elements = [4, 4, 4]
+    symbol(x1,x2,x3,t1,t2,t3,e, *n_elements)
     print(e)
     # ...
 
     # ...
-    n_elements = [4, 8]
-    symbol(x1,x2,t1,t2,e, *n_elements)
+    n_elements = [4, 8, 8]
+    symbol(x1,x2,x3,t1,t2,t3,e, *n_elements)
     print(e)
     # ...
 
@@ -101,5 +105,5 @@ def test_symbol_2d_2():
 
 # .....................................................
 if __name__ == '__main__':
-    test_symbol_2d_1()
-    test_symbol_2d_2()
+    test_symbol_3d_1()
+    test_symbol_3d_2()

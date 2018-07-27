@@ -23,11 +23,11 @@ from spl.fem.splines import SplineSpace
 from spl.fem.tensor  import TensorFemSpace
 
 # ...
-def test_pdes_2d_1():
-    print('============ test_pdes_2d_1 =============')
+def test_pdes_3d_1():
+    print('============ test_pdes_3d_1 =============')
 
     # ... abstract model
-    V = H1Space('V', ldim=2)
+    V = H1Space('V', ldim=3)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -37,19 +37,21 @@ def test_pdes_2d_1():
 
     # ... discretization
     # Input data: degree, number of elements
-    p1  = 1 ; p2 = 1
-    ne1 = 4 ; ne2 = 4
+    p1  = 1 ; p2  = 1 ; p3  = 1
+    ne1 = 4 ; ne2 = 4 ; ne3 = 4
 
     # Create uniform grid
     grid_1 = linspace( 0., 1., num=ne1+1 )
     grid_2 = linspace( 0., 1., num=ne2+1 )
+    grid_3 = linspace( 0., 1., num=ne3+1 )
 
     # Create 1D finite element spaces and precompute quadrature data
     V1 = SplineSpace( p1, grid=grid_1 ); V1.init_fem()
     V2 = SplineSpace( p2, grid=grid_2 ); V2.init_fem()
+    V3 = SplineSpace( p3, grid=grid_3 ); V3.init_fem()
 
     # Create 2D tensor product finite element space
-    V = TensorFemSpace( V1, V2 )
+    V = TensorFemSpace( V1, V2, V3 )
     # ...
 
     # ...
@@ -58,18 +60,20 @@ def test_pdes_2d_1():
     # ...
 
     # ...
-    n1 = 21 ; n2 = 21
+    n1 = 21 ; n2 = 21 ; n3 = 21
 
     t1 = linspace(-pi, pi, n1)
     t2 = linspace(-pi, pi, n2)
+    t3 = linspace(-pi, pi, n3)
     x1 = linspace(0.,1., n1)
     x2 = linspace(0.,1., n2)
+    x3 = linspace(0.,1., n3)
 
-    e = a.symbol(x1,x2,t1,t2)
+    e = a.symbol(x1,x2,x3,t1,t2,t3)
     print(e)
     # ...
 # ...
 
 # .....................................................
 if __name__ == '__main__':
-    test_pdes_2d_1()
+    test_pdes_3d_1()
