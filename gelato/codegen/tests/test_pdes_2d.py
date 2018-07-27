@@ -1,11 +1,10 @@
 # coding: utf-8
 
-from numpy import linspace
+from numpy import linspace, zeros, pi
 
 from sympy import Symbol
 from sympy.core.containers import Tuple
 from sympy import symbols
-from sympy import pi, cos, sin
 from sympy import srepr
 
 from symfe.core import dx, dy, dz
@@ -18,7 +17,7 @@ from symfe.core import VectorTestFunction
 from symfe.core import BilinearForm
 
 from gelato.codegen import compile_symbol
-from gelato.codegen import discretize
+from gelato.codegen import discretize_symbol
 
 from spl.fem.splines import SplineSpace
 from spl.fem.tensor  import TensorFemSpace
@@ -27,24 +26,18 @@ from spl.fem.tensor  import TensorFemSpace
 def test_pdes_2d_1():
     print('============ test_pdes_2d_1 =============')
 
+    # ... abstract model
     V = H1Space('V', ldim=2)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
 
-    mass = BilinearForm((v,u), u*v)
-    laplace = BilinearForm((v,u), dot(grad(v), grad(u)))
-
-    # ...
-    degrees = [1,1]
-#    degrees = None
-    compile_symbol('mass', mass)
-    print(mass.symbol_expr)
+    a = BilinearForm((v,u), dot(grad(v), grad(u)))
     # ...
 
     # ... discretization
     # Input data: degree, number of elements
-    p1  = 3  ; p2  = 3
+    p1  = 1 ; p2 = 1
     ne1 = 4 ; ne2 = 4
 
     # Create uniform grid
@@ -60,10 +53,22 @@ def test_pdes_2d_1():
     # ...
 
     # ...
-    discretize( mass, [V,V] )
+    discretize_symbol( a, [V,V] )
 #    print(mass.symbol.__doc__)
     # ...
 
+    # ...
+    n1 = 101 ; n2 = 101
+
+    t1 = linspace(-pi, pi, n1)
+    t2 = linspace(-pi, pi, n2)
+    x1 = linspace(0.,1., n1)
+    x2 = linspace(0.,1., n2)
+
+    e = zeros((n1, n2))
+    a.symbol(x1,x2,t1,t2,e)
+    print(e)
+    # ...
 # ...
 
 # .....................................................

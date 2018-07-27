@@ -17,19 +17,45 @@ from symfe.core import gelatize
 from symfe.core import BilinearForm, LinearForm, FunctionForm
 from symfe.core import Constant
 from symfe.core import Field
-
 from symfe.codegen.utils import arguments_datatypes_as_dict
 from symfe.codegen.utils import arguments_datatypes_split
+
+from spl.fem.splines import SplineSpace
+from spl.fem.tensor  import TensorFemSpace
 
 from .symbol import compile_symbol
 
 import types
 
+# ... TODO move this in another file
+def print_position_args(dim):
+    pattern = 'arr_x{}'
+    ls = []
+    for i in range(1, dim+1):
+        x = pattern.format(i)
+        ls.append(x)
+    ls = ', '.join(i for i in ls)
+    return ls
+
+def print_fourier_args(dim):
+    pattern = 'arr_t{}'
+    ls = []
+    for i in range(1, dim+1):
+        x = pattern.format(i)
+        ls.append(x)
+    ls = ', '.join(i for i in ls)
+    return ', {}'.format(ls)
+
+# TODO improve in the case of block
+def print_mat_args():
+    return ', mat'
+# ...
+
 # TODO change target to meta var, and update spaces_str
 _template ="""
-def {__NAME__}( target{__ARGS__}{__FIELDS__} ):
+def {__NAME__}( target, {__X_ARGS__}{__T_ARGS__}{__ARGS__}{__FIELDS__}{__MAT_ARGS__} ):
     {__DOCSTRING__}
-    return {__SYMBOL_NAME__}( target, {__SPACE_ARGS__}{__ARGS__}{__FIELDS__} )
+    return {__SYMBOL_NAME__}( {__X_ARGS__}{__T_ARGS__}{__ARGS__}{__FIELDS__}{__MAT_ARGS__} )
 """
 
 _template_docstring = """
@@ -86,17 +112,18 @@ def docstring_arguments(constants, d_args, is_function_form=False):
 
 # TODO add check on spaces
 # TODO pass root to compile kernel and assembly
-def discretize(a, spaces,
-               verbose=False,
-               namespace=globals(),
-               context=None,
-               name=None,
-               root=None,
-               backend='python',
-               export_pyfile=True):
+def discretize_symbol(a, spaces,
+                      verbose=False,
+                      namespace=globals(),
+                      context=None,
+                      name=None,
+                      root=None,
+                      backend='python',
+                      export_pyfile=True):
     """."""
     # ...
     fields = a.fields
+    dim = a.ldim
     # ...
 
     # ...
@@ -112,8 +139,23 @@ def discretize(a, spaces,
                                          hash=abs(hash(a)))
     # ...
 
+    # ... TODO improve + checks
+    V = spaces[0]
+    if isinstance(V, SplineSpace):
+        degrees = [V.degree]
+        n_elements = [V.ncells]
+
+    elif isinstance(V, TensorFemSpace):
+        degrees = V.degree
+        n_elements = V.ncells
+
+    else:
+        raise NotImplementedError('')
     # ...
-    symbol = compile_symbol(symbol_name, a,
+
+    # ...
+    symbol = compile_symbol(symbol_name, a, degrees,
+                            n_elements=n_elements,
                             verbose=verbose,
                             namespace=namespace,
                             context=context,
@@ -154,13 +196,29 @@ def discretize(a, spaces,
     # ...
 
     # ...
+    x_args_str = print_position_args(dim)
+    t_args_str = print_fourier_args(dim)
+    # ...
+
+    # ...
+    mat_args_str = print_mat_args()
+    # ...
+
+    # ...
     code = _template.format(__NAME__=name,
                             __SYMBOL_NAME__=symbol_name,
-                            __SPACE_ARGS__=spaces_str,
+                            __X_ARGS__=x_args_str,
+                            __T_ARGS__=t_args_str,
+                            __MAT_ARGS__=mat_args_str,
                             __ARGS__=args,
                             __FIELDS__=fields_str,
                             __DOCSTRING__=docstring)
     # ...
+
+#    print('--------------')
+#    print(code)
+#    print('--------------')
+#    import sys; sys.exit(0)
 
     # ...
     exec(code, namespace)
