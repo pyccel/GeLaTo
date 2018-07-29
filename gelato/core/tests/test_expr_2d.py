@@ -130,7 +130,30 @@ def test_gelatize_2d_1():
 
 # ...
 
+# ...
+def test_gelatize_2d_3():
+    print('============ test_gelatize_2d_3 =============')
+
+    V = H1Space('V', ldim=2, is_block=True, shape=2)
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(V, name='u')
+
+    c = Constant('c')
+
+#    a = BilinearForm((v,u), div(v) * div(u) + rot(v) * rot(u))
+
+    degrees = None
+
+    expr = div(v) * div(u) + c * rot(v) * rot(u)
+    expr = BilinearForm((v,u), expr)
+    print('> input     >>> {0}'.format(expr))
+    print('> gelatized >>> {0}'.format(gelatize(expr, degrees=degrees)))
+
+# ...
+
 # .....................................................
 if __name__ == '__main__':
     test_gelatize_2d_1()
 #    test_gelatize_2d_2()
+    test_gelatize_2d_3()

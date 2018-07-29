@@ -8,6 +8,7 @@ from sympy.core.containers import Tuple
 from sympy import S
 from sympy.core import Expr, Basic, AtomicExpr
 from sympy import simplify
+from sympy import Matrix, ImmutableDenseMatrix
 
 from symfe.core import BilinearForm, BilinearAtomicForm
 from symfe.core import tensorize
@@ -50,6 +51,18 @@ def _gelatize(a, degrees=None, evaluate=False, verbose=False):
             j = Mul(*args)
 
         return Mul(i, j)
+
+    elif isinstance(expr, (Matrix, ImmutableDenseMatrix)):
+
+        n_rows, n_cols = expr.shape
+        lines = []
+        for i in range(0, n_rows):
+            line = []
+            for j in range(0, n_cols):
+                eij = _gelatize(expr[i,j], degrees=degrees, evaluate=evaluate)
+                line.append(eij)
+            lines.append(line)
+        return Matrix(lines)
 
     elif isinstance(expr, BilinearAtomicForm):
 
