@@ -22,7 +22,6 @@ from gelato.core import (Mass,
                          Advection,
                          Bilaplacian)
 
-
 # ...
 def test_gelatize_2d_1():
     print('============ test_gelatize_2d_1 =============')
@@ -149,7 +148,21 @@ def test_gelatize_2d_3():
     expr = BilinearForm((v,u), expr)
     print('> input     >>> {0}'.format(expr))
     print('> gelatized >>> {0}'.format(gelatize(expr, degrees=degrees)))
+# ...
 
+# ...
+def test_gelatize_2d_4():
+    print('============ test_gelatize_2d_4 =============')
+
+    V = H1Space('V', ldim=2)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(V, name='u')
+
+    expr = BilinearForm((v,u), dot(grad(v), grad(u)))
+
+    print('> input     >>> {0}'.format(expr))
+    print('> gelatized >>> {0}'.format(gelatize(expr)))
 # ...
 
 # .....................................................
@@ -157,3 +170,4 @@ if __name__ == '__main__':
     test_gelatize_2d_1()
 #    test_gelatize_2d_2()
     test_gelatize_2d_3()
+    test_gelatize_2d_4()

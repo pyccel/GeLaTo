@@ -38,4 +38,3 @@ def plot_stiffness_symbols(degrees=[2, 3], nx=100):
 
         plt.plot(t1, w.real, "-"+colors[i], label="$p=" + str(p) + "$")
         plt.legend(loc=9)
-    plt.show()
