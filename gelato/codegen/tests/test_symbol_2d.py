@@ -11,7 +11,7 @@ from sympde.core import dx, dy, dz
 from sympde.core import Constant
 from sympde.core import Field
 from sympde.core import grad, dot, inner, cross, rot, curl, div
-from sympde.core import H1Space
+from sympde.core import FunctionSpace
 from sympde.core import TestFunction
 from sympde.core import VectorTestFunction
 from sympde.core import BilinearForm
@@ -23,7 +23,7 @@ def test_symbol_2d_1():
     print('============ test_symbol_2d_1 =============')
 
     # ... abstract model
-    V = H1Space('V', ldim=2)
+    V = FunctionSpace('V', ldim=2)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -62,7 +62,7 @@ def test_symbol_2d_2():
     print('============ test_symbol_2d_2 =============')
 
     # ... abstract model
-    V = H1Space('V', ldim=2)
+    V = FunctionSpace('V', ldim=2)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')

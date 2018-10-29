@@ -8,10 +8,12 @@ from sympy import srepr
 from sympy import I
 
 from sympde.core import dx, dy, dz
+from sympde.core import Domain
 from sympde.core import Constant
 from sympde.core import Field
 from sympde.core import grad, dot, inner, cross, rot, curl, div
-from sympde.core import H1Space
+from sympde.core import FunctionSpace
+from sympde.core import VectorFunctionSpace
 from sympde.core import TestFunction
 from sympde.core import VectorTestFunction
 from sympde.core import BilinearForm
@@ -22,11 +24,14 @@ from gelato.core import (Mass,
                          Advection,
                          Bilaplacian)
 
+DIM = 3
+domain = Domain('Omega', dim=DIM)
+
 # ...
 def test_gelatize_3d_1():
     print('============ test_gelatize_3d_1 =============')
 
-    V = H1Space('V', ldim=3)
+    V = FunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')

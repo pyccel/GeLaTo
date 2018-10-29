@@ -9,6 +9,7 @@ from sympy import S
 from sympy.core import Expr, Basic, AtomicExpr
 from sympy import simplify
 from sympy import Matrix, ImmutableDenseMatrix
+from sympy.physics.quantum import TensorProduct
 
 from sympde.core import BilinearForm, BilinearAtomicForm
 from sympde.core import tensorize
@@ -51,6 +52,10 @@ def _gelatize(a, degrees=None, evaluate=False, verbose=False):
             j = Mul(*args)
 
         return Mul(i, j)
+
+    if isinstance(expr, TensorProduct):
+        args = [_gelatize(i, degrees=degrees, evaluate=evaluate) for i in expr.args]
+        return Mul(*args)
 
     elif isinstance(expr, (Matrix, ImmutableDenseMatrix)):
 

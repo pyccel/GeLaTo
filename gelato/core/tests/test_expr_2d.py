@@ -8,10 +8,12 @@ from sympy import srepr
 from sympy import I
 
 from sympde.core import dx, dy, dz
+from sympde.core import Domain
 from sympde.core import Constant
 from sympde.core import Field
 from sympde.core import grad, dot, inner, cross, rot, curl, div
-from sympde.core import H1Space
+from sympde.core import FunctionSpace
+from sympde.core import VectorFunctionSpace
 from sympde.core import TestFunction
 from sympde.core import VectorTestFunction
 from sympde.core import BilinearForm
@@ -22,11 +24,14 @@ from gelato.core import (Mass,
                          Advection,
                          Bilaplacian)
 
+DIM = 2
+domain = Domain('Omega', dim=DIM)
+
 # ...
 def test_gelatize_2d_1():
     print('============ test_gelatize_2d_1 =============')
 
-    V = H1Space('V', ldim=2)
+    V = FunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -100,40 +105,10 @@ def test_gelatize_2d_1():
 # ...
 
 # ...
-#def test_gelatize_2d_2():
-#    print('============ test_gelatize_2d_2 =============')
-#
-#    V = H1Space('V', ldim=2)
-#
-#    v = TestFunction(V, name='v')
-#    u = TestFunction(V, name='u')
-#
-#    mass = BilinearForm((v,u), u*v)
-#    laplace = BilinearForm((v,u), dot(grad(v), grad(u)))
-#
-#    # ...
-#    degrees = [1,1]
-##    degrees = None
-#    symbol_m = Glt(mass, degrees=degrees, n_elements=[4,4])
-#    print(symbol_m)
-#    # ...
-#
-#    # ...
-#    degrees = [2,2]
-#    degrees = None
-#    symbol_l = Glt(laplace, degrees=degrees)
-#    print(symbol_l)
-#    # ...
-#
-##    print(symbol_l/symbol_m)
-
-# ...
-
-# ...
 def test_gelatize_2d_3():
     print('============ test_gelatize_2d_3 =============')
 
-    V = H1Space('V', ldim=2, is_block=True, shape=2)
+    V = VectorFunctionSpace('V', domain)
 
     v = VectorTestFunction(V, name='v')
     u = VectorTestFunction(V, name='u')
@@ -154,7 +129,7 @@ def test_gelatize_2d_3():
 def test_gelatize_2d_4():
     print('============ test_gelatize_2d_4 =============')
 
-    V = H1Space('V', ldim=2)
+    V = FunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -168,6 +143,5 @@ def test_gelatize_2d_4():
 # .....................................................
 if __name__ == '__main__':
     test_gelatize_2d_1()
-#    test_gelatize_2d_2()
-    test_gelatize_2d_3()
+#    test_gelatize_2d_3() # TODO debug
     test_gelatize_2d_4()
