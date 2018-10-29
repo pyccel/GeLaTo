@@ -10,13 +10,13 @@ from sympy.core import Expr, Basic, AtomicExpr
 from sympy import simplify
 from sympy import Matrix, ImmutableDenseMatrix
 
-from symfe.core import BilinearForm, BilinearAtomicForm
-from symfe.core import tensorize
-from symfe.core import Mass as MassForm
-from symfe.core import Stiffness as StiffnessForm
-from symfe.core import Advection as AdvectionForm
-from symfe.core import AdvectionT as AdvectionTForm
-from symfe.core.basic import _coeffs_registery
+from sympde.core import BilinearForm, BilinearAtomicForm
+from sympde.core import tensorize
+from sympde.core import Mass as MassForm
+from sympde.core import Stiffness as StiffnessForm
+from sympde.core import Advection as AdvectionForm
+from sympde.core import AdvectionT as AdvectionTForm
+from sympde.core.basic import _coeffs_registery
 
 from .glt import (Mass,
                   Stiffness,

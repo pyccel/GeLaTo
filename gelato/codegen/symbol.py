@@ -2,11 +2,11 @@
 
 import importlib
 
-from symfe.core import BilinearForm
-from symfe.codegen import arguments_datatypes_as_dict
-from symfe.codegen import arguments_datatypes_split
-from symfe.codegen.utils import _convert_int_to_float
-from symfe.codegen.utils import write_code
+from sympde.core import BilinearForm
+from sympde.codegen import arguments_datatypes_as_dict
+from sympde.codegen import arguments_datatypes_split
+from sympde.codegen.utils import _convert_int_to_float
+from sympde.codegen.utils import write_code
 
 from gelato.core import gelatize
 

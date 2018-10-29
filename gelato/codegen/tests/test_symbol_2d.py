@@ -7,14 +7,14 @@ from sympy.core.containers import Tuple
 from sympy import symbols
 from sympy import srepr
 
-from symfe.core import dx, dy, dz
-from symfe.core import Constant
-from symfe.core import Field
-from symfe.core import grad, dot, inner, cross, rot, curl, div
-from symfe.core import H1Space
-from symfe.core import TestFunction
-from symfe.core import VectorTestFunction
-from symfe.core import BilinearForm
+from sympde.core import dx, dy, dz
+from sympde.core import Constant
+from sympde.core import Field
+from sympde.core import grad, dot, inner, cross, rot, curl, div
+from sympde.core import H1Space
+from sympde.core import TestFunction
+from sympde.core import VectorTestFunction
+from sympde.core import BilinearForm
 
 from gelato.codegen import compile_symbol
 

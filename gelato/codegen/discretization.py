@@ -18,12 +18,12 @@ from numpy import unique
 import os
 import importlib
 
-from symfe.core import gelatize
-from symfe.core import BilinearForm, LinearForm, FunctionForm
-from symfe.core import Constant
-from symfe.core import Field
-from symfe.codegen.utils import arguments_datatypes_as_dict
-from symfe.codegen.utils import arguments_datatypes_split
+from sympde.core import gelatize
+from sympde.core import BilinearForm, LinearForm, FunctionForm
+from sympde.core import Constant
+from sympde.core import Field
+from sympde.codegen.utils import arguments_datatypes_as_dict
+from sympde.codegen.utils import arguments_datatypes_split
 
 from spl.fem.splines import SplineSpace
 from spl.fem.tensor  import TensorFemSpace
