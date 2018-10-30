@@ -35,8 +35,8 @@ from numpy import linspace, zeros, allclose
 def create_discrete_space():
     # ... discrete spaces
     # Input data: degree, number of elements
-    p  = 1
-    ne = 2**1
+    p  = 3
+    ne = 2**2
 
     # Create uniform grid
     grid = linspace( 0., 1., num=ne+1 )
