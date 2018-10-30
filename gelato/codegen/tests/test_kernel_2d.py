@@ -94,7 +94,7 @@ def test_kernel_2d_scalar_2(mapping=False):
     v = TestFunction(V, name='v')
     u = TestFunction(U, name='u')
 
-    c = Constant('c', real=True)
+    c = Constant('c')
 
     expr = dot(grad(v), grad(u)) + c*v*u
     a = BilinearForm((v,u), expr, mapping=mapping)
@@ -113,6 +113,6 @@ if __name__ == '__main__':
 
     # .................................
     # without mapping
-#    test_kernel_2d_scalar_1(mapping=False)
+    test_kernel_2d_scalar_1(mapping=False)
     test_kernel_2d_scalar_2(mapping=False)
     # .................................

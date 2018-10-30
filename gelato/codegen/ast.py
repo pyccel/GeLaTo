@@ -11,6 +11,7 @@ from sympy import Mul, Add, Tuple
 from sympy import Matrix, ImmutableDenseMatrix
 from sympy import sqrt as sympy_sqrt
 from sympy import S as sympy_S
+from sympy import simplify, expand
 
 from pyccel.ast.core import For
 from pyccel.ast.core import Assign
@@ -216,6 +217,9 @@ class Kernel(GelatoBasic):
 
         # ...
         kernel_expr = gelatize(weak_form, degrees=degrees, n_elements=n_elements)
+        kernel_expr = expand(kernel_expr)
+        kernel_expr = simplify(kernel_expr)
+        kernel_expr = kernel_expr.evalf()
         # ...
 
         # ...
@@ -410,9 +414,9 @@ class Interface(GelatoBasic):
         body = []
         for M in global_mats:
             if_cond = Is(M, Nil())
-            # TODO case of dim > 1
             if dim > 1:
                 lengths = Tuple(*lengths)
+                lengths = [lengths]
 
             if_body = [Assign(M, FunctionCall('zeros', lengths))]
 

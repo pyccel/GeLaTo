@@ -140,8 +140,26 @@ def test_gelatize_2d_4():
     print('> gelatized >>> {0}'.format(gelatize(expr)))
 # ...
 
+# ...
+def test_gelatize_2d_5():
+    print('============ test_gelatize_2d_5 =============')
+
+    V = FunctionSpace('V', domain)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(V, name='u')
+
+    c = Constant('c')
+
+    expr = BilinearForm((v,u), dot(grad(v), grad(u)) + c*v*u)
+
+    print('> input     >>> {0}'.format(expr))
+    print('> gelatized >>> {0}'.format(gelatize(expr)))
+# ...
+
 # .....................................................
 if __name__ == '__main__':
     test_gelatize_2d_1()
 #    test_gelatize_2d_3() # TODO debug
     test_gelatize_2d_4()
+    test_gelatize_2d_5()

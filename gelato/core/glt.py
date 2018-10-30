@@ -6,6 +6,7 @@
 from sympy import Symbol
 from sympy import Function
 from sympy import bspline_basis
+from sympy import sympify
 from sympy import lambdify
 from sympy import cos
 from sympy import sin
@@ -102,6 +103,10 @@ class Mass(BasicGlt):
                 m += 2 * phi[i] * cos(i * t)
             # ...
 
+            # hack to avoid
+            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+            m = sympify(str(m))
+
             return m
 # ...
 
@@ -151,6 +156,10 @@ class Stiffness(BasicGlt):
                 m += -2 * phi[i] * cos(i * t)
             # ...
 
+            # hack to avoid
+            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+            m = sympify(str(m))
+
             return m
 # ...
 
@@ -198,6 +207,10 @@ class Advection(BasicGlt):
             for i in range(1, p+1):
                 m += -2 * phi[i] * sin(i * t)
             # ...
+
+            # hack to avoid
+            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+            m = sympify(str(m))
 
             return m
 # ...
@@ -249,6 +262,10 @@ class Bilaplacian(BasicGlt):
             for i in range(1, p+1):
                 m += 2 * phi[i] * cos(i * t)
             # ...
+
+            # hack to avoid
+            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+            m = sympify(str(m))
 
             return m
 # ...
