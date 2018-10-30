@@ -28,6 +28,7 @@ from gelato.api import DiscreteSymbol
 from gelato.printing.pycode import pycode
 
 from spl.fem.splines import SplineSpace
+from spl.fem.tensor  import TensorFemSpace
 
 from numpy import linspace, zeros, allclose
 
@@ -35,15 +36,19 @@ from numpy import linspace, zeros, allclose
 def create_discrete_space():
     # ... discrete spaces
     # Input data: degree, number of elements
-    p  = 1
-    ne = 2**1
+    p1  = 1 ; p2  = 1
+    ne1 = 2**1 ; ne2 = 2**1
 
     # Create uniform grid
-    grid = linspace( 0., 1., num=ne+1 )
+    grid_1 = linspace( 0., 1., num=ne1+1 )
+    grid_2 = linspace( 0., 1., num=ne2+1 )
 
-    # Create finite element space and precompute quadrature data
-    V = SplineSpace( p, grid=grid )
-    V.init_fem()
+    # Create 1D finite element spaces and precompute quadrature data
+    V1 = SplineSpace( p1, grid=grid_1 ); V1.init_fem()
+    V2 = SplineSpace( p2, grid=grid_2 ); V2.init_fem()
+
+    # Create 2D tensor product finite element space
+    V = TensorFemSpace( V1, V2 )
     # ...
 
     return V
@@ -52,12 +57,12 @@ def create_discrete_space():
 
 #DEBUG = False
 DEBUG = True
-DIM = 1
+DIM = 2
 
 domain = Domain('\Omega', dim=DIM)
 
-def test_interface_1d_scalar_1(mapping=False):
-    print('============ test_interface_1d_scalar_1 =============')
+def test_interface_2d_scalar_1(mapping=False):
+    print('============ test_interface_2d_scalar_1 =============')
 
     if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
 
@@ -77,11 +82,12 @@ def test_interface_1d_scalar_1(mapping=False):
     symbol = DiscreteSymbol(a, Vh)
 
     t1 = linspace(0, 1, 100)
-    M = symbol.evaluate(t1)
+    t2 = linspace(0, 1, 100)
+    M = symbol.evaluate(t1, t2)
     print(M.shape)
 
-def test_interface_1d_scalar_2(mapping=False):
-    print('============ test_interface_1d_scalar_2 =============')
+def test_interface_2d_scalar_2(mapping=False):
+    print('============ test_interface_2d_scalar_2 =============')
 
     if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
 
@@ -100,11 +106,12 @@ def test_interface_1d_scalar_2(mapping=False):
     Vh = create_discrete_space()
     # ...
 
-    kernel = Kernel(a, Vh, name='kernel')
-    interface = Interface(kernel, name='interface')
-    code = pycode(interface.func)
-    print(pycode(kernel.func))
-    if DEBUG: print(code)
+    symbol = DiscreteSymbol(a, Vh)
+
+    t1 = linspace(0, 1, 100)
+    t2 = linspace(0, 1, 100)
+    M = symbol.evaluate(t1, t2, c=0.5)
+    print(M.shape)
 
 
 #................................
@@ -112,6 +119,6 @@ if __name__ == '__main__':
 
     # .................................
     # without mapping
-    test_interface_1d_scalar_1(mapping=False)
-#    test_interface_1d_scalar_2(mapping=False)
+    test_interface_2d_scalar_1(mapping=False)
+    test_interface_2d_scalar_2(mapping=False)
     # .................................

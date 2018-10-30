@@ -100,11 +100,11 @@ def test_interface_1d_scalar_2(mapping=False):
     Vh = create_discrete_space()
     # ...
 
-    kernel = Kernel(a, Vh, name='kernel')
-    interface = Interface(kernel, name='interface')
-    code = pycode(interface.func)
-    print(pycode(kernel.func))
-    if DEBUG: print(code)
+    symbol = DiscreteSymbol(a, Vh)
+
+    t1 = linspace(0, 1, 100)
+    M = symbol.evaluate(t1, c=0.5)
+    print(M.shape)
 
 
 #................................
@@ -113,5 +113,5 @@ if __name__ == '__main__':
     # .................................
     # without mapping
     test_interface_1d_scalar_1(mapping=False)
-#    test_interface_1d_scalar_2(mapping=False)
+    test_interface_1d_scalar_2(mapping=False)
     # .................................
