@@ -42,15 +42,12 @@ from sympde.core.space import FunctionSpace
 from sympde.core.space import TestFunction
 from sympde.core.space import VectorTestFunction
 from sympde.core.space import Trace
-from sympde.printing.pycode import pycode  # TODO remove from here
 from sympde.core.derivatives import print_expression
 from sympde.core.derivatives import get_atom_derivatives
 from sympde.core.derivatives import get_index_derivatives
 from sympde.core.math import math_atoms_as_str
 
 from gelato.core import gelatize
-
-from spl.fem.splines import SplineSpace
 
 def random_string( n ):
     chars    = string.ascii_uppercase + string.ascii_lowercase + string.digits
@@ -214,11 +211,7 @@ class Kernel(GelatoBasic):
         Vh = self.discrete_space
 
         n_elements = Vh.ncells
-        if isinstance(Vh, SplineSpace):
-            degrees    = Vh.degree
-
-        else:
-            degrees    = Vh.degrees
+        degrees    = Vh.degree
         # ...
 
         # ...
@@ -274,20 +267,28 @@ class Kernel(GelatoBasic):
 
         # ...
         body = []
+#        for i in range(dim-1,-1,-1):
+#            x = indices[i]
+#            rx = ranges[i]
+#
+#            ti = tis[i]
+#            arr_ti = arr_tis[i]
+#            body += [Assign(ti, arr_ti[x])]
+
+        for i_row in range(0, n_rows):
+            for i_col in range(0, n_cols):
+                symbol = d_symbols[i_row,i_col]
+                symbol = symbol[indices]
+                # TODO matrix case
+                body += [Assign(symbol, kernel_expr)]
+
         for i in range(dim-1,-1,-1):
             x = indices[i]
             rx = ranges[i]
 
             ti = tis[i]
             arr_ti = arr_tis[i]
-            body += [Assign(ti, arr_ti[x])]
-
-            for i_row in range(0, n_rows):
-                for i_col in range(0, n_cols):
-                    symbol = d_symbols[i_row,i_col]
-                    symbol = symbol[x]
-                    # TODO matrix case
-                    body += [Assign(symbol, kernel_expr)]
+            body = [Assign(ti, arr_ti[x])] + body
 
             body = [For(x, rx, body)]
         # ...
@@ -295,6 +296,13 @@ class Kernel(GelatoBasic):
         # ...
         body = prelude + body
         # ...
+
+        # get math functions and constants
+        math_elements = math_atoms_as_str(kernel_expr)
+        math_imports = []
+        for e in math_elements:
+            math_imports += [Import(e, 'numpy')]
+        body = math_imports + body
 
         # ...
         self._basic_args = [*arr_tis]

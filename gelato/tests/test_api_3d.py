@@ -24,8 +24,7 @@ from sympde.core import Domain
 from sympde.core import Boundary, trace_0, trace_1
 from sympde.core import evaluate
 
-from gelato.codegen.ast import Kernel
-from gelato.codegen.ast import Interface
+from gelato.api import DiscreteSymbol
 from gelato.printing.pycode import pycode
 
 from spl.fem.splines import SplineSpace
@@ -75,11 +74,11 @@ def test_interface_1d_scalar_1(mapping=False):
     Vh = create_discrete_space()
     # ...
 
-    kernel = Kernel(a, Vh, name='kernel')
-    interface = Interface(kernel, name='interface')
-    code = pycode(interface.func)
-    print(pycode(kernel.func))
-    if DEBUG: print(code)
+    symbol = DiscreteSymbol(a, Vh)
+
+    t1 = linspace(0, 1, 100)
+    M = symbol.evaluate(t1)
+    print(M.shape)
 
 def test_interface_1d_scalar_2(mapping=False):
     print('============ test_interface_1d_scalar_2 =============')
@@ -114,5 +113,5 @@ if __name__ == '__main__':
     # .................................
     # without mapping
     test_interface_1d_scalar_1(mapping=False)
-    test_interface_1d_scalar_2(mapping=False)
+#    test_interface_1d_scalar_2(mapping=False)
     # .................................

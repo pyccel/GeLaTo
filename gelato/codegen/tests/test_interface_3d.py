@@ -29,6 +29,7 @@ from gelato.codegen.ast import Interface
 from gelato.printing.pycode import pycode
 
 from spl.fem.splines import SplineSpace
+from spl.fem.tensor  import TensorFemSpace
 
 from numpy import linspace, zeros, allclose
 
@@ -36,15 +37,21 @@ from numpy import linspace, zeros, allclose
 def create_discrete_space():
     # ... discrete spaces
     # Input data: degree, number of elements
-    p  = 1
-    ne = 2**1
+    p1  = 1 ; p2  = 1 ; p3  = 1
+    ne1 = 2**1 ; ne2 = 2**1 ; ne3 = 2**1
 
     # Create uniform grid
-    grid = linspace( 0., 1., num=ne+1 )
+    grid_1 = linspace( 0., 1., num=ne1+1 )
+    grid_2 = linspace( 0., 1., num=ne2+1 )
+    grid_3 = linspace( 0., 1., num=ne3+1 )
 
-    # Create finite element space and precompute quadrature data
-    V = SplineSpace( p, grid=grid )
-    V.init_fem()
+    # Create 1D finite element spaces and precompute quadrature data
+    V1 = SplineSpace( p1, grid=grid_1 ); V1.init_fem()
+    V2 = SplineSpace( p2, grid=grid_2 ); V2.init_fem()
+    V3 = SplineSpace( p3, grid=grid_3 ); V3.init_fem()
+
+    # Create 3D tensor product finite element space
+    V = TensorFemSpace( V1, V2, V3 )
     # ...
 
     return V
@@ -53,12 +60,12 @@ def create_discrete_space():
 
 #DEBUG = False
 DEBUG = True
-DIM = 1
+DIM = 3
 
 domain = Domain('\Omega', dim=DIM)
 
-def test_interface_1d_scalar_1(mapping=False):
-    print('============ test_interface_1d_scalar_1 =============')
+def test_interface_3d_scalar_1(mapping=False):
+    print('============ test_interface_3d_scalar_1 =============')
 
     if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
 
@@ -81,8 +88,8 @@ def test_interface_1d_scalar_1(mapping=False):
     print(pycode(kernel.func))
     if DEBUG: print(code)
 
-def test_interface_1d_scalar_2(mapping=False):
-    print('============ test_interface_1d_scalar_2 =============')
+def test_interface_3d_scalar_2(mapping=False):
+    print('============ test_interface_3d_scalar_2 =============')
 
     if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
 
@@ -113,6 +120,6 @@ if __name__ == '__main__':
 
     # .................................
     # without mapping
-    test_interface_1d_scalar_1(mapping=False)
-    test_interface_1d_scalar_2(mapping=False)
+    test_interface_3d_scalar_1(mapping=False)
+    test_interface_3d_scalar_2(mapping=False)
     # .................................

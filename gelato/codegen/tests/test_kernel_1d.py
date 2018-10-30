@@ -25,8 +25,8 @@ from sympde.core import Boundary, trace_0, trace_1
 from sympde.core import evaluate
 
 from gelato.codegen.ast import Kernel
+from gelato.printing.pycode import pycode
 
-from spl.api.codegen.printing import pycode
 from spl.fem.splines import SplineSpace
 
 from numpy import linspace, zeros, allclose
