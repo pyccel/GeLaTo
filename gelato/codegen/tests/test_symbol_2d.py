@@ -8,6 +8,7 @@ from sympy import symbols
 from sympy import srepr
 
 from sympde.core import dx, dy, dz
+from sympde.core import Domain
 from sympde.core import Constant
 from sympde.core import Field
 from sympde.core import grad, dot, inner, cross, rot, curl, div
@@ -18,12 +19,15 @@ from sympde.core import BilinearForm
 
 from gelato.codegen import compile_symbol
 
+DIM = 2
+domain = Domain('Omega', dim=DIM)
+
 # ...
 def test_symbol_2d_1():
     print('============ test_symbol_2d_1 =============')
 
     # ... abstract model
-    V = FunctionSpace('V', ldim=2)
+    V = FunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -62,7 +66,7 @@ def test_symbol_2d_2():
     print('============ test_symbol_2d_2 =============')
 
     # ... abstract model
-    V = FunctionSpace('V', ldim=2)
+    V = FunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')

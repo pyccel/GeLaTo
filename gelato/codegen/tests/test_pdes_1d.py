@@ -22,12 +22,15 @@ from gelato.codegen import discretize_symbol
 from spl.fem.splines import SplineSpace
 from spl.fem.tensor  import TensorFemSpace
 
+DIM = 1
+domain = Domain('Omega', dim=DIM)
+
 # ...
 def test_pdes_1d_1():
     print('============ test_pdes_1d_1 =============')
 
     # ... abstract model
-    V = FunctionSpace('V', ldim=1)
+    V = FunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
