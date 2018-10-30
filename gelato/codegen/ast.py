@@ -180,6 +180,10 @@ class Kernel(GelatoBasic):
     def eval_mapping(self):
         return self._eval_mapping
 
+    @property
+    def global_mats(self):
+        return self._global_mats
+
     def build_arguments(self, data):
 
         other = data
@@ -290,7 +294,6 @@ class Kernel(GelatoBasic):
 
         # ...
         body = prelude + body
-#        print(body)
         # ...
 
         # ...
@@ -304,9 +307,156 @@ class Kernel(GelatoBasic):
             for j in range(0, n_cols):
                 mats.append(d_symbols[i,j])
         mats = tuple(mats)
+        self._global_mats = mats
         # ...
 
         # function args
         func_args = self.build_arguments(mats)
 
         return FunctionDef(self.name, list(func_args), [], body)
+
+class Interface(GelatoBasic):
+
+    def __new__(cls, kernel, name=None):
+
+        if not isinstance(kernel, Kernel):
+            raise TypeError('> Expecting an Kernel')
+
+        obj = GelatoBasic.__new__(cls, kernel.tag, name=name, prefix='interface')
+
+        obj._kernel = kernel
+
+        # update dependencies
+        obj._dependencies += [kernel]
+
+        obj._func = obj._initialize()
+        return obj
+
+    @property
+    def weak_form(self):
+        return self.kernel.weak_form
+
+    @property
+    def kernel(self):
+        return self._kernel
+
+    @property
+    def max_nderiv(self):
+        return self.kernel.kernel.max_nderiv
+
+    def build_arguments(self, data):
+        # data must be at the end, since they are optional
+        return self.basic_args + data
+
+    @property
+    def in_arguments(self):
+        return self._in_arguments
+
+    @property
+    def inout_arguments(self):
+        return self._inout_arguments
+
+    def _initialize(self):
+        form = self.weak_form
+        kernel = self.kernel
+        global_mats = kernel.global_mats
+        fields = tuple(form.expr.atoms(Field))
+        fields = sorted(fields, key=lambda x: str(x.name))
+        fields = tuple(fields)
+
+        dim = form.ldim
+
+        # ... declarations
+        test_space = Symbol('W')
+        trial_space = Symbol('V')
+
+        arr_tis    = symbols('arr_t1:%d'%(dim+1), cls=IndexedBase)
+        lengths    = symbols('nt1:%d'%(dim+1))
+
+        mapping = ()
+        if form.mapping:
+            mapping = Symbol('mapping')
+        # ...
+
+        # ...
+        self._basic_args = kernel.basic_args
+        # ...
+
+        # ...
+        body = []
+
+        # ...
+        if mapping:
+            for i, coeff in enumerate(kernel.kernel.mapping_coeffs):
+                component = IndexedBase(DottedName(mapping, '_fields'))[i]
+                body += [Assign(coeff, DottedName(component, '_coeffs', '_data'))]
+        # ...
+
+        # ...
+        prelude = [Import('zeros', 'numpy')]
+        for l,arr_ti in zip(lengths, arr_tis):
+            prelude += [Assign(l, Len(arr_ti))]
+        # ...
+
+        # ...
+        body = []
+        for M in global_mats:
+            if_cond = Is(M, Nil())
+            # TODO case of dim > 1
+            if dim > 1:
+                lengths = Tuple(*lengths)
+
+            if_body = [Assign(M, FunctionCall('zeros', lengths))]
+
+            stmt = If((if_cond, if_body))
+            body += [stmt]
+        # ...
+
+        # ...
+        body = prelude + body
+        # ...
+
+        # ...
+        self._inout_arguments = list(global_mats)
+        self._in_arguments = list(self.kernel.constants) + list(fields)
+        # ...
+
+        # ... call to kernel
+        mat_data       = tuple(global_mats)
+
+        field_data     = [DottedName(F, '_coeffs', '_data') for F in fields]
+        field_data     = tuple(field_data)
+
+        args = kernel.build_arguments(field_data + mat_data)
+
+        body += [FunctionCall(kernel.func, args)]
+        # ...
+
+        # ... results
+        if len(global_mats) == 1:
+            M = global_mats[0]
+            body += [Return(M)]
+
+        else:
+            body += [Return(global_mats)]
+        # ...
+
+        # ... arguments
+        mats = [Assign(M, Nil()) for M in global_mats]
+        mats = tuple(mats)
+
+        if mapping:
+            mapping = (mapping,)
+
+        if self.kernel.constants:
+            constants = self.kernel.constants
+            args = mapping + constants + fields + mats
+
+        else:
+            args = mapping + fields + mats
+
+        func_args = self.build_arguments(args)
+        # ...
+
+        return FunctionDef(self.name, list(func_args), [], body)
+

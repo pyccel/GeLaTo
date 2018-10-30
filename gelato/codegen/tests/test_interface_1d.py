@@ -25,6 +25,7 @@ from sympde.core import Boundary, trace_0, trace_1
 from sympde.core import evaluate
 
 from gelato.codegen.ast import Kernel
+from gelato.codegen.ast import Interface
 
 from spl.api.codegen.printing import pycode
 from spl.fem.splines import SplineSpace
@@ -56,8 +57,8 @@ DIM = 1
 
 domain = Domain('\Omega', dim=DIM)
 
-def test_kernel_1d_scalar_1(mapping=False):
-    print('============ test_kernel_1d_scalar_1 =============')
+def test_interface_1d_scalar_1(mapping=False):
+    print('============ test_interface_1d_scalar_1 =============')
 
     if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
 
@@ -75,11 +76,13 @@ def test_kernel_1d_scalar_1(mapping=False):
     # ...
 
     kernel = Kernel(a, Vh, name='kernel')
-    code = pycode(kernel.func)
+    interface = Interface(kernel, name='interface')
+    code = pycode(interface.func)
+    print(pycode(kernel.func))
     if DEBUG: print(code)
 
-def test_kernel_1d_scalar_2(mapping=False):
-    print('============ test_kernel_1d_scalar_2 =============')
+def test_interface_1d_scalar_2(mapping=False):
+    print('============ test_interface_1d_scalar_2 =============')
 
     if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
 
@@ -99,7 +102,9 @@ def test_kernel_1d_scalar_2(mapping=False):
     # ...
 
     kernel = Kernel(a, Vh, name='kernel')
-    code = pycode(kernel.func)
+    interface = Interface(kernel, name='interface')
+    code = pycode(interface.func)
+    print(pycode(kernel.func))
     if DEBUG: print(code)
 
 
@@ -108,6 +113,6 @@ if __name__ == '__main__':
 
     # .................................
     # without mapping
-    test_kernel_1d_scalar_1(mapping=False)
-    test_kernel_1d_scalar_2(mapping=False)
+    test_interface_1d_scalar_1(mapping=False)
+    test_interface_1d_scalar_2(mapping=False)
     # .................................
