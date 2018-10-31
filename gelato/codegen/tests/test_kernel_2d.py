@@ -17,6 +17,7 @@ from sympde.core import Field
 from sympde.core import grad, dot, inner, cross, rot, curl, div
 from sympde.core import FunctionSpace
 from sympde.core import TestFunction
+from sympde.core import VectorFunctionSpace
 from sympde.core import VectorTestFunction
 from sympde.core import BilinearForm, LinearForm, Integral
 from sympde.core import Mapping
@@ -107,6 +108,30 @@ def test_kernel_2d_scalar_2(mapping=False):
     code = pycode(kernel.func)
     if DEBUG: print(code)
 
+def test_kernel_2d_block_1(mapping=False):
+    print('============ test_kernel_2d_block_1 =============')
+
+    if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
+
+    V = VectorFunctionSpace('V', domain)
+    U = VectorFunctionSpace('U', domain)
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(U, name='u')
+
+    c = Constant('c')
+
+    expr = div(v) * div(u) + c * rot(v) * rot(u)
+    a = BilinearForm((v,u), expr)
+
+    # ... discrete spaces
+    Vh = create_discrete_space()
+    # ...
+
+    kernel = Kernel(a, Vh, name='kernel')
+    code = pycode(kernel.func)
+    if DEBUG: print(code)
+
 
 #................................
 if __name__ == '__main__':
@@ -115,4 +140,5 @@ if __name__ == '__main__':
     # without mapping
     test_kernel_2d_scalar_1(mapping=False)
     test_kernel_2d_scalar_2(mapping=False)
+    test_kernel_2d_block_1(mapping=False)
     # .................................

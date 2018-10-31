@@ -149,4 +149,3 @@ def gelatize(a, degrees=None, n_elements=None):
             expr = expr.subs({n: v})
 
     return expr
-#    return simplify(expr)

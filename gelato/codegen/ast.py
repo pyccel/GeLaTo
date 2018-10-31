@@ -198,16 +198,6 @@ class Kernel(GelatoBasic):
         weak_form = self.weak_form
         dim       = weak_form.ldim
 
-        # ...
-        n_rows = 1 ; n_cols = 1
-        if isinstance(weak_form, (Matrix, ImmutableDenseMatrix)):
-            n_rows = weak_form.shape[0]
-            n_cols = weak_form.shape[1]
-
-        self._n_rows = n_rows
-        self._n_cols = n_cols
-        # ...
-
         # ... discrete values
         Vh = self.discrete_space
 
@@ -220,6 +210,16 @@ class Kernel(GelatoBasic):
         kernel_expr = expand(kernel_expr)
         kernel_expr = simplify(kernel_expr)
         kernel_expr = kernel_expr.evalf()
+        # ...
+
+        # ...
+        n_rows = 1 ; n_cols = 1
+        if isinstance(kernel_expr, (Matrix, ImmutableDenseMatrix)):
+            n_rows = kernel_expr.shape[0]
+            n_cols = kernel_expr.shape[1]
+
+        self._n_rows = n_rows
+        self._n_cols = n_cols
         # ...
 
         # ...
@@ -283,8 +283,12 @@ class Kernel(GelatoBasic):
             for i_col in range(0, n_cols):
                 symbol = d_symbols[i_row,i_col]
                 symbol = symbol[indices]
-                # TODO matrix case
-                body += [Assign(symbol, kernel_expr)]
+
+                if isinstance(kernel_expr, (Matrix, ImmutableDenseMatrix)):
+                    body += [Assign(symbol, kernel_expr[i_row,i_col])]
+
+                else:
+                    body += [Assign(symbol, kernel_expr)]
 
         for i in range(dim-1,-1,-1):
             x = indices[i]
@@ -411,12 +415,13 @@ class Interface(GelatoBasic):
         # ...
 
         # ...
+        if dim > 1:
+            lengths = Tuple(*lengths)
+            lengths = [lengths]
+
         body = []
         for M in global_mats:
             if_cond = Is(M, Nil())
-            if dim > 1:
-                lengths = Tuple(*lengths)
-                lengths = [lengths]
 
             if_body = [Assign(M, FunctionCall('zeros', lengths))]
 
