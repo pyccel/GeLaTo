@@ -56,8 +56,8 @@ DIM = 1
 
 domain = Domain('\Omega', dim=DIM)
 
-def test_interface_1d_scalar_1(mapping=False):
-    print('============ test_interface_1d_scalar_1 =============')
+def test_api_1d_scalar_1(mapping=False):
+    print('============ test_api_1d_scalar_1 =============')
 
     if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
 
@@ -80,8 +80,8 @@ def test_interface_1d_scalar_1(mapping=False):
     M = symbol.evaluate(t1)
     print(M.shape)
 
-def test_interface_1d_scalar_2(mapping=False):
-    print('============ test_interface_1d_scalar_2 =============')
+def test_api_1d_scalar_2(mapping=False):
+    print('============ test_api_1d_scalar_2 =============')
 
     if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
 
@@ -112,6 +112,6 @@ if __name__ == '__main__':
 
     # .................................
     # without mapping
-    test_interface_1d_scalar_1(mapping=False)
-    test_interface_1d_scalar_2(mapping=False)
+    test_api_1d_scalar_1(mapping=False)
+    test_api_1d_scalar_2(mapping=False)
     # .................................

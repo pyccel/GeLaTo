@@ -90,11 +90,11 @@ def test_gelatize_2d_1():
     assert(gelatize(BilinearForm((v,u), dot(b, grad(v)) * dot(b, grad(u)))) == expected)
     # ...
 
-    degrees = None
-#    degrees = [2, 1]
+#    degrees = None
+##    degrees = [2, 1]
 
-#    evaluate = True
-    evaluate = False
+##    evaluate = True
+#    evaluate = False
 
 #    expr = dot(b, grad(v)) * dot(b, grad(u))
 #    expr = dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v
@@ -115,14 +115,10 @@ def test_gelatize_2d_3():
 
     c = Constant('c')
 
-#    a = BilinearForm((v,u), div(v) * div(u) + rot(v) * rot(u))
-
-    degrees = None
-
     expr = div(v) * div(u) + c * rot(v) * rot(u)
     expr = BilinearForm((v,u), expr)
     print('> input     >>> {0}'.format(expr))
-    print('> gelatized >>> {0}'.format(gelatize(expr, degrees=degrees)))
+    print('> gelatized >>> {0}'.format(gelatize(expr)))
 # ...
 
 # ...
@@ -160,6 +156,6 @@ def test_gelatize_2d_5():
 # .....................................................
 if __name__ == '__main__':
     test_gelatize_2d_1()
-#    test_gelatize_2d_3() # TODO debug
+    test_gelatize_2d_3()
     test_gelatize_2d_4()
     test_gelatize_2d_5()
