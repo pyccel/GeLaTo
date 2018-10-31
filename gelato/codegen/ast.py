@@ -12,6 +12,7 @@ from sympy import Matrix, ImmutableDenseMatrix
 from sympy import sqrt as sympy_sqrt
 from sympy import S as sympy_S
 from sympy import simplify, expand
+from sympy.core.numbers import ImaginaryUnit
 
 from pyccel.ast.core import For
 from pyccel.ast.core import Assign
@@ -182,6 +183,10 @@ class Kernel(GelatoBasic):
     def global_mats(self):
         return self._global_mats
 
+    @property
+    def global_mats_types(self):
+        return self._global_mats_types
+
     def build_arguments(self, data):
 
         other = data
@@ -245,6 +250,7 @@ class Kernel(GelatoBasic):
         d_symbols = {}
         for i in range(0, n_rows):
             for j in range(0, n_cols):
+                is_complex = False
                 mat = IndexedBase('symbol_{i}{j}'.format(i=i,j=j))
                 d_symbols[i,j] = mat
         # ...
@@ -271,13 +277,6 @@ class Kernel(GelatoBasic):
 
         # ...
         body = []
-#        for i in range(dim-1,-1,-1):
-#            x = indices[i]
-#            rx = ranges[i]
-#
-#            ti = tis[i]
-#            arr_ti = arr_tis[i]
-#            body += [Assign(ti, arr_ti[x])]
 
         for i_row in range(0, n_rows):
             for i_col in range(0, n_cols):
@@ -324,6 +323,26 @@ class Kernel(GelatoBasic):
                 mats.append(d_symbols[i,j])
         mats = tuple(mats)
         self._global_mats = mats
+        # ...
+
+        # ...
+        mats_types = []
+        if isinstance(kernel_expr, (Matrix, ImmutableDenseMatrix)):
+            for i in range(0, n_rows):
+                for j in range(0, n_cols):
+                    dtype = 'float'
+                    if kernel_expr[i,j].atoms(ImaginaryUnit):
+                        dtype = 'complex'
+                    mats_types.append(dtype)
+
+        else:
+            dtype = 'float'
+            if kernel_expr.atoms(ImaginaryUnit):
+                dtype = 'complex'
+            mats_types.append(dtype)
+
+        mats_types = tuple(mats_types)
+        self._global_mats_types = mats_types
         # ...
 
         # function args
@@ -376,6 +395,7 @@ class Interface(GelatoBasic):
         form = self.weak_form
         kernel = self.kernel
         global_mats = kernel.global_mats
+        global_mats_types = kernel.global_mats_types
         fields = tuple(form.expr.atoms(Field))
         fields = sorted(fields, key=lambda x: str(x.name))
         fields = tuple(fields)
@@ -420,10 +440,11 @@ class Interface(GelatoBasic):
             lengths = [lengths]
 
         body = []
-        for M in global_mats:
+        for M,dtype in zip(global_mats, global_mats_types):
             if_cond = Is(M, Nil())
 
-            if_body = [Assign(M, FunctionCall('zeros', lengths))]
+            _args = list(lengths) + ['dtype={}'.format(dtype)]
+            if_body = [Assign(M, FunctionCall('zeros', _args))]
 
             stmt = If((if_cond, if_body))
             body += [stmt]

@@ -142,6 +142,37 @@ def test_api_2d_block_1(mapping=False):
     for M in Ms:
         print(M.shape)
 
+def test_api_2d_stokes(mapping=False):
+    print('============ test_api_2d_stokes =============')
+
+    if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
+
+    # ... abstract model
+    V = VectorFunctionSpace('V', domain)
+    W = FunctionSpace('W', domain)
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(V, name='u')
+    p = TestFunction(W, name='p')
+    q = TestFunction(W, name='q')
+
+    a = BilinearForm((v,u), inner(grad(v), grad(u)), name='a')
+    b = BilinearForm((v,p), div(v)*p, name='b')
+    A = BilinearForm(((v,q),(u,p)), a(v,u) - b(v,p) + b(u,q), name='A')
+    # ...
+
+    # ... discrete spaces
+    Vh = create_discrete_space()
+    # ...
+
+    symbol = DiscreteSymbol(A, Vh)
+
+    t1 = linspace(0, 1, 100)
+    t2 = linspace(0, 1, 100)
+    Ms = symbol.evaluate(t1, t2, c=0.5)
+    for M in Ms:
+        print(M.shape)
+
 
 #................................
 if __name__ == '__main__':
@@ -151,4 +182,6 @@ if __name__ == '__main__':
     test_api_2d_scalar_1(mapping=False)
     test_api_2d_scalar_2(mapping=False)
     test_api_2d_block_1(mapping=False)
+
+    test_api_2d_stokes(mapping=False)
     # .................................

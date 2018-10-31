@@ -78,7 +78,7 @@ def test_interface_1d_scalar_1(mapping=False):
     kernel = Kernel(a, Vh, name='kernel')
     interface = Interface(kernel, name='interface')
     code = pycode(interface.func)
-    print(pycode(kernel.func))
+    if DEBUG: print(pycode(kernel.func))
     if DEBUG: print(code)
 
 def test_interface_1d_scalar_2(mapping=False):
@@ -104,7 +104,7 @@ def test_interface_1d_scalar_2(mapping=False):
     kernel = Kernel(a, Vh, name='kernel')
     interface = Interface(kernel, name='interface')
     code = pycode(interface.func)
-    print(pycode(kernel.func))
+    if DEBUG: print(pycode(kernel.func))
     if DEBUG: print(code)
 
 

@@ -84,7 +84,7 @@ def test_interface_2d_scalar_1(mapping=False):
     kernel = Kernel(a, Vh, name='kernel')
     interface = Interface(kernel, name='interface')
     code = pycode(interface.func)
-    print(pycode(kernel.func))
+    if DEBUG: print(pycode(kernel.func))
     if DEBUG: print(code)
 
 def test_interface_2d_scalar_2(mapping=False):
@@ -110,7 +110,7 @@ def test_interface_2d_scalar_2(mapping=False):
     kernel = Kernel(a, Vh, name='kernel')
     interface = Interface(kernel, name='interface')
     code = pycode(interface.func)
-    print(pycode(kernel.func))
+    if DEBUG: print(pycode(kernel.func))
     if DEBUG: print(code)
 
 def test_interface_2d_block_1(mapping=False):
@@ -136,7 +136,36 @@ def test_interface_2d_block_1(mapping=False):
     kernel = Kernel(a, Vh, name='kernel')
     interface = Interface(kernel, name='interface')
     code = pycode(interface.func)
-    print(pycode(kernel.func))
+    if DEBUG: print(pycode(kernel.func))
+    if DEBUG: print(code)
+
+def test_interface_2d_stokes(mapping=False):
+    print('============ test_interface_2d_stokes =============')
+
+    if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
+
+    # ... abstract model
+    V = VectorFunctionSpace('V', domain)
+    W = FunctionSpace('W', domain)
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(V, name='u')
+    p = TestFunction(W, name='p')
+    q = TestFunction(W, name='q')
+
+    a = BilinearForm((v,u), inner(grad(v), grad(u)), name='a')
+    b = BilinearForm((v,p), div(v)*p, name='b')
+    A = BilinearForm(((v,q),(u,p)), a(v,u) - b(v,p) + b(u,q), name='A')
+    # ...
+
+    # ... discrete spaces
+    Vh = create_discrete_space()
+    # ...
+
+    kernel = Kernel(A, Vh, name='kernel')
+    interface = Interface(kernel, name='interface')
+    code = pycode(interface.func)
+    if DEBUG: print(pycode(kernel.func))
     if DEBUG: print(code)
 
 
@@ -148,4 +177,6 @@ if __name__ == '__main__':
     test_interface_2d_scalar_1(mapping=False)
     test_interface_2d_scalar_2(mapping=False)
     test_interface_2d_block_1(mapping=False)
+
+    test_interface_2d_stokes(mapping=False)
     # .................................
