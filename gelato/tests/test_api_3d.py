@@ -17,6 +17,7 @@ from sympde.core import Field
 from sympde.core import grad, dot, inner, cross, rot, curl, div
 from sympde.core import FunctionSpace
 from sympde.core import TestFunction
+from sympde.core import VectorFunctionSpace
 from sympde.core import VectorTestFunction
 from sympde.core import BilinearForm, LinearForm, Integral
 from sympde.core import Mapping
@@ -117,6 +118,35 @@ def test_api_3d_scalar_2(mapping=False):
     M = symbol.evaluate(t1, t2, t3, c=0.5)
     print(M.shape)
 
+def test_api_3d_block_1(mapping=False):
+    print('============ test_api_3d_block_1 =============')
+
+    if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
+
+    V = VectorFunctionSpace('V', domain)
+    U = VectorFunctionSpace('U', domain)
+
+    v = VectorTestFunction(V, name='v')
+    u = VectorTestFunction(U, name='u')
+
+    c = Constant('c')
+
+    expr = div(v) * div(u) + c * dot(curl(v), curl(u))
+    a = BilinearForm((v,u), expr)
+
+    # ... discrete spaces
+    Vh = create_discrete_space()
+    # ...
+
+    symbol = DiscreteSymbol(a, Vh)
+
+    t1 = linspace(0, 1, 10)
+    t2 = linspace(0, 1, 10)
+    t3 = linspace(0, 1, 10)
+    Ms = symbol.evaluate(t1, t2, t3, c=0.5)
+    for M in Ms:
+        print(M.shape)
+
 
 #................................
 if __name__ == '__main__':
@@ -125,4 +155,5 @@ if __name__ == '__main__':
     # without mapping
     test_api_3d_scalar_1(mapping=False)
     test_api_3d_scalar_2(mapping=False)
+    test_api_3d_block_1(mapping=False)
     # .................................
