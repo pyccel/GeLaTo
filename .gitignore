@@ -5,6 +5,7 @@
 *.so
 *.f90
 *.pyccel*
+__pycache__
 
 *build*
 *egg*
