@@ -179,9 +179,9 @@ if __name__ == '__main__':
 
     # .................................
     # without mapping
-    test_api_2d_scalar_1(mapping=False)
-    test_api_2d_scalar_2(mapping=False)
-    test_api_2d_block_1(mapping=False)
+#    test_api_2d_scalar_1(mapping=False)
+#    test_api_2d_scalar_2(mapping=False)
+#    test_api_2d_block_1(mapping=False)
 
     test_api_2d_stokes(mapping=False)
     # .................................

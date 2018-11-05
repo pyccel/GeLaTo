@@ -17,6 +17,7 @@ from sympde.core import Mass as MassForm
 from sympde.core import Stiffness as StiffnessForm
 from sympde.core import Advection as AdvectionForm
 from sympde.core import AdvectionT as AdvectionTForm
+from sympde.core import Bilaplacian as BilaplacianForm
 from sympde.core.basic import _coeffs_registery
 
 from .glt import (Mass,
@@ -115,6 +116,10 @@ def _gelatize(a, degrees=None, evaluate=False, verbose=False):
         elif isinstance(expr, AdvectionTForm):
             symbol = - sympy_I * Advection(p, t, evaluate=evaluate)
             return symbol
+
+        elif isinstance(expr, BilaplacianForm):
+            symbol = Bilaplacian(p, t, evaluate=evaluate)
+            return symbol * n**3
 
         else:
             raise NotImplementedError('TODO')
