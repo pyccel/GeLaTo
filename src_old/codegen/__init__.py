@@ -1,2 +1,0 @@
-from .latex import *
-
