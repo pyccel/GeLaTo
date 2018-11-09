@@ -146,6 +146,14 @@ class Kernel(GelatoBasic):
         return self._max_nderiv
 
     @property
+    def with_coordinates(self):
+        return self._with_coordinates
+
+    @property
+    def coordinates(self):
+        return self._coordinates
+
+    @property
     def constants(self):
         return self._constants
 
@@ -241,9 +249,20 @@ class Kernel(GelatoBasic):
         n_elements = symbols('n1:%d'%(dim+1), integer=True)
         tis        = symbols('t1:%d'%(dim+1), real=True)
         arr_tis    = symbols('arr_t1:%d'%(dim+1), cls=IndexedBase)
+        xis        = symbols('x1:%d'%(dim+1), real=True)
+        arr_xis    = symbols('arr_x1:%d'%(dim+1), cls=IndexedBase)
         indices    = symbols('i1:%d'%(dim+1))
         lengths    = symbols('nt1:%d'%(dim+1))
         ranges     = [Range(lengths[i]) for i in range(dim)]
+        # ...
+
+        # ...
+        coordinates = tuple([a for a in kernel_expr.atoms(Symbol) if a.name in
+                             ['x', 'y', 'z']])
+
+        self._with_coordinates = (len(coordinates) > 0)
+        if self.with_coordinates:
+            self._coordinates = arr_xis
         # ...
 
         # ...
@@ -259,6 +278,10 @@ class Kernel(GelatoBasic):
         txs = [Symbol(tx) for tx in ['tx', 'ty', 'tz'][:dim]]
         for ti, tx in zip(tis, txs):
             kernel_expr = kernel_expr.subs(tx, ti)
+
+        xs = [Symbol(x) for x in ['x', 'y', 'z'][:dim]]
+        for xi, x in zip(xis, xs):
+            kernel_expr = kernel_expr.subs(x, xi)
         # ...
 
         # ...
@@ -296,6 +319,10 @@ class Kernel(GelatoBasic):
             ti = tis[i]
             arr_ti = arr_tis[i]
             body = [Assign(ti, arr_ti[x])] + body
+            if self.with_coordinates:
+                xi = xis[i]
+                arr_xi = arr_xis[i]
+                body = [Assign(xi, arr_xi[x])] + body
 
             body = [For(x, rx, body)]
         # ...
@@ -346,7 +373,7 @@ class Kernel(GelatoBasic):
         # ...
 
         # function args
-        func_args = self.build_arguments(mats)
+        func_args = self.build_arguments(self.coordinates + mats)
 
         return FunctionDef(self.name, list(func_args), [], body)
 
@@ -391,6 +418,10 @@ class Interface(GelatoBasic):
     def inout_arguments(self):
         return self._inout_arguments
 
+    @property
+    def coordinates(self):
+        return self._coordinates
+
     def _initialize(self):
         form = self.weak_form
         kernel = self.kernel
@@ -416,6 +447,12 @@ class Interface(GelatoBasic):
 
         # ...
         self._basic_args = kernel.basic_args
+        # ...
+
+        # ...
+        self._coordinates = []
+        if self.kernel.with_coordinates:
+            self._coordinates = symbols('x y z')[:dim]
         # ...
 
         # ...
@@ -456,16 +493,17 @@ class Interface(GelatoBasic):
 
         # ...
         self._inout_arguments = list(global_mats)
-        self._in_arguments = list(self.kernel.constants) + list(fields)
+        self._in_arguments = list(self.coordinates) + list(self.kernel.constants) + list(fields)
         # ...
 
         # ... call to kernel
+        # TODO add fields
         mat_data       = tuple(global_mats)
 
         field_data     = [DottedName(F, '_coeffs', '_data') for F in fields]
         field_data     = tuple(field_data)
 
-        args = kernel.build_arguments(field_data + mat_data)
+        args = kernel.build_arguments(self.coordinates + field_data + mat_data)
 
         body += [FunctionCall(kernel.func, args)]
         # ...
@@ -486,12 +524,24 @@ class Interface(GelatoBasic):
         if mapping:
             mapping = (mapping,)
 
+        # TODO improve using in_arguments
         if self.kernel.constants:
             constants = self.kernel.constants
-            args = mapping + constants + fields + mats
+
+            if self.coordinates:
+                coordinates = self.coordinates
+                args = mapping + constants + coordinates + fields + mats
+
+            else:
+                args = mapping + constants + fields + mats
 
         else:
-            args = mapping + fields + mats
+            if self.coordinates:
+                coordinates = self.coordinates
+                args = mapping + coordinates + fields + mats
+
+            else:
+                args = mapping + fields + mats
 
         func_args = self.build_arguments(args)
         # ...

@@ -61,11 +61,10 @@ def test_kernel_1d_scalar_1(mapping=False):
 
     if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
 
-    U = FunctionSpace('U', domain)
     V = FunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
-    u = TestFunction(U, name='u')
+    u = TestFunction(V, name='u')
 
     expr = dot(grad(v), grad(u))
     a = BilinearForm((v,u), expr, mapping=mapping)
@@ -83,15 +82,37 @@ def test_kernel_1d_scalar_2(mapping=False):
 
     if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
 
-    U = FunctionSpace('U', domain)
     V = FunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
-    u = TestFunction(U, name='u')
+    u = TestFunction(V, name='u')
 
     c = Constant('c', real=True)
 
     expr = dot(grad(v), grad(u)) + c*v*u
+    a = BilinearForm((v,u), expr, mapping=mapping)
+
+    # ... discrete spaces
+    Vh = create_discrete_space()
+    # ...
+
+    kernel = Kernel(a, Vh, name='kernel')
+    code = pycode(kernel.func)
+    if DEBUG: print(code)
+
+def test_kernel_1d_scalar_3(mapping=False):
+    print('============ test_kernel_1d_scalar_3 =============')
+
+    if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
+
+    V = FunctionSpace('V', domain)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(V, name='u')
+
+    x = V.coordinates
+
+    expr = dot(grad(v), grad(u)) + x*v*u
     a = BilinearForm((v,u), expr, mapping=mapping)
 
     # ... discrete spaces
@@ -110,4 +131,5 @@ if __name__ == '__main__':
     # without mapping
     test_kernel_1d_scalar_1(mapping=False)
     test_kernel_1d_scalar_2(mapping=False)
+    test_kernel_1d_scalar_3(mapping=False)
     # .................................

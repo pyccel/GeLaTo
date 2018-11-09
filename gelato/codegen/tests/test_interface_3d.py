@@ -120,6 +120,32 @@ def test_interface_3d_scalar_3(mapping=False):
 
     if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
 
+    U = FunctionSpace('U', domain)
+    V = FunctionSpace('V', domain)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    x,y,z = V.coordinates
+
+    expr = dot(grad(v), grad(u)) + x*y*z*v*u
+    a = BilinearForm((v,u), expr, mapping=mapping)
+
+    # ... discrete spaces
+    Vh = create_discrete_space()
+    # ...
+
+    kernel = Kernel(a, Vh, name='kernel')
+    interface = Interface(kernel, name='interface')
+    code = pycode(interface.func)
+    if DEBUG: print(pycode(kernel.func))
+    if DEBUG: print(code)
+
+def test_interface_3d_block_1(mapping=False):
+    print('============ test_interface_3d_block_1 =============')
+
+    if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
+
     V = VectorFunctionSpace('V', domain)
     U = VectorFunctionSpace('U', domain)
 
@@ -176,9 +202,10 @@ if __name__ == '__main__':
 
     # .................................
     # without mapping
-    test_interface_3d_scalar_1(mapping=False)
-    test_interface_3d_scalar_2(mapping=False)
+#    test_interface_3d_scalar_1(mapping=False)
+#    test_interface_3d_scalar_2(mapping=False)
     test_interface_3d_scalar_3(mapping=False)
-
-    test_interface_3d_stokes(mapping=False)
+#    test_interface_3d_block_1(mapping=False)
+#
+#    test_interface_3d_stokes(mapping=False)
     # .................................

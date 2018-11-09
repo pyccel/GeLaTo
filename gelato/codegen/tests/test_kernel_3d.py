@@ -110,6 +110,30 @@ def test_kernel_3d_scalar_2(mapping=False):
     code = pycode(kernel.func)
     if DEBUG: print(code)
 
+def test_kernel_3d_scalar_3(mapping=False):
+    print('============ test_kernel_3d_scalar_3 =============')
+
+    if mapping: mapping = Mapping('M', rdim=DIM, domain=domain)
+
+    U = FunctionSpace('U', domain)
+    V = FunctionSpace('V', domain)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(U, name='u')
+
+    x,y,z = V.coordinates
+
+    expr = dot(grad(v), grad(u)) + x*y*z*v*u
+    a = BilinearForm((v,u), expr, mapping=mapping)
+
+    # ... discrete spaces
+    Vh = create_discrete_space()
+    # ...
+
+    kernel = Kernel(a, Vh, name='kernel')
+    code = pycode(kernel.func)
+    if DEBUG: print(code)
+
 def test_kernel_3d_block_1(mapping=False):
     print('============ test_kernel_3d_block_1 =============')
 
@@ -169,6 +193,7 @@ if __name__ == '__main__':
     # without mapping
     test_kernel_3d_scalar_1(mapping=False)
     test_kernel_3d_scalar_2(mapping=False)
+    test_kernel_3d_scalar_3(mapping=False)
     test_kernel_3d_block_1(mapping=False)
 
     test_kernel_3d_stokes(mapping=False)
