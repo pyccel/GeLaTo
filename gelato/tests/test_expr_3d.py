@@ -18,11 +18,11 @@ from sympde.topology import Trace, trace_0, trace_1
 from sympde.topology import Square
 from sympde.expr.expr import LinearForm, BilinearForm
 
-from gelato.core import gelatize
-from gelato.core import (Mass,
-                         Stiffness,
-                         Advection,
-                         Bilaplacian)
+from gelato import gelatize
+from gelato import (Mass,
+                    Stiffness,
+                    Advection,
+                    Bilaplacian)
 
 DIM = 3
 domain = Domain('Omega', dim=DIM)

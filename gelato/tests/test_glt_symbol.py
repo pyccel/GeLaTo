@@ -5,7 +5,7 @@ from sympy import cos, sin
 
 from matplotlib import pyplot as plt
 
-from gelato.core import Mass, Stiffness, Advection, Bilaplacian
+from gelato import Mass, Stiffness, Advection, Bilaplacian
 
 #==============================================================================
 def test_glt_symbol_1():

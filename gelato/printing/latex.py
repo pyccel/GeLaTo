@@ -4,11 +4,6 @@
 from sympy.core import Symbol
 from sympy.printing.latex import LatexPrinter as LatexPrinterSympy
 
-from gelato.core.glt import (Mass,
-                             Stiffness,
-                             Advection,
-                             Bilaplacian)
-
 class LatexPrinter(LatexPrinterSympy):
 
     def __init__(self, settings=None):
