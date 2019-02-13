@@ -309,9 +309,9 @@ class Mass(BasicGlt):
 #            print(phi)
 #            print('> mass = ', m)
 
-            # hack to avoid
-            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
-            m = sympify(str(m))
+#            # hack to avoid
+#            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+#            m = sympify(str(m))
 
             return m
 # ...
@@ -368,9 +368,9 @@ class Stiffness(BasicGlt):
 
 #            print('> stiffness = ', m)
 
-            # hack to avoid
-            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
-            m = sympify(str(m))
+#            # hack to avoid
+#            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+#            m = sympify(str(m))
 
             return m
 # ...
@@ -426,9 +426,9 @@ class Advection(BasicGlt):
 
 #            print('> advection = ', m)
 
-            # hack to avoid
-            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
-            m = sympify(str(m))
+#            # hack to avoid
+#            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+#            m = sympify(str(m))
 
             return m
 # ...
@@ -452,28 +452,34 @@ class Bilaplacian(BasicGlt):
 
         elif isinstance(p, int):
 
-            # ...
-            r  = Symbol('r')
+            if p <= P_MAX:
+                raise NotImplementedError('Bilaplacian table not available')
+#                phi = d_phi_rrrr[p]
 
-            pp = 2*p + 1
-            N = pp + 1
-            L = list(range(0, N + pp + 1))
+            else:
 
-            b0    = bspline_basis(pp, L, 0, r)
-            b0_r  = diff(b0, r)
-            b0_rr = diff(b0_r, r)
-            b0_rrr = diff(b0_rr, r)
-            b0_rrrr = diff(b0_rrr, r)
-            bsp   = lambdify(r, b0_rrrr)
-            # ...
+                # ...
+                r  = Symbol('r')
 
-            # ... we use nsimplify to get the rational number
-            phi = []
-            for i in range(0, p+1):
-                y = bsp(p+1-i)
-                y = nsimplify(y, tolerance=TOLERANCE, rational=True)
-                phi.append(y)
-            # ...
+                pp = 2*p + 1
+                N = pp + 1
+                L = list(range(0, N + pp + 1))
+
+                b0    = bspline_basis(pp, L, 0, r)
+                b0_r  = diff(b0, r)
+                b0_rr = diff(b0_r, r)
+                b0_rrr = diff(b0_rr, r)
+                b0_rrrr = diff(b0_rrr, r)
+                bsp   = lambdify(r, b0_rrrr)
+                # ...
+
+                # ... we use nsimplify to get the rational number
+                phi = []
+                for i in range(0, p+1):
+                    y = bsp(p+1-i)
+                    y = nsimplify(y, tolerance=TOLERANCE, rational=True)
+                    phi.append(y)
+                # ...
 
             # ...
             m = phi[0] * cos(S.Zero)
@@ -483,9 +489,9 @@ class Bilaplacian(BasicGlt):
 
 #            print('> bilaplacian = ', m)
 
-            # hack to avoid
-            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
-            m = sympify(str(m))
+#            # hack to avoid
+#            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+#            m = sympify(str(m))
 
             return m
 # ...
