@@ -3,36 +3,39 @@ language: python
 
 # which python versions to test
 python:
-  - "2.7"
-  - "3.4"
-#  - "3.5"
-#  - "3.6"
-#  - "3.5-dev" # 3.5 development branch
-#  - "3.6"
-#  - "3.6-dev" # 3.6 development branch
-#  - "3.7-dev" # 3.7 development branch
-#  - "nightly"
-#
+  - "3.5"
+  - "3.6"
 
+# Enable 3.7 without globally enabling 'dist: xenial' for other build jobs
 matrix:
-  allow_failures:
-    - python: "2.7"
-    - python: "3.4"
-#    - python: "3.5"
-#    - python: "3.6"
+  include:
+    - python: 3.7
+      dist: xenial
 
-virtualenv:
-    system_site_packages: true
+# Cache directory $HOME/.cache/pip
+cache: pip
 
-# command to install dependencies
+# command before installation: install all dependencies and run CMAKE config
+before_install:
+  - python -m pip install --upgrade pip
+  - python -m pip install -r requirements.txt
+  - python -m pip uninstall -y sympde
+  - wget https://raw.githubusercontent.com/pyccel/sympde/master/requirements.txt -O requirements_sympde.txt
+  - python -m pip install -r requirements_sympde.txt
+  - python -m pip install git+https://github.com/pyccel/sympde@master
+
+# command to install project
 install:
-  - pip install -r requirements.txt
-  - pip install .
+  - python -m pip install .
+
+before_script:
+  - mkdir pytest
 
 # command to run tests
 script:
-#  - pytest # or py.test for Python versions 3.5 and below
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.4 || $TRAVIS_PYTHON_VERSION == 3.5 ]]; then export PYTEST=py.test ;else export PYTEST=pytest ; fi
-  - $PYTEST tests/expressions
-  - $PYTEST tests/glt
-  - $PYTEST tests/weak_form
+  - cd pytest
+  - python -m pytest --pyargs geltao
+  - cd -
+
+after_script:
+  - rm -rf pytest
