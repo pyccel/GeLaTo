@@ -7,9 +7,8 @@ from matplotlib import pyplot as plt
 
 from gelato.core import Mass, Stiffness, Advection, Bilaplacian
 
-# ...
+#==============================================================================
 def test_glt_symbol_1():
-    print('============ test_glt_symbol_1 ==============')
 
     t = Symbol('t')
 
@@ -43,22 +42,30 @@ def test_glt_symbol_1():
 #    print(Stiffness(p, t))
 #    print(Advection(p, t))
 #    print(Bilaplacian(p, t))
-# ...
 
-# ...
-def test_glt_symbol_2():
-    print('============ test_glt_symbol_2 ==============')
+#==============================================================================
+#def test_glt_symbol_2():
+#
+#    from sympy import limit, sin, Symbol, oo
+#    from sympy.abc import x
+#
+#    t = Symbol('t')
+#    p = Symbol('p')
+#
+#    l = limit(Mass(p, t), p, oo)
+#    print(l)
 
-    from sympy import limit, sin, Symbol, oo
-    from sympy.abc import x
+#==============================================================================
+# CLEAN UP SYMPY NAMESPACE
+#==============================================================================
 
-    t = Symbol('t')
-    p = Symbol('p')
+def teardown_module():
+    from sympy import cache
+    cache.clear_cache()
 
-    l = limit(Mass(p, t), p, oo)
-    print(l)
+def teardown_function():
+    from sympy import cache
+    cache.clear_cache()
 
-# .....................................................
-if __name__ == '__main__':
-    test_glt_symbol_1()
-#    test_glt_symbol_2()
+#test_glt_symbol_1()
+#test_glt_symbol_2()

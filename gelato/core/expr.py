@@ -11,14 +11,15 @@ from sympy import simplify
 from sympy import Matrix, ImmutableDenseMatrix
 from sympy.physics.quantum import TensorProduct
 
-from sympde.core import BilinearForm, BilinearAtomicForm
-from sympde.core import tensorize
-from sympde.core import Mass as MassForm
-from sympde.core import Stiffness as StiffnessForm
-from sympde.core import Advection as AdvectionForm
-from sympde.core import AdvectionT as AdvectionTForm
-from sympde.core import Bilaplacian as BilaplacianForm
-from sympde.core.basic import _coeffs_registery
+from sympde.expr import LinearForm, BilinearForm
+from sympde.expr import TensorExpr
+
+from sympde.expr import Mass as MassForm
+from sympde.expr import Stiffness as StiffnessForm
+from sympde.expr import Advection as AdvectionForm
+from sympde.expr import AdvectionT as AdvectionTForm
+from sympde.expr import Bilaplacian as BilaplacianForm
+from sympde.expr import Basic1dForm
 
 from .glt import (Mass,
                   Stiffness,
@@ -128,17 +129,72 @@ def _gelatize(a, degrees=None, evaluate=False, verbose=False):
 # ...
 
 
-def gelatize(a, degrees=None, n_elements=None):
+def gelatize(a, degrees=None, n_elements=None, evaluate=False):
 
     if not isinstance(a, BilinearForm):
         raise TypeError('> Expecting a BilinearForm')
 
-    evaluate = False
+    # ... compute tensor form
+    expr = TensorExpr(a)
+    # ...
+
+    # ... coordinates as strings
+    coordinates = ['x', 'y', 'z']
+    # ...
+
+    # ... get the degree
     if not( degrees is None ):
-        evaluate = True
+        if not isinstance(degrees, (tuple, list, Tuple)):
+            degrees = [degrees]
 
-    expr = _gelatize(a, degrees=degrees, evaluate=evaluate)
+    else:
+        degrees = [Symbol('p{}'.format(i), integer=True) for i in coordinates]
+    # ...
 
+    # ... coordinates as symbols
+    coordinates = [Symbol(i) for i in coordinates]
+    # ...
+
+    # ...
+    forms = list(expr.atoms(Basic1dForm))
+    for form in forms:
+
+        p = degrees[form.axis]
+        coord = coordinates[form.axis]
+
+        # ... construct the fourier variable and the number of elements
+        t_name = 't{}'.format(coord)
+        n_name = 'n{}'.format(coord)
+
+        t = Symbol(t_name)
+        n = Symbol(n_name, integer=True)
+        # ...
+
+        if isinstance(form, MassForm):
+            symbol = Mass(p, t, evaluate=evaluate)
+            expr = expr.subs(form, symbol / n)
+
+        elif isinstance(form, StiffnessForm):
+            symbol = Stiffness(p, t, evaluate=evaluate)
+            expr = expr.subs(form, symbol * n)
+
+        elif isinstance(form, AdvectionForm):
+            symbol = sympy_I * Advection(p, t, evaluate=evaluate)
+            expr = expr.subs(form, symbol)
+
+        elif isinstance(form, AdvectionTForm):
+            symbol = - sympy_I * Advection(p, t, evaluate=evaluate)
+            expr = expr.subs(form, symbol)
+
+        elif isinstance(form, BilaplacianForm):
+            symbol = Bilaplacian(p, t, evaluate=evaluate)
+            expr = expr.subs(form, symbol * n**3)
+
+        else:
+            raise NotImplementedError('{} not available yet'.format(type(form)))
+    # ...
+
+    # ...
     if not( n_elements is None ):
         dim = a.ldim
         ns = ['nx', 'ny', 'nz'][:dim]
@@ -151,6 +207,7 @@ def gelatize(a, degrees=None, n_elements=None):
             raise ValueError('Wrong size for n_elements')
 
         for n,v in zip(ns, n_elements):
-            expr = expr.subs({n: v})
+            expr = expr.subs(n, v)
+    # ...
 
     return expr
