@@ -7,7 +7,7 @@ from sympy import Symbol
 from sympy.core.containers import Tuple
 from sympy import S
 from sympy.core import Expr, Basic, AtomicExpr
-from sympy import simplify
+from sympy import simplify, expand
 from sympy import Matrix, ImmutableDenseMatrix
 from sympy.physics.quantum import TensorProduct
 
@@ -21,6 +21,7 @@ from sympde.expr import AdvectionT as AdvectionTForm
 from sympde.expr import Bilaplacian as BilaplacianForm
 from sympde.expr import Basic1dForm
 from sympde.topology import SymbolicExpr
+from sympde.topology.space import ScalarField, VectorField
 
 from .glt import (Mass,
                   Stiffness,
@@ -123,3 +124,76 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
     # ...
 
     return expr
+
+
+
+#==============================================================================
+# TODO add __call__
+class GltExpr(Expr):
+    is_Function = True
+    _form = None
+
+    def __new__(cls, expr, mapping=None, human=False):
+
+        form = expr
+        expr = gelatize(form, mapping=mapping, human=human)
+
+        expr = expand(expr)
+#        expr = simplify(expr)
+
+        # ...
+        atoms = expr.atoms(Symbol)
+
+        fourier_vars = [i for i in atoms if i.name in ['tx', 'ty', 'tz']]
+        space_vars   = [i for i in atoms if i.name in ['x', 'y', 'z']]
+        # ...
+
+        obj = Basic.__new__(cls, fourier_vars, space_vars, expr)
+        obj._form = form
+        return obj
+
+    @property
+    def fourier_variables(self):
+        return self._args[0]
+
+    @property
+    def space_variables(self):
+        return self._args[1]
+
+    @property
+    def expr(self):
+        return self._args[2]
+
+    @property
+    def form(self):
+        return self._form
+
+    @property
+    def ldim(self):
+        return self.form.ldim
+
+    @property
+    def coordinates(self):
+        return self.form.coordinates
+
+    @property
+    def fields(self):
+        return self.form.fields
+
+    @property
+    def constants(self):
+        return self.form.constants
+
+#    def __call__(self, *args):
+#        args = _sanitize_arguments(args, is_bilinear=True)
+#        left,right = args
+#        if not is_sequence(left):
+#            left = [left]
+#
+#        if not is_sequence(right):
+#            right = [right]
+#
+#        args = Tuple(*left, *right)
+#
+#        variables = Tuple(*self.variables[0], *self.variables[1])
+#        return self.expr.xreplace(dict(list(zip(variables, args))))

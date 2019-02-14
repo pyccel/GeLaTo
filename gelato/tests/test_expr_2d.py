@@ -19,7 +19,7 @@ from sympde.topology import Mapping
 from sympde.topology import Square
 from sympde.expr.expr import LinearForm, BilinearForm
 
-from gelato import gelatize
+from gelato import gelatize, GltExpr
 from gelato import (Mass,
                     Stiffness,
                     Advection,
@@ -180,6 +180,20 @@ def test_gelatize_2d_3_mapping():
     print('> input     >>> {0}'.format(expr))
     print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
 
+#==============================================================================
+def test_glt_expr_2d_1():
+
+    V = FunctionSpace('V', domain)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(V, name='u')
+
+    c = Constant('c')
+
+    a = BilinearForm((u,v), dot(grad(v), grad(u)) + c*v*u)
+    expr = GltExpr(a)
+    print(expr)
+
 
 #==============================================================================
 # CLEAN UP SYMPY NAMESPACE
@@ -199,3 +213,5 @@ def teardown_function():
 #test_gelatize_2d_5()
 #test_gelatize_2d_5_mapping()
 #test_gelatize_2d_3_mapping()
+
+test_glt_expr_2d_1()
