@@ -20,6 +20,7 @@ from sympde.expr import Advection as AdvectionForm
 from sympde.expr import AdvectionT as AdvectionTForm
 from sympde.expr import Bilaplacian as BilaplacianForm
 from sympde.expr import Basic1dForm
+from sympde.topology import SymbolicExpr
 
 from .glt import (Mass,
                   Stiffness,
@@ -27,115 +28,21 @@ from .glt import (Mass,
                   Bilaplacian)
 
 
-# ...
-def _gelatize(a, degrees=None, evaluate=False, verbose=False):
-    if isinstance(a, BilinearForm) and not(isinstance(a, BilinearAtomicForm)):
-        expr = tensorize(a)
-        if verbose:
-            print('> tensorized = ', expr)
-    else:
-        expr = a
-
-    if isinstance(expr, Add):
-        args = [_gelatize(i, degrees=degrees, evaluate=evaluate) for i in expr.args]
-        return Add(*args)
-
-    elif isinstance(expr, Mul):
-        coeffs  = [i for i in expr.args if isinstance(i, _coeffs_registery)]
-        vectors = [i for i in expr.args if not(i in coeffs)]
-
-        i = S.One
-        if coeffs:
-            i = Mul(*coeffs)
-
-        j = S.One
-        if vectors:
-            args = [_gelatize(i, degrees=degrees, evaluate=evaluate) for i in vectors]
-            j = Mul(*args)
-
-        return Mul(i, j)
-
-    if isinstance(expr, TensorProduct):
-        args = [_gelatize(i, degrees=degrees, evaluate=evaluate) for i in expr.args]
-        return Mul(*args)
-
-    elif isinstance(expr, (Matrix, ImmutableDenseMatrix)):
-
-        n_rows, n_cols = expr.shape
-        lines = []
-        for i in range(0, n_rows):
-            line = []
-            for j in range(0, n_cols):
-                eij = _gelatize(expr[i,j], degrees=degrees, evaluate=evaluate)
-                line.append(eij)
-            lines.append(line)
-        return Matrix(lines)
-
-    elif isinstance(expr, BilinearAtomicForm):
-
-        coord = expr.trial_spaces[0].coordinates
-
-        # ... construct the fourier variable and the number of elements
-        t_name = 't{}'.format(coord)
-        n_name = 'n{}'.format(coord)
-
-        t = Symbol(t_name)
-        n = Symbol(n_name, integer=True)
-        # ...
-
-        # ...
-        _coordinates = ['x', 'y', 'z']
-        index = _coordinates.index(str(coord.name))
-        # ...
-
-        if evaluate and ( degrees is None ):
-            raise ValueError('> degrees must be provided')
-
-        # ... get the degree
-        if not( degrees is None ):
-            if not isinstance(degrees, (tuple, list, Tuple)):
-                degrees = [degrees]
-
-            p = degrees[index]
-        else:
-            p_name = 'p{}'.format(coord)
-            p = Symbol(p_name, integer=True)
-        # ...
-
-        if isinstance(expr, MassForm):
-            symbol = Mass(p, t, evaluate=evaluate)
-            return symbol / n
-
-        elif isinstance(expr, StiffnessForm):
-            symbol = Stiffness(p, t, evaluate=evaluate)
-            return symbol * n
-
-        elif isinstance(expr, AdvectionForm):
-            symbol = sympy_I * Advection(p, t, evaluate=evaluate)
-            return symbol
-
-        elif isinstance(expr, AdvectionTForm):
-            symbol = - sympy_I * Advection(p, t, evaluate=evaluate)
-            return symbol
-
-        elif isinstance(expr, BilaplacianForm):
-            symbol = Bilaplacian(p, t, evaluate=evaluate)
-            return symbol * n**3
-
-        else:
-            raise NotImplementedError('TODO')
-
-    return expr
-# ...
-
-
-def gelatize(a, degrees=None, n_elements=None, evaluate=False):
+def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
+             human=False):
 
     if not isinstance(a, BilinearForm):
         raise TypeError('> Expecting a BilinearForm')
 
     # ... compute tensor form
-    expr = TensorExpr(a)
+    expr = TensorExpr(a, mapping=mapping)
+    # ...
+
+    # ...
+    atoms = list(expr.atoms(TensorExpr))
+    if atoms:
+        for i in atoms:
+            expr = expr.subs(i, i._args[0])
     # ...
 
     # ... coordinates as strings
@@ -208,6 +115,11 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False):
 
         for n,v in zip(ns, n_elements):
             expr = expr.subs(n, v)
+    # ...
+
+    # ...
+    if mapping and human:
+        expr = SymbolicExpr(expr)
     # ...
 
     return expr

@@ -15,6 +15,7 @@ from sympde.topology import FunctionSpace, VectorFunctionSpace
 from sympde.topology import Field, TestFunction
 from sympde.topology import Domain
 from sympde.topology import Trace, trace_0, trace_1
+from sympde.topology import Mapping
 from sympde.topology import Square
 from sympde.expr.expr import LinearForm, BilinearForm
 
@@ -112,7 +113,7 @@ def test_gelatize_2d_3():
 
     c = Constant('c')
 
-    expr = div(v) * div(u) + c * rot(v) * rot(u)
+    expr = c * div(v) * div(u) + rot(v) * rot(u)
     expr = BilinearForm((u,v), expr)
     print('> input     >>> {0}'.format(expr))
     print('> gelatized >>> {0}'.format(gelatize(expr)))
@@ -146,6 +147,41 @@ def test_gelatize_2d_5():
     print('> gelatized >>> {0}'.format(gelatize(expr)))
 
 #==============================================================================
+def test_gelatize_2d_5_mapping():
+
+    M = Mapping('M', DIM)
+
+    V = FunctionSpace('V', domain)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(V, name='u')
+
+    c = Constant('c')
+
+    expr = BilinearForm((u,v), dot(grad(v), grad(u)) + c*v*u)
+
+    print('> input     >>> {0}'.format(expr))
+    print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
+
+#==============================================================================
+def test_gelatize_2d_3_mapping():
+
+    M = Mapping('M', DIM)
+
+    V = VectorFunctionSpace('V', domain)
+
+    v = TestFunction(V, name='v')
+    u = TestFunction(V, name='u')
+
+    c = Constant('c')
+
+    expr = c * div(v) * div(u) + rot(v) * rot(u)
+    expr = BilinearForm((u,v), expr)
+    print('> input     >>> {0}'.format(expr))
+    print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
+
+
+#==============================================================================
 # CLEAN UP SYMPY NAMESPACE
 #==============================================================================
 
@@ -161,3 +197,5 @@ def teardown_function():
 #test_gelatize_2d_3()
 #test_gelatize_2d_4()
 #test_gelatize_2d_5()
+#test_gelatize_2d_5_mapping()
+#test_gelatize_2d_3_mapping()
