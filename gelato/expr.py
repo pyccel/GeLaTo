@@ -133,26 +133,22 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
 # TODO add __call__
 class GltExpr(Expr):
     is_Function = True
-    _form = None
 
-    def __new__(cls, expr, mapping=None, human=False):
+    def __new__(cls, form):
 
-        form = expr
-        expr = gelatize(form, mapping=mapping, human=human)
-
-        expr = expand(expr)
-#        expr = simplify(expr)
+        assert(isinstance(form, BilinearForm))
 
         # ...
-        atoms = expr.atoms(Symbol)
+        dim = form.ldim
 
-        fourier_vars = [i for i in atoms if i.name in ['tx', 'ty', 'tz']]
+        fourier_vars = [Symbol(i) for i in ['tx', 'ty', 'tz'][:dim]]
+#        space_vars   = [Symbol(i) for i in ['x', 'y', 'z'][:dim]]
+
+        atoms = form.atoms(Symbol)
         space_vars   = [i for i in atoms if i.name in ['x', 'y', 'z']]
         # ...
 
-        obj = Basic.__new__(cls, fourier_vars, space_vars, expr)
-        obj._form = form
-        return obj
+        return Basic.__new__(cls, fourier_vars, space_vars, form)
 
     @property
     def fourier_variables(self):
@@ -163,12 +159,8 @@ class GltExpr(Expr):
         return self._args[1]
 
     @property
-    def expr(self):
-        return self._args[2]
-
-    @property
     def form(self):
-        return self._form
+        return self._args[2]
 
     @property
     def ldim(self):
@@ -186,16 +178,23 @@ class GltExpr(Expr):
     def constants(self):
         return self.form.constants
 
-#    def __call__(self, *args):
-#        args = _sanitize_arguments(args, is_bilinear=True)
-#        left,right = args
-#        if not is_sequence(left):
-#            left = [left]
-#
-#        if not is_sequence(right):
-#            right = [right]
-#
-#        args = Tuple(*left, *right)
-#
-#        variables = Tuple(*self.variables[0], *self.variables[1])
-#        return self.expr.xreplace(dict(list(zip(variables, args))))
+    def __call__(self, *args, **kwargs):
+
+        mapping    = kwargs.pop('mapping',    None)
+        human      = kwargs.pop('human',      True)
+        degrees    = kwargs.pop('degrees',    None)
+        n_elements = kwargs.pop('n_elements', None)
+
+        expr =  gelatize( self.form,
+                          degrees = degrees, n_elements = n_elements,
+                          mapping = mapping, human = human, evaluate = True)
+
+        dim = self.ldim
+
+        for i in ['tx', 'ty', 'tz'][:dim] +  ['x', 'y', 'z'][:dim]:
+            I = kwargs.pop(i, None)
+            if not(I is None):
+                S = Symbol(i)
+                expr = expr.subs(S, I)
+
+        return expr

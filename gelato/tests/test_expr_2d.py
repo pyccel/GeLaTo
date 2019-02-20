@@ -191,8 +191,10 @@ def test_glt_expr_2d_1():
     c = Constant('c')
 
     a = BilinearForm((u,v), dot(grad(v), grad(u)) + c*v*u)
-    expr = GltExpr(a)
-    print(expr)
+    glt = GltExpr(a)
+    print(glt)
+    print(glt(degrees=[2,2]))
+    print(glt(tx=0.1, ty=0.2, degrees=[2,2]))
 
 
 #==============================================================================
@@ -214,4 +216,4 @@ def teardown_function():
 #test_gelatize_2d_5_mapping()
 #test_gelatize_2d_3_mapping()
 
-test_glt_expr_2d_1()
+#test_glt_expr_2d_1()
