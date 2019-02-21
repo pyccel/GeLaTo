@@ -24,10 +24,8 @@ from sympde.topology import SymbolicExpr
 from sympde.topology import SymbolicDeterminant
 from sympde.topology.space import ScalarField, VectorField
 
-from .glt import (Mass,
-                  Stiffness,
-                  Advection,
-                  Bilaplacian)
+from .glt import (BasicGlt, Mass, Stiffness,
+                  Advection, Bilaplacian)
 
 
 def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
@@ -35,6 +33,8 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
 
     if not isinstance(a, BilinearForm):
         raise TypeError('> Expecting a BilinearForm')
+
+    dim = a.ldim
 
     # ... compute tensor form
     expr = TensorExpr(a, mapping=mapping)
@@ -48,36 +48,22 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
     # ...
 
     # ... coordinates as strings
-    coordinates = ['x', 'y', 'z']
+    coordinates = ['x', 'y', 'z'][:dim]
     # ...
 
-    # ... get the degree
-    if not( degrees is None ):
-        if not isinstance(degrees, (tuple, list, Tuple)):
-            degrees = [degrees]
-
-    else:
-        degrees = [Symbol('p{}'.format(i), integer=True) for i in coordinates]
-    # ...
-
-    # ... coordinates as symbols
-    coordinates = [Symbol(i) for i in coordinates]
+    # ... symbolic degree, ncells, fourier variables
+    ps = [Symbol('p{}'.format(i), integer=True) for i in coordinates]
+    ns = [Symbol('n{}'.format(i), integer=True) for i in coordinates]
+    ts = [Symbol('t{}'.format(i))               for i in coordinates]
     # ...
 
     # ...
     forms = list(expr.atoms(Basic1dForm))
     for form in forms:
 
-        p = degrees[form.axis]
-        coord = coordinates[form.axis]
-
-        # ... construct the fourier variable and the number of elements
-        t_name = 't{}'.format(coord)
-        n_name = 'n{}'.format(coord)
-
-        t = Symbol(t_name)
-        n = Symbol(n_name, integer=True)
-        # ...
+        p = ps[form.axis]
+        n = ns[form.axis]
+        t = ts[form.axis]
 
         if isinstance(form, MassForm):
             symbol = Mass(p, t, evaluate=evaluate)
@@ -105,9 +91,6 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
 
     # ...
     if not( n_elements is None ):
-        dim = a.ldim
-        ns = ['nx', 'ny', 'nz'][:dim]
-        ns = [Symbol(i, integer=True) for i in ns]
 
         if isinstance(n_elements, int):
             n_elements = [n_elements]*dim
@@ -117,6 +100,26 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
 
         for n,v in zip(ns, n_elements):
             expr = expr.subs(n, v)
+    # ...
+
+    # ... get the degree
+    if not( degrees is None ):
+        if not isinstance(degrees, (tuple, list, Tuple)):
+            degrees = [degrees]
+
+        assert(len(degrees) == len(ps))
+
+        atoms = list(expr.atoms(BasicGlt))
+
+        d = {}
+        for p,v in zip(ps, degrees):
+            d[p] = v
+
+        for atom in atoms:
+            p,t = atom.args[:]
+            newp = d[p]
+            newatom = atom.func(newp, t)
+            expr = expr.subs(atom, newatom)
     # ...
 
     # ...
