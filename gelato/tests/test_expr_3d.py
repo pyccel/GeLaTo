@@ -130,6 +130,8 @@ def test_gelatize_3d_5_mapping():
     print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
 
 #==============================================================================
+# TODO it takes some time => optimize LogicalExpr
+#      using nodes to describe subexpresions
 def test_gelatize_3d_3_mapping():
 
     M = Mapping('M', DIM)
@@ -157,8 +159,3 @@ def teardown_module():
 def teardown_function():
     from sympy import cache
     cache.clear_cache()
-
-
-#test_gelatize_3d_1()
-#test_gelatize_3d_5_mapping()
-test_gelatize_3d_3_mapping()

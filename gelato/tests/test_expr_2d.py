@@ -208,12 +208,3 @@ def teardown_module():
 def teardown_function():
     from sympy import cache
     cache.clear_cache()
-
-#test_gelatize_2d_1()
-#test_gelatize_2d_3()
-#test_gelatize_2d_4()
-#test_gelatize_2d_5()
-#test_gelatize_2d_5_mapping()
-#test_gelatize_2d_3_mapping()
-
-#test_glt_expr_2d_1()
