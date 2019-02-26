@@ -34,7 +34,7 @@ before_script:
 # command to run tests
 script:
   - cd pytest
-  - python -m pytest --pyargs geltao
+  - python -m pytest --pyargs gelato
   - cd -
 
 after_script:
