@@ -3,8 +3,6 @@
 from sympy.core import Symbol
 from sympy import cos, sin
 
-from matplotlib import pyplot as plt
-
 from gelato import Mass, Stiffness, Advection, Bilaplacian
 
 #==============================================================================
