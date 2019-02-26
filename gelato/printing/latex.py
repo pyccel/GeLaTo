@@ -23,16 +23,16 @@ class LatexPrinter(LatexPrinterSympy):
         name = r"\mathfrak{" + name + "}"
         return name + '_{' + p + "}" + fourier
 
-    def _print_Mass(self, expr):
+    def _print_Mass(self, expr, **kwargs):
         return self._print_BasicGlt('m', *expr.args)
 
-    def _print_Stiffness(self, expr):
+    def _print_Stiffness(self, expr, **kwargs):
         return self._print_BasicGlt('s', *expr.args)
 
-    def _print_Advection(self, expr):
+    def _print_Advection(self, expr, **kwargs):
         return self._print_BasicGlt('a', *expr.args)
 
-    def _print_Bilaplacian(self, expr):
+    def _print_Bilaplacian(self, expr, **kwargs):
         return self._print_BasicGlt('b', *expr.args)
 
 def latex(expr, **settings):
