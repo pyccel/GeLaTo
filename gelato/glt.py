@@ -1,922 +1,235 @@
 # -*- coding: utf-8 -*-
 #
 #
-# TODO use to_assign and post processing as expression and not latex => helpful
-#      for Fortran and Lua (code gen).
+# TODO: - add tabulation for Bilaplacian
+
 """This module contains different functions to create and treate the GLT symbols."""
 
-import numpy as np
-
-from sympy.core.sympify import sympify
-from sympy.simplify.simplify import simplify
 from sympy import Symbol
-from sympy import Lambda
 from sympy import Function
 from sympy import bspline_basis
+from sympy import sympify
 from sympy import lambdify
 from sympy import cos
 from sympy import sin
 from sympy import Rational
 from sympy import diff
-from sympy import Matrix
-from sympy import latex
-from sympy import Integral
 from sympy import I as sympy_I
 from sympy.core import Basic
 from sympy.core.singleton import S
 from sympy.simplify.simplify import nsimplify
-from sympy.utilities.lambdify import implemented_function
-from sympy.matrices.dense import MutableDenseMatrix
-from sympy import Mul, Add
 from sympy import Tuple
-from sympy import postorder_traversal
-from sympy import preorder_traversal
-from sympy import Indexed
-from sympy import IndexedBase
-from sympy import Lambda
+from sympy import Rational
 
 from itertools import product
 
-from scipy.linalg import eig
+# ............................................
+# tabular values
+# ............................................
+P_MAX = 8
 
-from gelato.calculus import (Dot_1d, Grad_1d, Div_1d)
-from gelato.calculus import (Dot_2d, Cross_2d, Grad_2d, Curl_2d, Rot_2d, Div_2d)
-from gelato.calculus import (Dot_3d, Cross_3d, Grad_3d, Curl_3d, Div_3d)
-from gelato.expression import construct_weak_form
+# ... phi_{2p+1}
+d_phi = {}
+d_phi[1] = [Rational(2,3),
+            Rational(1,6)]
+d_phi[2] = [Rational(11,20),
+            Rational(13,60),
+            Rational(1,120)]
+d_phi[3] = [Rational(151,315),
+            Rational(397,1680),
+            Rational(1,42),
+            Rational(1,5040)]
+d_phi[4] = [Rational(15619,36288),
+            Rational(44117,181440),
+            Rational(913,22680),
+            Rational(251,181440),
+            Rational(1,362880)]
+d_phi[5] = [Rational(655177,1663200),
+            Rational(1623019,6652800),
+            Rational(1093,19800),
+            Rational(50879,13305600),
+            Rational(509,9979200),
+            Rational(1,39916800)]
+d_phi[6] = [Rational(27085381,74131200),
+            Rational(125468459,518918400),
+            Rational(28218769,415134720),
+            Rational(910669,124540416),
+            Rational(82207,345945600),
+            Rational(1363,1037836800),
+            Rational(1,6227020800)]
+d_phi[7] = [Rational(2330931341,6810804000),
+            Rational(103795866137,435891456000),
+            Rational(6423562433,81729648000),
+            Rational(15041229521,1307674368000),
+            Rational(26502841,40864824000),
+            Rational(13824739,1307674368000),
+            Rational(2047,81729648000),
+            Rational(1,1307674368000)]
+d_phi[8] = [Rational(12157712239,37638881280),
+            Rational(8313722318537,35568742809600),
+            Rational(7763913237097,88921857024000),
+            Rational(317627331799,19760412672000),
+            Rational(23667665053,17784371404800),
+            Rational(297507989,7113748561920),
+            Rational(704339,1976041267200),
+            Rational(851,2309658624000),
+            Rational(1,355687428096000)]
+# ...
 
-try:
-    from pyccel.ast.core import Variable
-    ENABLE_PYCCEL = True
-except:
-    ENABLE_PYCCEL = False
+# ... phi'_{2p+1}
+d_phi_r = {}
+d_phi_r[1] = [0,
+              Rational(1,2)]
+d_phi_r[2] = [0,
+              Rational(5,12),
+              Rational(1,24)]
+d_phi_r[3] = [0,
+              Rational(49,144),
+              Rational(7,90),
+              Rational(1,720)]
+d_phi_r[4] = [0,
+              Rational(809,2880),
+              Rational(289,2880),
+              Rational(41,6720),
+              Rational(1,40320)]
+d_phi_r[5] = [0,
+              Rational(6787,28800),
+              Rational(16973,151200),
+              Rational(5203,403200),
+              Rational(253,907200),
+              Rational(1,3628800)]
+d_phi_r[6] = [0,
+              Rational(728741,3628800),
+              Rational(1700933,14515200),
+              Rational(441337,21772800),
+              Rational(10777,10886400),
+              Rational(2041,239500800),
+              Rational(1,479001600)]
+d_phi_r[7] = [0,
+              Rational(35263201,203212800),
+              Rational(4489301,38102400),
+              Rational(5532241,203212800),
+              Rational(233021,104781600),
+              Rational(6323,121927680),
+              Rational(31,165110400),
+              Rational(1,87178291200)]
+d_phi_r[8] = [0,
+              Rational(11102502613,73156608000),
+              Rational(8480306503,73156608000),
+              Rational(7939969,238436352),
+              Rational(3146582819,804722688000),
+              Rational(353015251,2092278988800),
+              Rational(775319,387459072000),
+              Rational(32759,10461394944000),
+              Rational(1,20922789888000)]
+# ...
 
+# ... phi''_{2p+1}
+d_phi_rr = {}
+d_phi_rr[1] = [-2,
+               1]
+d_phi_rr[2] = [-1,
+               Rational(1,3),
+               Rational(1,6)]
+d_phi_rr[3] = [Rational(-2,3),
+               Rational(1,8),
+               Rational(1,5),
+               Rational(1,120)]
+d_phi_rr[4] = [Rational(-35,72),
+               Rational(11,360),
+               Rational(17,90),
+               Rational(59,2520),
+               Rational(1,5040)]
+d_phi_rr[5] = [Rational(-809,2160),
+               Rational(-1,64),
+               Rational(31,189),
+               Rational(907,24192),
+               Rational(25,18144),
+               Rational(1,362880)]
+d_phi_rr[6] = [Rational(-4319,14400),
+               Rational(-11731,302400),
+               Rational(6647,48384),
+               Rational(3455,72576),
+               Rational(2251,604800),
+               Rational(113,2217600),
+               Rational(1,39916800)]
+d_phi_rr[7] = [Rational(-56057,226800),
+               Rational(-104159,2073600),
+               Rational(43993,388800),
+               Rational(333361,6220800),
+               Rational(14623,2138400),
+               Rational(16081,68428800),
+               Rational(73,55598400),
+               Rational(1,6227020800)]
+d_phi_rr[8] = [Rational(-35263201,169344000),
+               Rational(-253354477,4572288000),
+               Rational(30188519,326592000),
+               Rational(44897821,798336000),
+               Rational(36700199,3592512000),
+               Rational(58605299,93405312000),
+               Rational(382201,36324288000),
+               Rational(131,5230697472),
+               Rational(1,1307674368000)]
+# ...
 
-# TODO find a better solution.
-#      this code is duplicated in printing.latex
-ARGS_x       = ["x", "y", "z"]
-ARGS_u       = ["u", "v", "w"]
-ARGS_s       = ["s", "ss", "sss", "ssss"]
-BASIS_TEST   = "Ni"
-BASIS_TRIAL  = "Nj"
-BASIS_PREFIX = ["x", "y", "z", "xx", "yy", "zz", "xy", "yz", "xz"]
+## ...
+#d_phi[1] = [Rational(,),
+#            Rational(,)]
+#d_phi[2] = [Rational(,),
+#            Rational(,),
+#            Rational(,)]
+#d_phi[3] = [Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,)]
+#d_phi[4] = [Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,)]
+#d_phi[5] = [Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,)]
+#d_phi[6] = [Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,)]
+#d_phi[7] = [Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,)]
+#d_phi[8] = [Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,),
+#            Rational(,)]
+## ...
+
+# ............................................
+
+# TODO add it to glt_function
 TOLERANCE    = 1.e-10
-#TOLERANCE    = 1.e-4
-SETTINGS     = ["glt_integrate", "glt_formatting", "glt_formatting_atoms"]
 
-
-# ...
-_coord_registery = ['x', 'y', 'z']
-
-# ...
-def basis_symbols(dim, n_deriv=1):
-    """
-    Returns a dictionary that contains sympy symbols for the basis and their
-    derivatives. The kind of a basis function can be trial or test.
-
-    dim: int
-        dimension of the logical/physical domain.
-
-    n_deriv: int
-        number of derivatives
-    """
-    # ...
-    args_x = ARGS_x[:dim]
-    # ...
-
-    # ...
-    words = []
-    for i_deriv in range(1, n_deriv+1):
-        words += [''.join(i) for i in product(args_x, repeat = i_deriv)]
-    # ...
-
-    # ...
-    ops = [o for o in words if o in BASIS_PREFIX]
-    # ...
-
-    # ...
-    ns = {}
-
-    for B in [BASIS_TEST, BASIS_TRIAL]:
-        ns[B] = Symbol(B)
-        for d in ops:
-            B_d = B + "_" + d
-            ns[B_d] = Symbol(B_d)
-    # ...
-
-    return ns
-# ...
-
-# ...
-def apply_mapping(expr, dim, instructions=None, **settings):
-    """
-    Applies a mapping to a given expression
-
-    expr: sympy.Expression
-        a sympy expression
-
-    dim: int
-        dimension of the logical/physical domain.
-
-    instructions: list
-        a list to keep track of the applied instructions.
-
-    settings: dict
-        dictionary for different settings
-    """
-    # ...
-    args_x = ARGS_x[:dim]
-    args_u = ARGS_u[:dim]
-    for B in [BASIS_TEST, BASIS_TRIAL]:
-        for (x,u) in zip(args_x, args_u):
-            B_x = B + "_" + x
-            B_u = B + "_" + u
-            expr = expr.subs({Symbol(B_x): Symbol(B_u)})
-
-            # TODO make it recursive for higher derivatives
-            for (xx,uu) in zip(args_x, args_u):
-                B_xx = B_x + x
-                B_uu = B_u + u
-                expr = expr.subs({Symbol(B_xx): Symbol(B_uu)})
-    # ...
-
-    # ... updates the latex expression
-    if instructions is not None:
-        sets = {}
-        for key, value in list(settings.items()):
-            sets[key] = value
-        sets["mode"] = "equation*"
-
-        instructions.append(glt_latex(expr, **sets))
-    # ...
-
-    return expr
-# ...
-
-# ...
-def apply_tensor(expr, dim, instructions=None, **settings):
-    """
-    decomposes the basis function to their tensor form
-
-    expr:
-        a sympy expression
-
-    dim: int
-        dimension of the logical/physical domain.
-
-    instructions: list
-        a list to keep track of the applied instructions.
-
-    settings: dict
-        dictionary for different settings
-    """
-    args_u = ARGS_u[:dim]
-    for B in [BASIS_TEST, BASIS_TRIAL]:
-        # ... substruct the basis function
-        prod = S.One
-        for k in range(0, dim):
-            Bk_u = B + str(k+1)
-            prod *= Symbol(Bk_u)
-        expr = expr.subs({Symbol(B): prod})
-        # ...
-
-        # ... substruct the derivatives
-        for i,u in enumerate(args_u):
-            B_u = B + "_" + u
-            prod = S.One
-            for k in range(0, dim):
-                if k==i:
-                    Bk_u = B + str(k+1) + "_s"
-                else:
-                    Bk_u = B + str(k+1)
-                prod *= Symbol(Bk_u)
-            expr = expr.subs({Symbol(B_u): prod})
-
-        # TODO improve for higher derivatives
-        for i,u in enumerate(args_u):
-            for j,v in enumerate(args_u):
-                B_uv = B + "_" + u + v
-                prod = S.One
-                for k in range(0, dim):
-                    if k==i and k==j:
-                        Bk_uv = B + str(k+1) + "_ss"
-                    elif k==i or k==j:
-                        Bk_uv = B + str(k+1) + "_s"
-                    else:
-                        Bk_uv = B + str(k+1)
-                    prod *= Symbol(Bk_uv)
-                expr = expr.subs({Symbol(B_uv): prod})
-        # ...
-
-    # ... updates the latex expression
-    if instructions is not None:
-        sets = {}
-        for key, value in list(settings.items()):
-            sets[key] = value
-        sets["mode"] = "equation*"
-
-        instructions.append(glt_latex(expr, **sets))
-    # ...
-
-    return expr
-# ...
-
-# ...
-def apply_factor(expr, dim, instructions=None, **settings):
-    """
-    factorizes the basis function by coupling the trial/test functions related
-    to the same tensor index.
-
-    expr:
-        a sympy expression
-
-    dim: int
-        dimension of the logical/physical domain.
-
-    instructions: list
-        a list to keep track of the applied instructions.
-
-    settings: dict
-        dictionary for different settings
-    """
-    Bi = BASIS_TEST
-    Bj = BASIS_TRIAL
-
-    for k in range(0, dim):
-        # ... mass symbol
-        Bik = Bi + str(k+1)
-        Bjk = Bj + str(k+1)
-        P = Symbol(Bik) * Symbol(Bjk)
-        mk = Symbol("m"+str(k+1))
-
-        expr = expr.subs({P: mk})
-        # ...
-
-        # ... stiffness symbol
-        Bik = Bi + str(k+1) + "_s"
-        Bjk = Bj + str(k+1) + "_s"
-        P = Symbol(Bik) * Symbol(Bjk)
-        sk = Symbol("s"+str(k+1))
-
-        expr = expr.subs({P: sk})
-        # ...
-
-        # ... advection symbol
-        Bik = Bi + str(k+1)
-        Bjk = Bj + str(k+1) + "_s"
-        P = Symbol(Bik) * Symbol(Bjk)
-        ak = Symbol("a"+str(k+1))
-
-        expr = expr.subs({P: sympy_I * ak})
-        # ...
-
-        # ... adjoint advection symbol
-        Bik = Bi + str(k+1) + "_s"
-        Bjk = Bj + str(k+1)
-        P = Symbol(Bik) * Symbol(Bjk)
-        ak = Symbol("a"+str(k+1))
-
-        expr = expr.subs({P: - sympy_I * ak})
-        # ...
-
-        # ... bilaplacian symbol
-        Bik = Bi + str(k+1) + "_ss"
-        Bjk = Bj + str(k+1) + "_ss"
-        P = Symbol(Bik) * Symbol(Bjk)
-        bk = Symbol("b"+str(k+1))
-
-        expr = expr.subs({P: bk})
-        # ...
-
-    # ... updates the latex expression
-    if instructions is not None:
-        # ...
-        instruction = "The symbol is then:"
-        instructions.append(instruction)
-        # ...
-
-        # ...
-        sets = {}
-        for key, value in list(settings.items()):
-            if not(key == "glt_integrate"):
-                sets[key] = value
-        sets["mode"] = "equation*"
-
-        instructions.append(glt_latex(expr, **sets))
-        # ...
-    # ...
-
-    return expr
-# ...
-
-# ...
-def glt_update_atoms(expr, discretization):
-    """
-    updates the glt symbol with the atomic symbols
-
-    expr:
-        a sympy expression
-
-    discretization: dict
-        a dictionary that contains the used discretization
-    """
-    # ...
-    dim = len(discretization["n_elements"])
-    # ...
-
-    # ...
-    args = _coord_registery[:dim]
-    args = [Symbol(i) for i in args]
-    # ...
-
-    # ...
-    for k in range(0, dim):
-        # ...
-        t = Symbol('t'+str(k+1))
-
-        n = discretization["n_elements"][k]
-        p = discretization["degrees"][k]
-
-        m   = glt_symbol_m(n,p,t)
-        s   = glt_symbol_s(n,p,t)
-        a   = glt_symbol_a(n,p,t)
-        t_a = -a
-        b   = glt_symbol_b(n,p,t)
-        # ...
-
-        # ...
-        expr = expr.subs({Symbol('m'+str(k+1)): m})
-        expr = expr.subs({Symbol('s'+str(k+1)): s})
-        expr = expr.subs({Symbol('a'+str(k+1)): a})
-        expr = expr.subs({Symbol('t_a'+str(k+1)): t_a})
-        expr = expr.subs({Symbol('b'+str(k+1)): b})
-        # ...
-
-        # ...
-        args += [t]
-        # ...
-    # ...
-
-    return Lambda(args, expr)
-# ...
-
-# ...
-def glt_symbol(expr,
-               n_deriv=1,
-               space=None,
-               verbose=False,
-               evaluate=False,
-               is_block=False,
-               discretization=None,
-               instructions=[], **settings):
-    """
-    computes the glt symbol of a weak formulation given as a sympy expression.
-
-    expr: sympy.Expression
-        a sympy expression or a text
-
-    space: spl.fem.SplineSpace, spl.fem.TensorFemSpace, spl.fem.VectorFemSpace
-        a Finite elements space from spl. Default: None
-
-    n_deriv: int
-        maximum derivatives that appear in the weak formulation.
-
-    verbose: bool
-        talk more
-
-    evaluate: bool
-        causes the evaluation of the atomic symbols, if true
-
-    is_block: bool
-        treat a block prolbem if True. Must be supplied only when using
-        discretization. Otherwise, the fem space should be consistent with the
-        weak formulation.
-
-    discretization: dict
-        a dictionary that contains the used discretization
-
-    instructions: list
-        a list to keep track of the applied instructions.
-
-    settings: dict
-        dictionary for different settings
-
-    """
-    # ...
-    if not isinstance(expr, Lambda):
-        raise TypeError('Expecting a Lambda expression')
-    # ...
-
-    # ...
-    if not( discretization is None ):
-        dim = len(discretization['n_elements'])
-
-    elif not( space is None ):
-        dim = space.pdim
-
-        n_elements = space.ncells
-        if not( isinstance(n_elements, (list, tuple))): n_elements = [n_elements]
-
-        degrees = space.degree
-        if not( isinstance(degrees, (list, tuple))): degrees = [degrees]
-
-        discretization = {'n_elements': n_elements, 'degrees': degrees}
-
-        from spl.fem.vector  import VectorFemSpace
-        is_block = isinstance(space, VectorFemSpace)
-
-        if is_block:
-            # TODO make sure all degrees are the same?
-            #      or remove discretization and use only the space
-            discretization['degrees'] = degrees[0]
-
-        # TODO check that the weak form is consistent with the space (both are blocks)
-
-    else:
-        raise ValueError('discretization (dict) or fem space must be given')
-    # ...
-
-    # ...
-    expr = construct_weak_form(expr, dim=dim, is_block=is_block, verbose=verbose)
-    # ...
-
-    # ...
-    if verbose:
-        print("*** Input expression : ", expr)
-    # ...
-
-    # ...
-    if type(expr) == dict:
-        d_expr = {}
-        for key, txt in list(expr.items()):
-            # ... when using vale, we may get also a coefficient.
-            if type(txt) == list:
-                txt = str(txt[0]) + " * (" + txt[1] + ")"
-            # ...
-
-            # ...
-            title  = "Computing the GLT symbol for the block " + str(key)
-            instructions.append(latex_title_as_paragraph(title))
-            # ...
-
-            # ...
-            d_expr[key] = glt_symbol(txt,
-                                     n_deriv=n_deriv,
-                                     verbose=verbose,
-                                     evaluate=evaluate,
-                                     discretization=discretization,
-                                     instructions=instructions,
-                                     **settings)
-            # ...
-
-        if len(d_expr) == 1:
-            key = d_expr.keys()[0]
-            return d_expr[key]
-
-        return dict_to_matrix(d_expr, instructions=instructions, **settings)
-    else:
-        # ...
-        ns = {}
-        # ...
-
-        # ...
-        d = basis_symbols(dim, n_deriv)
-        for key, item in list(d.items()):
-            ns[key] = item
-        # ...
-
-        # ...
-        if isinstance(expr, Lambda):
-            expr = normalize_weak_from(expr)
-        # ...
-
-        # ...
-        expr = sympify(expr, locals=ns)
-        expr = expr.expand()
-        # ...
-    # ...
-
-    # ...
-    if verbose:
-        # ...
-        instruction = "We consider the following weak formulation:"
-        instructions.append(instruction)
-        instructions.append(glt_latex(expr, **settings))
-        # ...
-
-        print(">>> weak formulation: ", expr)
-    # ...
-
-    # ...
-    expr = apply_mapping(expr, dim=dim, \
-                         instructions=instructions, \
-                         **settings)
-    if verbose:
-        print('>>> apply mapping: ', expr)
-    # ...
-
-    # ...
-    expr = apply_tensor(expr, dim=dim, \
-                         instructions=instructions, \
-                         **settings)
-    if verbose:
-        print('>>> apply tensor: ', expr)
-    # ...
-
-    # ...
-    expr = apply_factor(expr, dim, \
-                         instructions=instructions, \
-                         **settings)
-    if verbose:
-        print('>>> apply factor: ', expr)
-    # ...
-
-    # ...
-    if not evaluate:
-        return expr
-    # ...
-
-    # ...
-    if not discretization:
-        return expr
-    # ...
-
-    # ...
-    expr = glt_update_atoms(expr, discretization)
-    # ...
-
-    return expr
-# ...
-
-# ...
-def glt_lambdify(expr):
-    """
-    it is supposed that glt_symbol has been called before.
-
-    expr: sympy.Expression
-        a sympy expression or a text
-    """
-    if not isinstance(expr, Lambda):
-        raise TypeError('Expecting a Lambda expression')
-
-    return lambdify(expr.variables, expr.expr, "numpy")
-# ...
-
-# ... TODO: use pyccel rather than lambdify
-def glt_approximate_eigenvalues(expr,
-                                space=None,
-                                discretization=None,
-                                mapping=None,
-                                is_block=False,
-                                symbolic_eigen=False):
-    """
-    approximates the eigenvalues using a uniform sampling
-
-    expr: sympy.Expression
-        a sympy expression or a text
-
-    space: spl.fem.SplineSpace, spl.fem.TensorFemSpace
-        a Finite elements space from spl. Default: None
-
-    discretization: dict
-        a dictionary that contains the used discretization
-
-    mapping: clapp.spl.mapping.Mapping
-        a mapping object (geometric transformation)
-
-    is_block: bool
-        treat a block prolbem if True. Must be supplied only when using
-        discretization. Otherwise, the fem space should be consistent with the
-        weak formulation.
-
-    symbolic_eigen: bool
-        in the case of a block expression, we can first compute the (symbolic) eigenvalues
-        of the symbol then sample it, or doing the sampling then compute the
-        numerical eigenvalues.
-    """
-    # ...
-    if not isinstance(expr, Lambda):
-        raise TypeError('Expecting a Lambda expression')
-    # ...
-
-    # ...
-    if not( discretization is None ):
-        dim = len(discretization['n_elements'])
-
-    elif not( space is None ):
-        dim = space.pdim
-
-        n_elements = space.ncells
-        if not( isinstance(n_elements, (list, tuple))): n_elements = [n_elements]
-
-        degrees = space.degree
-        if not( isinstance(degrees, (list, tuple))): degrees = [degrees]
-
-        discretization = {'n_elements': n_elements, 'degrees': degrees}
-
-        from spl.fem.vector  import VectorFemSpace
-        is_block = isinstance(space, VectorFemSpace)
-
-        if is_block:
-            # TODO make sure all degrees are the same?
-            #      or remove discretization and use only the space
-            discretization['degrees'] = degrees[0]
-
-        # TODO check that the weak form is consistent with the space (both are blocks)
-
-    else:
-        raise ValueError('discretization (dict) or fem space must be given')
-    # ...
-
-    # ... lambdify the symbol.
-    f = glt_lambdify(expr)
-    # ...
-
-    # ...
-    expr = expr.expr
-    # ...
-
-    # ...
-    n       = discretization['n_elements']
-    degrees = discretization['degrees']
-
-    dim     = len(n)
-    # ...
-
-    # ...
-    if dim == 1:
-        # TODO boundary condition
-        nx = n[0] + degrees[0] #- 2
-
-        t1 = np.linspace(-np.pi,np.pi, nx)
-
-        u = np.linspace(0.,1.,nx)
-        if mapping is not None:
-            x = mapping.evaluate(u)[0,:]
-        else:
-            x = u
-
-        if is_block:
-            if symbolic_eigen:
-                eigen = expr.eigenvals()
-
-                eigs = []
-                for ek, mult in list(eigen.items()):
-                    f = glt_lambdify(ek)
-                    t = f(x,t1)
-                    eigs += mult * list(t)
-
-                return np.asarray(eigs) + 0.j
-
-            else:
-                # sample the lambdified matrix symbol
-                F = f(x,t1)
-
-                # TODO must be converted to Fortran (using pyccel?)
-                n,m = expr.shape
-                W = []
-                for i in range(0, nx):
-                    for j in range(0,ny):
-
-                        w, v = eig(F[:,i,j])
-                        wr = w.real
-
-                        # TODO treat the case of complex eigenvalues
-
-                        W += list(wr)
-
-                W = np.asarray(W)
-
-                return W
-
-        else:
-            return f(x,t1)
-    elif dim == 2:
-        # TODO boundary condition
-        nx = n[0] + degrees[0] #- 2
-        ny = n[1] + degrees[1] #- 2
-
-        t1 = np.linspace(-np.pi,np.pi, nx)
-        t2 = np.linspace(-np.pi,np.pi, ny)
-
-        u = np.linspace(0.,1.,nx)
-        v = np.linspace(0.,1.,ny)
-        if mapping is not None:
-            x = mapping.evaluate(u,v)[0,:,:]
-            y = mapping.evaluate(u,v)[1,:,:]
-        else:
-            x,y   = np.meshgrid(u,v)
-
-        t1,t2 = np.meshgrid(t1,t2)
-
-        if is_block:
-            if symbolic_eigen:
-                eigen = expr.eigenvals()
-
-                eigs = []
-                for ek, mult in list(eigen.items()):
-                    f = glt_lambdify(ek)
-                    t = f(x,y,t1,t2).ravel()
-                    eigs += mult * list(t)
-
-                return np.asarray(eigs) + 0.j
-
-            else:
-                # sample the lambdified matrix symbol
-                F = f(x,y,t1,t2)
-
-                # TODO must be converted to Fortran (using pyccel?)
-                n,m = expr.shape
-                W = []
-                for i in range(0, nx):
-                    for j in range(0,ny):
-
-                        w, v = eig(F[:,:,i,j])
-                        wr = w.real
-
-                        # TODO treat the case of complex eigenvalues
-
-                        W += list(wr)
-
-                W = np.asarray(W)
-
-                return W
-
-        else:
-            rr = f(x,y,t1,t2)
-            return f(x,y,t1,t2).ravel()
-
-    elif dim == 3:
-        # TODO boundary condition
-        nx = n[0] + degrees[0] #- 2
-        ny = n[1] + degrees[1] #- 2
-        nz = n[2] + degrees[2] #- 2
-
-        t1 = np.linspace(-np.pi,np.pi, nx)
-        t2 = np.linspace(-np.pi,np.pi, ny)
-        t3 = np.linspace(-np.pi,np.pi, nz)
-
-        u = np.linspace(0.,1.,nx)
-        v = np.linspace(0.,1.,ny)
-        w = np.linspace(0.,1.,nz)
-        if mapping is not None:
-            x = mapping.evaluate(t1,t2,t3)[0,:,:,:]
-            y = mapping.evaluate(t1,t2,t3)[1,:,:,:]
-            z = mapping.evaluate(t1,t2,t3)[2,:,:,:]
-        else:
-            # 1 and 0  are inverted to get the right shape
-            x,y,z = np.meshgrid(t2,t1,t3)
-
-        # 1 and 0  are inverted to get the right shape
-        t1,t2,t3 = np.meshgrid(t2,t1,t3)
-
-        if is_block:
-            if symbolic_eigen:
-                eigen = expr.eigenvals()
-
-                eigs = []
-                for ek, mult in list(eigen.items()):
-                    f = glt_lambdify(ek)
-                    t = f(x,y,z,t1,t2,t3).ravel()
-                    eigs += mult * list(t)
-
-                return np.asarray(eigs) + 0.j
-
-            else:
-                # sample the lambdified matrix symbol
-                F = f(x,y,z,t1,t2,t3)
-
-                # TODO must be converted to Fortran (using pyccel?)
-                n,m = expr.shape
-                W = []
-                for i in range(0, nx):
-                    for j in range(0,ny):
-                        for k in range(0,nz):
-
-                            w, v = eig(F[:,:,i,j,k])
-                            wr = w.real
-
-                            # TODO treat the case of complex eigenvalues
-
-                            W += list(wr)
-
-                W = np.asarray(W)
-
-                return W
-
-        else:
-            return f(x,y,z,t1,t2,t3).ravel()
-    # ...
-# ...
-
-# ... TODO to be removed, once we have notebooks with complex symbols
-def glt_plot_eigenvalues(expr, discretization, \
-                         mapping=None, \
-                         matrix=None, \
-                         tolerance=1.e-8, **settings):
-    """
-    plots the approximations of the eigenvalues by means of a uniform sampling
-    of the glt symbol.
-
-    expr: sympy.Expression
-        a sympy expression or a text
-
-    discretization: dict
-        a dictionary that contains the used discretization
-
-    mapping: clapp.spl.mapping.Mapping
-        a mapping object (geometric transformation)
-
-    matrix: clapp.plaf.matrix.Matrix
-        a matrix object after assembling the weak formulation.
-
-    tolerance: float
-        a tolerance to check if the values are pure real numbers.
-
-    settings: dict
-        dictionary for different settings
-    """
-    import matplotlib.pyplot as plt
-
-    # ...
-    M = None
-    if matrix is not None:
-        from scipy.linalg import eig
-
-        # ... PLAF matrix or scipy sparse
-        from clapp.plaf.matrix import Matrix
-        if type(matrix) == Matrix:
-            M = matrix.get().todense()
-        elif type(matrix) == dict:
-            raise ValueError("NOT YET IMPLEMENTED")
-        else:
-            M = matrix.todense()
-        # ...
-    # ...
-
-    # ...
-    try:
-        label = settings["label"]
-    except:
-        label = "glt symbol"
-    # ...
-
-    # ...
-    try:
-        properties = settings["properties"]
-    except:
-        properties = "+b"
-    # ...
-
-    # ... uniform sampling of the glt symbol
-    t  = glt_approximate_eigenvalues(expr, discretization, mapping=mapping)
-
-    tr = t.real.ravel()
-    ti = t.imag.ravel()
-    # ...
-
-    # ... real case
-    if (np.linalg.norm(ti) < tolerance):
-        # ...
-        tr.sort()
-
-        plt.plot(tr, properties, label=label)
-        # ...
-
-        # ...
-        if M is not None:
-            # ...
-            w, v = eig(M)
-            wr = w.real
-            wr.sort()
-            plt.plot(wr, "xr", label="eigenvalues")
-            # ...
-        # ...
-    else:
-        # ...
-        plt.plot(tr, ti, properties, label=label)
-        # ...
-
-        # ...
-        if M is not None:
-            # ...
-            w, v = eig(M)
-            wr = w.real
-            wi = w.imag
-            plt.plot(wr, wi, "xr", label="eigenvalues")
-            # ...
-        # ...
-    # ...
-# ...
-
-# ...
-class glt_function(Function):
+class BasicGlt(Function):
     """
 
     Examples
-    ========
 
     """
-
     nargs = None
 
     def __new__(cls, *args, **options):
@@ -932,547 +245,253 @@ class glt_function(Function):
         else:
             return r
 
-    @classmethod
-    def eval(cls, *_args):
-        """."""
+    @property
+    def name(self):
+        return self._name
 
-        if not _args:
-            return
+    def _sympystr(self, printer):
+        sstr = printer.doprint
 
-        f = _args[0]
-        n = _args[1]
-        p = _args[2]
+        name = sstr(self.name)
+        p = sstr(self.args[0])
+        t = sstr(self.args[1])
 
-        if isinstance(n, (Tuple, list, tuple)):
-            dim = len(n)
-        else:
-            dim = 1
-            n = [n]
-            p = [p]
-        discretization = {"n_elements": n, "degrees": p}
-
-        F = glt_symbol(f, dim=dim,
-                       discretization=discretization,
-                       evaluate=True,
-                       verbose=False)
-
-        return F
-# ...
+        return '{name}({p},{t})'.format(name=name, p=p, t=t)
+#        return '{name}_{p}({t})'.format(name=name, p=p, t=t)
 
 # ...
-class glt_symbol_m(Function):
+class Mass(BasicGlt):
     """
     A class for the mass symbol
     """
-    nargs = 3
+    nargs = 2
+    _name = 'Mass'
 
     @classmethod
-    def eval(cls, n, p, t):
-        # ...
-        if not 0 <= p:
-            raise ValueError("must have 0 <= p")
-        if not 0 <= n:
-            raise ValueError("must have 0 <= n")
-        # ...
+    def eval(cls, p, t):
 
-        # ...
-        r  = Symbol('r')
+        if p is S.Infinity:
+            raise NotImplementedError('Add symbol limit for p -> oo')
 
-        pp = 2*p + 1
-        N = pp + 1
-        L = list(range(0, N + pp + 1))
+        elif isinstance(p, Symbol):
+            return Mass(p, t, evaluate=False)
 
-        b0 = bspline_basis(pp, L, 0, r)
-        bsp = lambdify(r, b0)
-        # ...
+        elif isinstance(p, int):
 
-        # ... we use nsimplify to get the rational number
-        phi = []
-        for i in range(0, p+1):
-            y = bsp(p+1-i)
-            y = nsimplify(y, tolerance=TOLERANCE, rational=True)
-            phi.append(y)
-        # ...
+            # ... we use nsimplify to get the rational number
+            if p <= P_MAX:
+                phi = d_phi[p]
 
-        # ...
-        m = phi[0] * cos(S.Zero)
-        for i in range(1, p+1):
-            m += 2 * phi[i] * cos(i * t)
-        # ...
+            else:
+                # ...
+                r  = Symbol('r')
 
-        # ... scaling
-        m *= Rational(1,n)
-        # ...
+                pp = 2*p + 1
+                N = pp + 1
+                L = list(range(0, N + pp + 1))
 
-        return m
+                b0 = bspline_basis(pp, L, 0, r)
+                bsp = lambdify(r, b0)
+                # ...
+
+                phi = []
+                for i in range(0, p+1):
+                    y = bsp(p+1-i)
+                    y = nsimplify(y, tolerance=TOLERANCE, rational=True)
+                    phi.append(y)
+            # ...
+
+            # ...
+            m = phi[0] * cos(S.Zero)
+            for i in range(1, p+1):
+                m += 2 * phi[i] * cos(i * t)
+            # ...
+#            print(phi)
+#            print('> mass = ', m)
+
+#            # hack to avoid
+#            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+#            m = sympify(str(m))
+
+            return m
 # ...
 
 # ...
-class glt_symbol_s(Function):
+class Stiffness(BasicGlt):
     """
     A class for the stiffness symbol
     """
-    nargs = 3
+    nargs = 2
+    _name = 'Stiffness'
 
     @classmethod
-    def eval(cls, n, p, t):
-        # ...
-        if not 0 <= p:
-            raise ValueError("must have 0 <= p")
-        if not 0 <= n:
-            raise ValueError("must have 0 <= n")
-        # ...
+    def eval(cls, p, t):
 
-        # ...
-        r  = Symbol('r')
+        if p is S.Infinity:
+            raise NotImplementedError('Add symbol limit for p -> oo')
 
-        pp = 2*p + 1
-        N = pp + 1
-        L = list(range(0, N + pp + 1))
+        elif isinstance(p, Symbol):
+            return Stiffness(p, t, evaluate=False)
 
-        b0    = bspline_basis(pp, L, 0, r)
-        b0_r  = diff(b0, r)
-        b0_rr = diff(b0_r, r)
-        bsp   = lambdify(r, b0_rr)
-        # ...
+        elif isinstance(p, int):
 
-        # ... we use nsimplify to get the rational number
-        phi = []
-        for i in range(0, p+1):
-            y = bsp(p+1-i)
-            y = nsimplify(y, tolerance=TOLERANCE, rational=True)
-            phi.append(y)
-        # ...
+            if p <= P_MAX:
+                phi = d_phi_rr[p]
 
-        # ...
-        m = -phi[0] * cos(S.Zero)
-        for i in range(1, p+1):
-            m += -2 * phi[i] * cos(i * t)
-        # ...
+            else:
+                # ...
+                r  = Symbol('r')
 
-        # ... scaling
-        m *= n
-        # ...
+                pp = 2*p + 1
+                N = pp + 1
+                L = list(range(0, N + pp + 1))
 
-        return m
+                b0    = bspline_basis(pp, L, 0, r)
+                b0_r  = diff(b0, r)
+                b0_rr = diff(b0_r, r)
+                bsp   = lambdify(r, b0_rr)
+                # ...
+
+                # ... we use nsimplify to get the rational number
+                phi = []
+                for i in range(0, p+1):
+                    y = bsp(p+1-i)
+                    y = nsimplify(y, tolerance=TOLERANCE, rational=True)
+                    phi.append(y)
+                # ...
+
+            # ...
+            m = -phi[0] * cos(S.Zero)
+            for i in range(1, p+1):
+                m += -2 * phi[i] * cos(i * t)
+            # ...
+
+#            print('> stiffness = ', m)
+
+#            # hack to avoid
+#            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+#            m = sympify(str(m))
+
+            return m
 # ...
 
 # ...
-class glt_symbol_a(Function):
+class Advection(BasicGlt):
     """
     A class for the advection symbol
     """
-    nargs = 3
+    nargs = 2
+    _name = 'Advection'
 
     @classmethod
-    def eval(cls, n, p, t):
-        # ...
-        if not 0 <= p:
-            raise ValueError("must have 0 <= p")
-        if not 0 <= n:
-            raise ValueError("must have 0 <= n")
-        # ...
+    def eval(cls, p, t):
 
-        # ...
-        r  = Symbol('r')
+        if p is S.Infinity:
+            raise NotImplementedError('Add symbol limit for p -> oo')
 
-        pp = 2*p + 1
-        N = pp + 1
-        L = list(range(0, N + pp + 1))
+        elif isinstance(p, Symbol):
+            return Advection(p, t, evaluate=False)
 
-        b0   = bspline_basis(pp, L, 0, r)
-        b0_r = diff(b0, r)
-        bsp  = lambdify(r, b0_r)
-        # ...
+        elif isinstance(p, int):
 
-        # ... we use nsimplify to get the rational number
-        phi = []
-        for i in range(0, p+1):
-            y = bsp(p+1-i)
-            y = nsimplify(y, tolerance=TOLERANCE, rational=True)
-            phi.append(y)
-        # ...
+            if p <= P_MAX:
+                phi = d_phi_r[p]
 
-        # ...
-        m = -phi[0] * cos(S.Zero)
-        for i in range(1, p+1):
-            m += -2 * phi[i] * sin(i * t)
-        # ...
+            else:
+                # ...
+                r  = Symbol('r')
 
-#        # ... make it pure imaginary
-#        m *= sympy_I
-#        # ...
+                pp = 2*p + 1
+                N = pp + 1
+                L = list(range(0, N + pp + 1))
 
-        return m
+                b0   = bspline_basis(pp, L, 0, r)
+                b0_r = diff(b0, r)
+                bsp  = lambdify(r, b0_r)
+                # ...
+
+                # ... we use nsimplify to get the rational number
+                phi = []
+                for i in range(0, p+1):
+                    y = bsp(p+1-i)
+                    y = nsimplify(y, tolerance=TOLERANCE, rational=True)
+                    phi.append(y)
+                # ...
+
+            # ...
+            m = -phi[0] * cos(S.Zero)
+            for i in range(1, p+1):
+                m += -2 * phi[i] * sin(i * t)
+            # ...
+
+#            print('> advection = ', m)
+
+#            # hack to avoid
+#            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+#            m = sympify(str(m))
+
+            return m
 # ...
 
 # ...
-class glt_symbol_b(Function):
+class Bilaplacian(BasicGlt):
     """
     A class for the bilaplacian symbol
     """
-    nargs = 3
+    nargs = 2
+    _name = 'Bilaplacian'
 
     @classmethod
-    def eval(cls, n, p, t):
-        # ...
-        if not 0 <= p:
-            raise ValueError("must have 0 <= p")
-        if not 0 <= n:
-            raise ValueError("must have 0 <= n")
-        # ...
+    def eval(cls, p, t):
 
-        # ...
-        r  = Symbol('r')
+        if p is S.Infinity:
+            raise NotImplementedError('Add symbol limit for p -> oo')
 
-        pp = 2*p + 1
-        N = pp + 1
-        L = list(range(0, N + pp + 1))
+        elif isinstance(p, Symbol):
+            return Bilaplacian(p, t, evaluate=False)
 
-        b0    = bspline_basis(pp, L, 0, r)
-        b0_r  = diff(b0, r)
-        b0_rr = diff(b0_r, r)
-        b0_rrr = diff(b0_rr, r)
-        b0_rrrr = diff(b0_rrr, r)
-        bsp   = lambdify(r, b0_rrrr)
-        # ...
+        elif isinstance(p, int):
 
-        # ... we use nsimplify to get the rational number
-        phi = []
-        for i in range(0, p+1):
-            y = bsp(p+1-i)
-            y = nsimplify(y, tolerance=TOLERANCE, rational=True)
-            phi.append(y)
-        # ...
+            if p <= P_MAX:
+                raise NotImplementedError('Bilaplacian table not available')
+#                phi = d_phi_rrrr[p]
 
-        # ...
-        m = phi[0] * cos(S.Zero)
-        for i in range(1, p+1):
-            m += 2 * phi[i] * cos(i * t)
-        # ...
+            else:
 
-        # ... scaling
-        m *= n**3
-        # ...
+                # ...
+                r  = Symbol('r')
 
-        return m
-# ...
+                pp = 2*p + 1
+                N = pp + 1
+                L = list(range(0, N + pp + 1))
 
-# ...
-def glt_symbol_laplace(discretization, \
-                       verbose=False, evaluate=True, \
-                       instructions=[], \
-                       **settings):
-    """
-    Returns the Laplace symbol for a given discretization.
+                b0    = bspline_basis(pp, L, 0, r)
+                b0_r  = diff(b0, r)
+                b0_rr = diff(b0_r, r)
+                b0_rrr = diff(b0_rr, r)
+                b0_rrrr = diff(b0_rrr, r)
+                bsp   = lambdify(r, b0_rrrr)
+                # ...
 
-    discretization: dict
-        a dictionary that contains the used discretization
+                # ... we use nsimplify to get the rational number
+                phi = []
+                for i in range(0, p+1):
+                    y = bsp(p+1-i)
+                    y = nsimplify(y, tolerance=TOLERANCE, rational=True)
+                    phi.append(y)
+                # ...
 
-    verbose: bool
-        talk more
+            # ...
+            m = phi[0] * cos(S.Zero)
+            for i in range(1, p+1):
+                m += 2 * phi[i] * cos(i * t)
+            # ...
 
-    evaluate: bool
-        causes the evaluation of the atomic symbols, if true
+#            print('> bilaplacian = ', m)
 
-    instructions: list
-        a list to keep track of the applied instructions.
+#            # hack to avoid
+#            # sympy.tensor.array.dense_ndim_array.ImmutableDenseNDimArray
+#            m = sympify(str(m))
 
-    settings: dict
-        dictionary for different settings
-    """
-    raise NotImplementedError('')
-# ...
-
-# ...
-def glt_integrate(expr, domain="Omega"):
-    """
-    Adds the integral to the expression. needed for printing.
-
-    domain: str
-        domain over which we integrate the expression.
-    """
-    return Integral(expr, domain)
-# ...
-
-# ...
-def glt_formatting(expr, **settings):
-    """
-    Formatting the glt symbol, prior to calling a printer
-
-    expr: sympy.Expression
-        a sympy expression
-
-    settings: dict
-        dictionary for different settings
-    """
-
-    # ...
-    try:
-        domain = settings["glt_integrate"]
-        domain = sympify(str(domain))
-
-        expr = glt_integrate(expr, domain)
-    except:
-        pass
-    # ...
-
-    # ...
-    try:
-        fmt = settings["glt_formatting_atoms"]
-        if fmt:
-            expr = glt_formatting_atoms(expr, **settings)
-    except:
-        pass
-    # ...
-
-    return expr
-# ...
-
-# ...
-def glt_formatting_atoms(expr, **settings):
-    """
-    Formatting the glt symbol atoms, prior to calling a printer
-
-    expr: sympy.Expression
-        a sympy expression
-
-    settings: dict
-        dictionary for different settings
-    """
-    # TODO do we still need it?
-
-    # ...
-    dim    = 3
-    prefix = "\mathfrak{"
-    suffix = "}"
-    # ...
-
-    # ...
-    for k in range(0, dim):
-        # ...
-        t = Symbol('t'+str(k+1))
-
-        for s in ["m", "s", "a", "b"]:
-            sk = s + str(k+1)
-            s_old = Symbol(sk)
-            s_new = Symbol(prefix + sk + suffix)
-
-            expr = expr.subs({s_old: s_new})
-        # ...
-    # ...
-
-    return expr
-# ...
-
-
-
-# ...
-def latex_title_as_paragraph(title):
-    """
-    Returns the title as a paragraph.
-
-    title: str
-        a string for the paragraph title
-    """
-    return "\paragraph{" + str(title) + "}"
-# ...
-
-# ...
-def glt_latex_definitions():
-    """
-    Returns the definitions of the atomic symbols for the GLT.
-    """
-    # ...
-    t = Symbol('t')
-    m = Symbol('m')
-    s = Symbol('s')
-    a = Symbol('a')
-    b = Symbol('b')
-    # ...
-
-    # ...
-    def formula(symbol):
-        """
-        returns the latex formula for the mass symbol.
-        """
-        txt_m = r"\phi_{2p+1}(p+1) + 2 \sum_{k=1}^p \phi_{2p+1}(p+1-k) \cos(k \theta)"
-        txt_s = r"- {\phi}''_{2p+1}(p+1) - 2 \sum_{k=1}^p {\phi}''_{2p+1}(p+1-k) \cos(k \theta)"
-        txt_a = r"\phi_{2p+1}(p+1) + 2 \sum_{k=1}^p \phi_{2p+1}(p+1-k) \cos(k \theta)"
-        txt_b = r"{\phi}''''_{2p+1}(p+1) - 2 \sum_{k=1}^p {\phi}''''_{2p+1}(p+1-k) \cos(k \theta)"
-
-        if str(symbol) == "m":
-            return txt_m
-        elif str(symbol) == "s":
-            return txt_s
-        elif str(symbol) == "a":
-            return txt_a
-        elif str(symbol) == "b":
-            return txt_b
-        else:
-            print ("not yet available.")
-    # ...
-
-    # ...
-    definitions = {r"m(\theta)": formula(m), \
-                   r"s(\theta)": formula(s), \
-                   r"a(\theta)": formula(a)}
-    # ...
-
-    return definitions
-# ...
-
-# ...
-def glt_latex_names():
-    """
-    returns latex names for basis and atoms
-    """
-    # ...
-    dim = 3
-
-    symbol_names = {}
-    # ...
-
-    # ... rename basis
-    B = "N"
-    for i in ["i","j"]:
-        Bi = B + i
-        symbol_names[Symbol(Bi)] = B + "_" + i
-    # ...
-
-    # ... rename basis derivatives in the logical domain
-    args_x = ARGS_x[:dim]
-    args_u = ARGS_u[:dim]
-    B = "N"
-    for i in ["i","j"]:
-        Bi = B + i
-        for u in args_u + args_x:
-            Bi_u = Bi + "_" + u
-            partial = "\partial_" + u
-            symbol_names[Symbol(Bi_u)] = partial + B + "_" + i
-    # ...
-
-    # ... rename the tensor basis derivatives
-    B = "N"
-    for i in ["i","j"]:
-        Bi = B + i
-        for k in range(0, dim):
-            for s in ["", "s", "ss", "sss", "ssss"]:
-                Bk  = Bi + str(k+1)
-                _Bk = B + "_{" + i + "_" + str(k+1) + "}"
-
-                if len(s) > 0:
-                    prime = len(s) * "\prime"
-
-                    Bk += "_" + s
-                    _Bk = B + "^{" + prime + "}" \
-                            + "_{" + i + "_" + str(k+1) + "}"
-
-                symbol_names[Symbol(Bk)] = _Bk
-    # ...
-
-    # ... TODO add flag to choose which kind of printing:
-#    for k in range(0, dim):
-#        # ...
-#        symbol_names[Symbol('m'+str(k+1))] = "\mathfrak{m}_" + str(k+1)
-#        symbol_names[Symbol('s'+str(k+1))] = "\mathfrak{s}_" + str(k+1)
-#        symbol_names[Symbol('a'+str(k+1))] = "\mathfrak{a}_" + str(k+1)
-#        # ...
-
-    degree = "p"
-    for k in range(0, dim):
-        # ...
-        for s in ["m", "s", "a", "b"]:
-            symbol_names[Symbol(s+str(k+1))] = r"\mathfrak{" + s + "}_" \
-                                             + degree \
-                                             + r"(\theta_" \
-                                             + str(k+1) + ")"
-        # ...
-    # ...
-
-    # ...
-    for k in range(0, dim):
-        symbol_names[Symbol("t"+str(k+1))] = r"\theta_" + str(k+1)
-    # ...
-
-    return symbol_names
-# ...
-
-# ...
-def get_sympy_printer_settings(settings):
-    """
-    constructs the dictionary for sympy settings needed for the printer.
-
-    settings: dict
-        dictionary for different settings
-    """
-    sets = {}
-    for key, value in list(settings.items()):
-        if key not in SETTINGS:
-            sets[key] = value
-    return sets
-# ...
-
-# ...
-def glt_latex(expr, **settings):
-    """
-    returns the latex expression of expr.
-
-    expr: sympy.Expression
-        a sympy expression
-
-    settings: dict
-        dictionary for different settings
-    """
-    # ...
-    if type(expr) == dict:
-        d_expr = {}
-        try:
-            mode = settings["mode"]
-        except:
-            mode = "plain"
-
-        sets = settings.copy()
-        sets["mode"] = "plain"
-        for key, txt in list(expr.items()):
-            d_expr[key] = glt_latex(txt, **sets)
-
-        return d_expr
-    # ...
-
-    # ...
-    try:
-        from gelato.expression import glt_formatting
-        fmt = settings["glt_formatting"]
-        if fmt:
-            expr = glt_formatting(expr, **settings)
-    except:
-        pass
-    # ...
-
-    # ...
-    try:
-        smp = settings["glt_simplify"]
-        if smp:
-            expr = simplify(expr)
-    except:
-        pass
-    # ...
-
-    # ...
-    sets = get_sympy_printer_settings(settings)
-    # ...
-
-    return latex(expr, symbol_names=glt_latex_names(), **sets)
-# ...
-
-# ...
-def print_glt_latex(expr, **settings):
-    """
-    Prints the latex expression of expr.
-
-    settings: dict
-        dictionary for different settings
-    """
-    print((glt_latex(expr, **settings)))
+            return m
 # ...
