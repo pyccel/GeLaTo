@@ -3,3 +3,9 @@ numpy>=1.13, <1.16
 scipy>=0.18
 matplotlib
 sympde
+
+# sympde dependencies
+h5py
+pytest
+pyyaml
+yamlloader
