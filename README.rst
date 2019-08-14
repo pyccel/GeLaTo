@@ -43,3 +43,6 @@ From sources
     :target: http://gelato.readthedocs.io/en/latest/?badge=latest
     :scale: 100%
     :alt: Documentation Status
+
+.. |binder| image:: https://mybinder.org/badge_logo.svg
+ :target: https://mybinder.org/v2/gh/pyccel/gelato/devel
