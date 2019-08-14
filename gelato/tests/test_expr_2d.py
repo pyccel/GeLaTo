@@ -11,7 +11,7 @@ from sympde.core import Constant
 from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
 from sympde.topology import (dx, dy, dz)
-from sympde.topology import FunctionSpace, VectorFunctionSpace
+from sympde.topology import ScalarFunctionSpace, VectorFunctionSpace
 from sympde.topology import Field, TestFunction
 from sympde.topology import Domain
 from sympde.topology import Trace, trace_0, trace_1
@@ -31,7 +31,7 @@ domain = Domain('Omega', dim=DIM)
 #==============================================================================
 def test_gelatize_2d_1():
 
-    V = FunctionSpace('V', domain)
+    V = ScalarFunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -122,7 +122,7 @@ def test_gelatize_2d_3():
 #==============================================================================
 def test_gelatize_2d_4():
 
-    V = FunctionSpace('V', domain)
+    V = ScalarFunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -135,7 +135,7 @@ def test_gelatize_2d_4():
 #==============================================================================
 def test_gelatize_2d_5():
 
-    V = FunctionSpace('V', domain)
+    V = ScalarFunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -152,7 +152,7 @@ def test_gelatize_2d_5_mapping():
 
     M = Mapping('M', DIM)
 
-    V = FunctionSpace('V', domain)
+    V = ScalarFunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
@@ -185,7 +185,7 @@ def test_gelatize_2d_3_mapping():
 #==============================================================================
 def test_glt_expr_2d_1():
 
-    V = FunctionSpace('V', domain)
+    V = ScalarFunctionSpace('V', domain)
 
     v = TestFunction(V, name='v')
     u = TestFunction(V, name='u')
