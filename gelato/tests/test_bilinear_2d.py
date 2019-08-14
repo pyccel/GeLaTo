@@ -12,12 +12,11 @@ from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
 from sympde.topology import (dx, dy, dz)
 from sympde.topology import ScalarFunctionSpace, VectorFunctionSpace
-from sympde.topology import Field, TestFunction
+from sympde.topology import TestFunction
+#from sympde.topology import element_of # TODO not working yet
 from sympde.topology import Domain
-from sympde.topology import Trace, trace_0, trace_1
 from sympde.topology import Mapping
-from sympde.topology import Square
-from sympde.expr.expr import LinearForm, BilinearForm
+from sympde.expr.expr import BilinearForm
 
 from gelato import gelatize, GltExpr
 from gelato import (Mass,
@@ -26,85 +25,10 @@ from gelato import (Mass,
                     Bilaplacian)
 
 DIM = 2
-domain = Domain('Omega', dim=DIM)
 
 #==============================================================================
-def test_gelatize_2d_1():
-
-    V = ScalarFunctionSpace('V', domain)
-
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
-
-    nx, ny = symbols('nx ny', integer=True)
-    px, py = symbols('px py', integer=True)
-    tx, ty = symbols('tx ty')
-
-
-    c = Constant('c')
-
-    bx = Constant('bx')
-    by = Constant('by')
-    b = Tuple(bx, by)
-
-    # ...
-    expected = Mass(px,tx)*Mass(py,ty)/(nx*ny)
-    assert(gelatize(BilinearForm((u,v), u*v)) == expected)
-    # ...
-
-    # ...
-    expected = Mass(py,ty)*nx*Stiffness(px,tx)/ny
-    assert(gelatize(BilinearForm((u,v), dx(u)*dx(v))) == expected)
-    # ...
-
-    # ...
-    expected = I*Advection(py,ty)*Mass(px,tx)/nx
-    assert(gelatize(BilinearForm((u,v), dy(u) * v)) == expected)
-    # ...
-
-    # ...
-    expected = I*Advection(px,tx)*Mass(py,ty)/ny
-    assert(gelatize(BilinearForm((u,v), dx(u) * v)) == expected)
-    # ...
-
-    # ...
-    expected = Mass(px,tx)*ny*Stiffness(py,ty)/nx + Mass(py,ty)*nx*Stiffness(px,tx)/ny
-    assert(gelatize(BilinearForm((u,v), dot(grad(v), grad(u)))) == expected)
-    # ...
-
-    # ...
-    expected = (nx*Mass(py,ty)*Stiffness(px,tx)/ny +
-                I*Advection(px,tx)*Mass(py,ty)/ny +
-                ny*Mass(px,tx)*Stiffness(py,ty)/nx +
-                I*Advection(py,ty)*Mass(px,tx)/nx)
-    assert(gelatize(BilinearForm((u,v), dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v)) == expected)
-    # ...
-
-    # ...
-    expected = -bx*I*Advection(px,tx)*Mass(py,ty)/ny - by*I*Advection(py,ty)*Mass(px,tx)/nx
-    assert(gelatize(BilinearForm((u,v), dot(b, grad(v)) * u)) == expected)
-    # ...
-
-#    # ... TODO
-#    expected = bx**2*nx*Mass(py,ty)*Stiffness(px,tx)/ny + 2*bx*by*Advection(px,tx)*Advection(py,ty) + by**2*ny*Mass(px,tx)*Stiffness(py,ty)/nx
-#    assert(gelatize(BilinearForm((u,v), dot(b, grad(v)) * dot(b, grad(u)))) == expected)
-#    # ...
-
-#    degrees = None
-##    degrees = [2, 1]
-
-##    evaluate = True
-#    evaluate = False
-
-#    expr = dot(b, grad(v)) * dot(b, grad(u))
-#    expr = dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v
-#
-#    expr = BilinearForm((u,v), expr)
-#    print('> input     >>> {0}'.format(expr))
-#    print('> gelatized >>> {0}'.format(gelatize(expr, degrees=degrees)))
-
-#==============================================================================
-def test_gelatize_2d_3():
+def test_bilinear_2d_1():
+    domain = Domain('Omega', dim=DIM)
 
     V = VectorFunctionSpace('V', domain)
 
@@ -120,7 +44,8 @@ def test_gelatize_2d_3():
     print('> gelatized >>> {0}'.format(gelatize(expr)))
 
 #==============================================================================
-def test_gelatize_2d_4():
+def test_bilinear_2d_2():
+    domain = Domain('Omega', dim=DIM)
 
     V = ScalarFunctionSpace('V', domain)
 
@@ -133,7 +58,8 @@ def test_gelatize_2d_4():
     print('> gelatized >>> {0}'.format(gelatize(expr)))
 
 #==============================================================================
-def test_gelatize_2d_5():
+def test_bilinear_2d_3():
+    domain = Domain('Omega', dim=DIM)
 
     V = ScalarFunctionSpace('V', domain)
 
@@ -148,7 +74,8 @@ def test_gelatize_2d_5():
     print('> gelatized >>> {0}'.format(gelatize(expr)))
 
 #==============================================================================
-def test_gelatize_2d_5_mapping():
+def test_bilinear_2d_mapping_1():
+    domain = Domain('Omega', dim=DIM)
 
     M = Mapping('M', DIM)
 
@@ -165,7 +92,8 @@ def test_gelatize_2d_5_mapping():
     print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
 
 #==============================================================================
-def test_gelatize_2d_3_mapping():
+def test_bilinear_2d_mapping_2():
+    domain = Domain('Omega', dim=DIM)
 
     M = Mapping('M', DIM)
 
@@ -181,23 +109,6 @@ def test_gelatize_2d_3_mapping():
     expr = BilinearForm((u,v), expr)
     print('> input     >>> {0}'.format(expr))
     print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
-
-#==============================================================================
-def test_glt_expr_2d_1():
-
-    V = ScalarFunctionSpace('V', domain)
-
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
-
-    c = Constant('c')
-
-    a = BilinearForm((u,v), dot(grad(v), grad(u)) + c*v*u)
-    glt = GltExpr(a)
-    print(glt)
-    print(glt(degrees=[2,2]))
-    print(glt(tx=0.1, ty=0.2, degrees=[2,2]))
-
 
 #==============================================================================
 # CLEAN UP SYMPY NAMESPACE
