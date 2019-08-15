@@ -6,6 +6,7 @@
 *.f90
 *.pyccel*
 __pycache__
+.pytest_cache
 
 *build*
 *egg*
