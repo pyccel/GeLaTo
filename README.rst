@@ -6,8 +6,24 @@ Welcome to GeLaTo
 
 **GeLaTo** is a python library for the Generalized Locally Toeplitz theory for IsoGeometric Analysis.
 
-Installation
-************
+Install
+*******
+
+From PyPi
+^^^^^^^^^
+
+Simply run, for a local installation::
+
+  pip3 install --user gelato 
+
+or::
+
+  pip3 install gelato 
+
+for a global installation.
+
+From sources
+^^^^^^^^^^^^
 
 * **Standard mode**::
 
@@ -29,6 +45,4 @@ Installation
     :alt: Documentation Status
 
 .. |binder| image:: https://mybinder.org/badge_logo.svg
-    :target: https://mybinder.org/v2/gh/pyccel/GeLaTo/master?urlpath=https%3A%2F%2Fgithub.com%2Fpyccel%2FGeLaTo%2Fblob%2Fmaster%2Fnotebooks%2FLaplace_2d.ipynb
-    :scale: 100%
-    :alt: Binder interactive run
+ :target: https://mybinder.org/v2/gh/pyccel/gelato/devel

@@ -5,7 +5,7 @@ import sys
 from setuptools import setup, find_packages
 
 NAME    = 'gelato'
-VERSION = '0.1'
+VERSION = '0.9.2'
 AUTHOR  = 'Ahmed Ratnani'
 EMAIL   = 'ahmed.ratnani@ipp.mpg.de'
 URL     = 'https://github.com/ratnania/GeLaTo'
