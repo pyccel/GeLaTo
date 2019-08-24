@@ -33,6 +33,13 @@ From sources
 
     python3 -m pip install --user -e .
 
+Examples
+********
+
+   * `1- Laplace 2D <http://nbviewer.jupyter.org/github/pyccel/gelato/blob/master/notebooks/Laplace_2d.ipynb>`_
+
+   * `2- Vibration 1D <http://nbviewer.jupyter.org/github/pyccel/gelato/blob/master/notebooks/Vibration_1d.ipynb>`_
+
 
 .. |build-status| image:: https://travis-ci.org/pyccel/GeLaTo.svg?branch=master
     :alt: build status
@@ -45,4 +52,4 @@ From sources
     :alt: Documentation Status
 
 .. |binder| image:: https://mybinder.org/badge_logo.svg
- :target: https://mybinder.org/v2/gh/pyccel/gelato/devel
+ :target: https://mybinder.org/v2/gh/pyccel/gelato/master

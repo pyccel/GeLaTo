@@ -12,17 +12,13 @@ from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
 from sympde.topology import (dx, dy, dz)
 from sympde.topology import ScalarFunctionSpace, VectorFunctionSpace
-from sympde.topology import TestFunction
-#from sympde.topology import element_of # TODO not working yet
 from sympde.topology import Domain
 from sympde.topology import Mapping
-from sympde.expr.expr import BilinearForm
+from sympde.topology import elements_of
+from sympde.expr import BilinearForm
+from sympde.expr import integral
 
-from gelato import gelatize, GltExpr
-from gelato import (Mass,
-                    Stiffness,
-                    Advection,
-                    Bilaplacian)
+from gelato import GltExpr
 
 DIM = 2
 
@@ -32,12 +28,13 @@ def test_glt_expr_2d_1():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     c = Constant('c')
 
-    a = BilinearForm((u,v), dot(grad(v), grad(u)) + c*v*u)
+    expr = dot(grad(v), grad(u)) + c*v*u
+    a = BilinearForm((u,v), integral(domain, expr))
+
     glt = GltExpr(a)
     print(glt)
     print(glt(degrees=[2,2]))

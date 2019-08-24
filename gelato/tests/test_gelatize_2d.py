@@ -12,13 +12,13 @@ from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
 from sympde.topology import (dx, dy, dz)
 from sympde.topology import ScalarFunctionSpace, VectorFunctionSpace
-from sympde.topology import TestFunction
-#from sympde.topology import element_of # TODO not working yet
 from sympde.topology import Domain
 from sympde.topology import Mapping
-from sympde.expr.expr import BilinearForm
+from sympde.topology import elements_of
+from sympde.expr import BilinearForm
+from sympde.expr import integral
 
-from gelato import gelatize, GltExpr
+from gelato import gelatize
 from gelato import (Mass,
                     Stiffness,
                     Advection,
@@ -32,15 +32,18 @@ def test_gelatize_2d_1():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny = symbols('nx ny', integer=True)
     px, py = symbols('px py', integer=True)
     tx, ty = symbols('tx ty')
 
     expected = Mass(px,tx)*Mass(py,ty)/(nx*ny)
-    assert(gelatize(BilinearForm((u,v), u*v)) == expected)
+
+    expr = u*v
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
+
 
 #==============================================================================
 def test_gelatize_2d_2():
@@ -48,15 +51,17 @@ def test_gelatize_2d_2():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny = symbols('nx ny', integer=True)
     px, py = symbols('px py', integer=True)
     tx, ty = symbols('tx ty')
 
     expected = Mass(py,ty)*nx*Stiffness(px,tx)/ny
-    assert(gelatize(BilinearForm((u,v), dx(u)*dx(v))) == expected)
+
+    expr = dx(u)*dx(v)
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 def test_gelatize_2d_3():
@@ -64,15 +69,17 @@ def test_gelatize_2d_3():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny = symbols('nx ny', integer=True)
     px, py = symbols('px py', integer=True)
     tx, ty = symbols('tx ty')
 
     expected = I*Advection(py,ty)*Mass(px,tx)/nx
-    assert(gelatize(BilinearForm((u,v), dy(u) * v)) == expected)
+
+    expr = dy(u) * v
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 def test_gelatize_2d_4():
@@ -80,15 +87,17 @@ def test_gelatize_2d_4():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny = symbols('nx ny', integer=True)
     px, py = symbols('px py', integer=True)
     tx, ty = symbols('tx ty')
 
     expected = I*Advection(px,tx)*Mass(py,ty)/ny
-    assert(gelatize(BilinearForm((u,v), dx(u) * v)) == expected)
+
+    expr = dx(u) * v
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 def test_gelatize_2d_5():
@@ -96,15 +105,17 @@ def test_gelatize_2d_5():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny = symbols('nx ny', integer=True)
     px, py = symbols('px py', integer=True)
     tx, ty = symbols('tx ty')
 
     expected = Mass(px,tx)*ny*Stiffness(py,ty)/nx + Mass(py,ty)*nx*Stiffness(px,tx)/ny
-    assert(gelatize(BilinearForm((u,v), dot(grad(v), grad(u)))) == expected)
+
+    expr = dot(grad(v), grad(u))
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 def test_gelatize_2d_6():
@@ -112,8 +123,7 @@ def test_gelatize_2d_6():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny = symbols('nx ny', integer=True)
     px, py = symbols('px py', integer=True)
@@ -123,7 +133,10 @@ def test_gelatize_2d_6():
                 I*Advection(px,tx)*Mass(py,ty)/ny +
                 ny*Mass(px,tx)*Stiffness(py,ty)/nx +
                 I*Advection(py,ty)*Mass(px,tx)/nx)
-    assert(gelatize(BilinearForm((u,v), dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v)) == expected)
+
+    expr = dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 def test_gelatize_2d_7():
@@ -131,8 +144,7 @@ def test_gelatize_2d_7():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny = symbols('nx ny', integer=True)
     px, py = symbols('px py', integer=True)
@@ -143,7 +155,10 @@ def test_gelatize_2d_7():
     b = Tuple(bx, by)
 
     expected = -bx*I*Advection(px,tx)*Mass(py,ty)/ny - by*I*Advection(py,ty)*Mass(px,tx)/nx
-    assert(gelatize(BilinearForm((u,v), dot(b, grad(v)) * u)) == expected)
+
+    expr = dot(b, grad(v)) * u
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 ## TODO
@@ -152,8 +167,7 @@ def test_gelatize_2d_7():
 #
 #    V = ScalarFunctionSpace('V', domain)
 #
-#    v = TestFunction(V, name='v')
-#    u = TestFunction(V, name='u')
+#    u,v = elements_of(V, names='u,v')
 #
 #    nx, ny = symbols('nx ny', integer=True)
 #    px, py = symbols('px py', integer=True)
@@ -177,7 +191,7 @@ def test_gelatize_2d_7():
 #    expr = dot(b, grad(v)) * dot(b, grad(u))
 #    expr = dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v
 #
-#    expr = BilinearForm((u,v), expr)
+#    expr = BilinearForm((u,v), integral(domain, expr))
 #    print('> input     >>> {0}'.format(expr))
 #    print('> gelatized >>> {0}'.format(gelatize(expr, degrees=degrees)))
 

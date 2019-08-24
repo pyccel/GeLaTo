@@ -12,17 +12,13 @@ from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
 from sympde.topology import (dx, dy, dz)
 from sympde.topology import ScalarFunctionSpace, VectorFunctionSpace
-from sympde.topology import TestFunction
-#from sympde.topology import element_of # TODO not working yet
 from sympde.topology import Domain
 from sympde.topology import Mapping
-from sympde.expr.expr import BilinearForm
+from sympde.topology import elements_of
+from sympde.expr import BilinearForm
+from sympde.expr import integral
 
 from gelato import gelatize
-from gelato import (Mass,
-                    Stiffness,
-                    Advection,
-                    Bilaplacian)
 
 DIM = 3
 
@@ -34,12 +30,12 @@ def test_bilinear_3d_mapping_1():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     c = Constant('c')
 
-    expr = BilinearForm((u,v), dot(grad(v), grad(u)) + c*v*u)
+    expr = dot(grad(v), grad(u)) + c*v*u
+    expr = BilinearForm((u,v), integral(domain, expr))
 
     print('> input     >>> {0}'.format(expr))
     print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
@@ -54,13 +50,13 @@ def test_bilinear_3d_mapping_2():
 
     V = VectorFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     c = Constant('c')
 
     expr = c * div(v) * div(u) + dot(curl(v), curl(u))
-    expr = BilinearForm((u,v), expr)
+    expr = BilinearForm((u,v), integral(domain, expr))
+
     print('> input     >>> {0}'.format(expr))
     print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
 
