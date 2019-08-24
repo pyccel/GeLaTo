@@ -12,11 +12,11 @@ from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
 from sympde.topology import (dx, dy, dz)
 from sympde.topology import ScalarFunctionSpace, VectorFunctionSpace
-from sympde.topology import TestFunction
-#from sympde.topology import element_of # TODO not working yet
 from sympde.topology import Domain
 from sympde.topology import Mapping
-from sympde.expr.expr import BilinearForm
+from sympde.topology import elements_of
+from sympde.expr import BilinearForm
+from sympde.expr import integral
 
 from gelato import gelatize
 from gelato import (Mass,
@@ -32,15 +32,17 @@ def test_gelatize_3d_1():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny, nz = symbols('nx ny nz', integer=True)
     px, py, pz = symbols('px py pz', integer=True)
     tx, ty, tz = symbols('tx ty tz')
 
     expected = Mass(px,tx)*Mass(py,ty)*Mass(pz,tz)/(nx*ny*nz)
-    assert(gelatize(BilinearForm((u,v), u*v)) == expected)
+
+    expr = u*v
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 def test_gelatize_3d_2():
@@ -48,15 +50,17 @@ def test_gelatize_3d_2():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny, nz = symbols('nx ny nz', integer=True)
     px, py, pz = symbols('px py pz', integer=True)
     tx, ty, tz = symbols('tx ty tz')
 
     expected = nx*Mass(py,ty)*Mass(pz,tz)*Stiffness(px,tx)/(ny*nz)
-    assert(gelatize(BilinearForm((u,v), dx(u)*dx(v))) == expected)
+
+    expr = dx(u)*dx(v)
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 def test_gelatize_3d_3():
@@ -64,15 +68,17 @@ def test_gelatize_3d_3():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny, nz = symbols('nx ny nz', integer=True)
     px, py, pz = symbols('px py pz', integer=True)
     tx, ty, tz = symbols('tx ty tz')
 
     expected = I*Advection(py,ty)*Mass(px,tx)*Mass(pz,tz)/(nx*nz)
-    assert(gelatize(BilinearForm((u,v), dy(u) * v)) == expected)
+
+    expr = dy(u) * v
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 def test_gelatize_3d_4():
@@ -80,15 +86,17 @@ def test_gelatize_3d_4():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny, nz = symbols('nx ny nz', integer=True)
     px, py, pz = symbols('px py pz', integer=True)
     tx, ty, tz = symbols('tx ty tz')
 
     expected = I*Advection(px,tx)*Mass(py,ty)*Mass(pz,tz)/(ny*nz)
-    assert(gelatize(BilinearForm((u,v), dx(u) * v)) == expected)
+
+    expr = dx(u) * v
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 def test_gelatize_3d_5():
@@ -96,8 +104,7 @@ def test_gelatize_3d_5():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny, nz = symbols('nx ny nz', integer=True)
     px, py, pz = symbols('px py pz', integer=True)
@@ -106,7 +113,10 @@ def test_gelatize_3d_5():
     expected = ( nx*Mass(py,ty)*Mass(pz,tz)*Stiffness(px,tx)/(ny*nz) +
                 ny*Mass(px,tx)*Mass(pz,tz)*Stiffness(py,ty)/(nx*nz) +
                 nz*Mass(px,tx)*Mass(py,ty)*Stiffness(pz,tz)/(nx*ny))
-    assert(gelatize(BilinearForm((u,v), dot(grad(v), grad(u)))) == expected)
+
+    expr = dot(grad(v), grad(u))
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 def test_gelatize_3d_6():
@@ -114,8 +124,7 @@ def test_gelatize_3d_6():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny, nz = symbols('nx ny nz', integer=True)
     px, py, pz = symbols('px py pz', integer=True)
@@ -126,7 +135,10 @@ def test_gelatize_3d_6():
                 ny*Mass(px,tx)*Mass(pz,tz)*Stiffness(py,ty)/(nx*nz) +
                 I*Advection(py,ty)*Mass(px,tx)*Mass(pz,tz)/(nx*nz) +
                 nz*Mass(px,tx)*Mass(py,ty)*Stiffness(pz,tz)/(nx*ny))
-    assert(gelatize(BilinearForm((u,v), dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v)) == expected)
+
+    expr = dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 def test_gelatize_3d_7():
@@ -134,8 +146,7 @@ def test_gelatize_3d_7():
 
     V = ScalarFunctionSpace('V', domain)
 
-    v = TestFunction(V, name='v')
-    u = TestFunction(V, name='u')
+    u,v = elements_of(V, names='u,v')
 
     nx, ny, nz = symbols('nx ny nz', integer=True)
     px, py, pz = symbols('px py pz', integer=True)
@@ -149,7 +160,10 @@ def test_gelatize_3d_7():
     expected = (-bx*I*Advection(px,tx)*Mass(py,ty)*Mass(pz,tz)/(ny*nz) -
                 by*I*Advection(py,ty)*Mass(px,tx)*Mass(pz,tz)/(nx*nz) -
                 bz*I*Advection(pz,tz)*Mass(px,tx)*Mass(py,ty)/(nx*ny))
-    assert(gelatize(BilinearForm((u,v), dot(b, grad(v)) * u)) == expected)
+
+    expr = dot(b, grad(v)) * u
+    expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
 
 
 #==============================================================================
@@ -159,8 +173,7 @@ def test_gelatize_3d_7():
 #
 #    V = ScalarFunctionSpace('V', domain)
 #
-#    v = TestFunction(V, name='v')
-#    u = TestFunction(V, name='u')
+#    u,v = elements_of(V, names='u,v')
 #
 #    nx, ny, nz = symbols('nx ny nz', integer=True)
 #    px, py, pz = symbols('px py pz', integer=True)
@@ -180,7 +193,9 @@ def test_gelatize_3d_7():
 #                by**2*ny*Mass(px,tx)*Mass(pz,tz)*Stiffness(py,ty)/(nx*nz) +
 #                2*by*bz*Advection(py,ty)*Advection(pz,tz)*Mass(px,tx)/nx +
 #                bz**2*nz*Mass(px,tx)*Mass(py,ty)*Stiffness(pz,tz)/(nx*ny))
-#    assert(gelatize(BilinearForm((u,v), dot(b, grad(v)) * dot(b, grad(u)))) == expected)
+#    expr = dot(b, grad(v)) * dot(b, grad(u))
+#    expr = BilinearForm((u,v), integral(domain, expr))
+#    assert(gelatize(expr) == expected)
 #    # ...
 #
 ##    degrees = None
