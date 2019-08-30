@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 #! /usr/bin/python
 
-import sys
 from setuptools import setup, find_packages
 
 NAME    = 'gelato'
@@ -26,17 +25,28 @@ setup_args = dict(
 #    download_url     = URL+'/tarball/master',
 )
 
+install_requires = [
+
+    # Third-party libraries from PyPi
+    'sympy>=1.2',
+    'numpy>=1.13',
+    'scipy>=0.18',
+    'matplotlib',
+
+    # Our libraries from PyPi
+    'sympde',
+]
+
 # ...
 packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
 # ...
 
 def setup_package():
-    if 'setuptools' in sys.modules:
-        setup_args['install_requires'] = ['numpy']
 
-    setup(packages = packages, \
-          include_package_data = True, \
-          zip_safe=True, \
+    setup(packages = packages,
+          include_package_data = True,
+          install_requires = install_requires,
+          zip_safe = True,
           **setup_args)
 
 

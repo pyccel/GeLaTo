@@ -12,11 +12,8 @@ cache: pip
 # command before installation: install all dependencies and run CMAKE config
 before_install:
   - python -m pip install --upgrade pip
-  - python -m pip install -r requirements.txt
   - python -m pip uninstall -y sympde
-  - wget https://raw.githubusercontent.com/pyccel/sympde/master/requirements.txt -O requirements_sympde.txt
-  - python -m pip install -r requirements_sympde.txt
-  - python -m pip install git+https://github.com/pyccel/sympde@master
+  - python -m pip uninstall -y gelato
 
 # command to install project
 install:
