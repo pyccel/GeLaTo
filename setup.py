@@ -1,10 +1,17 @@
 # -*- coding: UTF-8 -*-
 #! /usr/bin/python
 
+from pathlib import Path
 from setuptools import setup, find_packages
 
+# ...
+# Read library version into '__version__' variable
+path = Path(__file__).parent / 'gelato' / 'version.py'
+exec(path.read_text())
+# ...
+
 NAME    = 'gelato'
-VERSION = '0.9.3'
+VERSION = __version__
 AUTHOR  = 'Ahmed Ratnani'
 EMAIL   = 'ahmed.ratnani@ipp.mpg.de'
 URL     = 'https://github.com/ratnania/GeLaTo'
