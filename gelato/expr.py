@@ -21,7 +21,7 @@ from sympde.expr import AdvectionT as AdvectionTForm
 from sympde.expr import Bilaplacian as BilaplacianForm
 from sympde.expr import Basic1dForm
 from sympde.topology import SymbolicExpr
-from sympde.topology import SymbolicDeterminant
+from sympde.calculus.matrices import SymbolicDeterminant
 from sympde.topology.space import ScalarField, VectorField
 
 from .glt import (BasicGlt, Mass, Stiffness,
