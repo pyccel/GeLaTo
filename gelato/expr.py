@@ -146,9 +146,8 @@ class GltExpr(Expr):
 
         fourier_vars = [Symbol(i) for i in ['tx', 'ty', 'tz'][:dim]]
 #        space_vars   = [Symbol(i) for i in ['x', 'y', 'z'][:dim]]
-
-        atoms = form.atoms(Symbol)
-        space_vars   = [i for i in atoms if i.name in ['x', 'y', 'z']]
+        atoms  = form.atoms(Symbol)
+        space_vars   = [i for i in atoms if i in form.coordinates]
         # ...
 
         return Basic.__new__(cls, fourier_vars, space_vars, form)
