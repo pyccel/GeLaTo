@@ -29,7 +29,7 @@ from .glt import (BasicGlt, Mass, Stiffness,
 
 
 def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
-             human=False):
+             human=False, expand=False):
 
     if not isinstance(a, BilinearForm):
         raise TypeError('> Expecting a BilinearForm')
@@ -37,7 +37,7 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
     dim = a.ldim
 
     # ... compute tensor form
-    expr = TensorExpr(a, mapping=mapping)
+    expr = TensorExpr(a, mapping=mapping, expand=expand)
     # ...
 
     # ...
