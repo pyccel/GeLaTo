@@ -28,14 +28,16 @@ def test_bilinear_3d_mapping_1():
 
     M = Mapping('M', DIM)
 
-    V = ScalarFunctionSpace('V', domain)
+    mapped_domain = M(domain)
+
+    V = ScalarFunctionSpace('V', mapped_domain)
 
     u,v = elements_of(V, names='u,v')
 
     c = Constant('c')
 
     expr = dot(grad(v), grad(u)) + c*v*u
-    expr = BilinearForm((u,v), integral(domain, expr))
+    expr = BilinearForm((u,v), integral(mapped_domain, expr))
 
     print('> input     >>> {0}'.format(expr))
     print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
@@ -48,14 +50,16 @@ def test_bilinear_3d_mapping_2():
 
     M = Mapping('M', DIM)
 
-    V = VectorFunctionSpace('V', domain)
+    mapped_domain = M(domain)
+
+    V = VectorFunctionSpace('V', mapped_domain)
 
     u,v = elements_of(V, names='u,v')
 
     c = Constant('c')
 
     expr = c * div(v) * div(u) + dot(curl(v), curl(u))
-    expr = BilinearForm((u,v), integral(domain, expr))
+    expr = BilinearForm((u,v), integral(mapped_domain, expr))
 
     print('> input     >>> {0}'.format(expr))
     print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))

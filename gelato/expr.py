@@ -125,7 +125,7 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
     # ...
     if mapping and human:
         expr *= SymbolicDeterminant(mapping)
-        expr = SymbolicExpr(expr)
+        expr  = SymbolicExpr(expr)
     # ...
 
     return expr

@@ -10,7 +10,7 @@ from sympy import I
 from sympde.core import Constant
 from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
-from sympde.topology import (dx, dy, dz)
+from sympde.topology import dx, dy, dz, dx1, dx2, dx3
 from sympde.topology import ScalarFunctionSpace, VectorFunctionSpace
 from sympde.topology import Domain
 from sympde.topology import Mapping
@@ -59,7 +59,7 @@ def test_gelatize_2d_2():
 
     expected = Mass(py,ty)*nx*Stiffness(px,tx)/ny
 
-    expr = dx(u)*dx(v)
+    expr = dx1(u)*dx1(v)
     expr = BilinearForm((u,v), integral(domain, expr))
     assert(gelatize(expr) == expected)
 
@@ -77,7 +77,7 @@ def test_gelatize_2d_3():
 
     expected = I*Advection(py,ty)*Mass(px,tx)/nx
 
-    expr = dy(u) * v
+    expr = dx2(u) * v
     expr = BilinearForm((u,v), integral(domain, expr))
     assert(gelatize(expr) == expected)
 
@@ -95,7 +95,7 @@ def test_gelatize_2d_4():
 
     expected = I*Advection(px,tx)*Mass(py,ty)/ny
 
-    expr = dx(u) * v
+    expr = dx1(u) * v
     expr = BilinearForm((u,v), integral(domain, expr))
     assert(gelatize(expr) == expected)
 
@@ -134,7 +134,7 @@ def test_gelatize_2d_6():
                 ny*Mass(px,tx)*Stiffness(py,ty)/nx +
                 I*Advection(py,ty)*Mass(px,tx)/nx)
 
-    expr = dot(grad(v), grad(u)) + dx(u)*v + dy(u)*v
+    expr = dot(grad(v), grad(u)) + dx1(u)*v + dx2(u)*v
     expr = BilinearForm((u,v), integral(domain, expr))
     assert(gelatize(expr) == expected)
 
