@@ -20,7 +20,7 @@ before_install:
 
 # command to install project
 install:
-  - python -m pip install .
+  - python -m pip install . --use-feature=2020-resolver
 
 # command to run tests
 script:
