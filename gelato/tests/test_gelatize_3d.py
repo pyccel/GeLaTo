@@ -10,7 +10,7 @@ from sympy import I
 from sympde.core import Constant
 from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
-from sympde.topology import dx, dy, dz, dx1, dx2, dx3
+from sympde.topology import dx1, dx2, dx3
 from sympde.topology import ScalarFunctionSpace, VectorFunctionSpace
 from sympde.topology import Domain
 from sympde.topology import Mapping
