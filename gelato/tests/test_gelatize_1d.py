@@ -10,7 +10,7 @@ from sympy import I
 from sympde.core import Constant
 from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
-from sympde.topology import (dx, dy, dz)
+from sympde.topology import dx, dy, dz, dx1, dx2, dx3
 from sympde.topology import ScalarFunctionSpace
 from sympde.topology import Domain
 from sympde.topology import elements_of
@@ -75,7 +75,7 @@ def test_gelatize_1d_3():
 
     expected = I*Advection(px,tx)
 
-    expr = dx(u) * v
+    expr = dx1(u) * v
     expr = BilinearForm((u,v), integral(domain, expr))
     assert(gelatize(expr) == expected)
 
@@ -98,7 +98,7 @@ def test_gelatize_1d_4():
 
     expected = c1*Mass(px,tx)/nx + c2*I*Advection(px,tx) - c3*I*Advection(px,tx) + c4*nx*Stiffness(px,tx)
 
-    expr = c1*v*u + c2*dx(u)*v + c3*dx(v)*u + c4*dx(v)*dx(u)
+    expr = c1*v*u + c2*dx1(u)*v + c3*dx1(v)*u + c4*dx1(v)*dx1(u)
     expr = BilinearForm((u,v), integral(domain, expr))
     assert(gelatize(expr) == expected)
 

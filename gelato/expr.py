@@ -21,7 +21,7 @@ from sympde.expr import AdvectionT as AdvectionTForm
 from sympde.expr import Bilaplacian as BilaplacianForm
 from sympde.expr import Basic1dForm
 from sympde.topology import SymbolicExpr
-from sympde.topology import SymbolicDeterminant
+from sympde.calculus.matrices import SymbolicDeterminant
 from sympde.topology.space import ScalarField, VectorField
 
 from .glt import (BasicGlt, Mass, Stiffness,
@@ -29,7 +29,7 @@ from .glt import (BasicGlt, Mass, Stiffness,
 
 
 def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
-             human=False):
+             human=False, expand=False):
 
     if not isinstance(a, BilinearForm):
         raise TypeError('> Expecting a BilinearForm')
@@ -37,7 +37,7 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
     dim = a.ldim
 
     # ... compute tensor form
-    expr = TensorExpr(a, mapping=mapping)
+    expr = TensorExpr(a, mapping=mapping, expand=expand)
     # ...
 
     # ...
@@ -125,7 +125,7 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
     # ...
     if mapping and human:
         expr *= SymbolicDeterminant(mapping)
-        expr = SymbolicExpr(expr)
+        expr  = SymbolicExpr(expr)
     # ...
 
     return expr
@@ -146,9 +146,8 @@ class GltExpr(Expr):
 
         fourier_vars = [Symbol(i) for i in ['tx', 'ty', 'tz'][:dim]]
 #        space_vars   = [Symbol(i) for i in ['x', 'y', 'z'][:dim]]
-
-        atoms = form.atoms(Symbol)
-        space_vars   = [i for i in atoms if i.name in ['x', 'y', 'z']]
+        atoms  = form.atoms(Symbol)
+        space_vars   = [i for i in atoms if i in form.coordinates]
         # ...
 
         return Basic.__new__(cls, fourier_vars, space_vars, form)
