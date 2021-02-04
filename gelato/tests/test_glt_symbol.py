@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from sympy.core import Symbol
-from sympy import cos, sin
+from sympy import cos, sin, Rational as frac
 
 from gelato import Mass, Stiffness, Advection, Bilaplacian
 
@@ -15,22 +15,22 @@ def test_glt_symbol_1():
     three = 3
 
     # ... linear splines
-    assert( Mass(one, t) == cos(t)/3 + 2/3 )
+    assert( Mass(one, t) == cos(t)/3 + frac(2, 3) )
     assert( Stiffness(one, t) == -2*cos(t) + 2 )
     assert( Advection(one, t) == -sin(t) )
 #    assert( Bilaplacian(one, t) == 0 )
     # ...
 
     # ... quadratic splines
-    assert( Mass(two, t) == 13*cos(t)/30 + cos(2*t)/60 + 11/20 )
+    assert( Mass(two, t) == 13*cos(t)/30 + cos(2*t)/60 + frac(11, 20) )
     assert( Stiffness(two, t) == -2*cos(t)/3 - cos(2*t)/3 + 1 )
     assert( Advection(two, t) == -5*sin(t)/6 - sin(2*t)/12 )
 #    assert( Bilaplacian(two, t) == -8*cos(t) + 2*cos(2*t) + 6 )
     # ...
 
     # ... cubic splines
-    assert( Mass(three, t) == 397*cos(t)/840 + cos(2*t)/21 + cos(3*t)/2520 + 151/315 )
-    assert( Stiffness(three, t) == -cos(t)/4 - 2*cos(2*t)/5 - cos(3*t)/60 + 2/3)
+    assert( Mass(three, t) == 397*cos(t)/840 + cos(2*t)/21 + cos(3*t)/2520 + frac(151, 315) )
+    assert( Stiffness(three, t) == -cos(t)/4 - 2*cos(2*t)/5 - cos(3*t)/60 + frac(2, 3))
     assert( Advection(three, t) == -49*sin(t)/72 - 7*sin(2*t)/45 - sin(3*t)/360 )
 #    assert( Bilaplacian(three, t) == -3*cos(t) + cos(3*t)/3 + 8/3 )
     # ...
