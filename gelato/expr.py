@@ -1,17 +1,13 @@
 # coding: utf-8
 
-from sympy import Function
-from sympy.core import Add, Mul
 from sympy import I as sympy_I
 from sympy import Symbol
 from sympy.core.containers import Tuple
 from sympy import S
-from sympy.core import Expr, Basic, AtomicExpr
+from sympy.core import Expr, Basic
 from sympy import simplify, expand
-from sympy import Matrix, ImmutableDenseMatrix
-from sympy.physics.quantum import TensorProduct
 
-from sympde.expr import LinearForm, BilinearForm
+from sympde.expr import BilinearForm
 from sympde.expr import TensorExpr
 
 from sympde.expr import Mass as MassForm
@@ -22,12 +18,12 @@ from sympde.expr import Bilaplacian as BilaplacianForm
 from sympde.expr import Basic1dForm
 from sympde.topology import SymbolicExpr
 from sympde.calculus.matrices import SymbolicDeterminant
-from sympde.topology.space import ScalarField, VectorField
 
-from .glt import (BasicGlt, Mass, Stiffness,
-                  Advection, Bilaplacian)
+from .glt import (BasicGlt, Mass, Stiffness, Advection, Bilaplacian)
 
+__all__ = ('gelatize', 'GltExpr')
 
+#==============================================================================
 def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
              human=False, expand=False):
 
@@ -129,8 +125,6 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
     # ...
 
     return expr
-
-
 
 #==============================================================================
 # TODO add __call__
