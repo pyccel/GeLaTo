@@ -42,7 +42,7 @@ def test_gelatize_3d_1():
 
     expr = u*v
     expr = BilinearForm((u,v), integral(domain, expr))
-    assert(gelatize(expr) == expected)
+    assert(gelatize(expr, domain=domain) == expected)
 
 #==============================================================================
 def test_gelatize_3d_2():
@@ -60,7 +60,7 @@ def test_gelatize_3d_2():
 
     expr = dx1(u)*dx1(v)
     expr = BilinearForm((u,v), integral(domain, expr))
-    assert(gelatize(expr) == expected)
+    assert(gelatize(expr, domain=domain) == expected)
 
 #==============================================================================
 def test_gelatize_3d_3():
@@ -78,7 +78,7 @@ def test_gelatize_3d_3():
 
     expr = dx2(u) * v
     expr = BilinearForm((u,v), integral(domain, expr))
-    assert(gelatize(expr) == expected)
+    assert(gelatize(expr, domain=domain) == expected)
 
 #==============================================================================
 def test_gelatize_3d_4():
@@ -96,7 +96,7 @@ def test_gelatize_3d_4():
 
     expr = dx1(u) * v
     expr = BilinearForm((u,v), integral(domain, expr))
-    assert(gelatize(expr) == expected)
+    assert(gelatize(expr, domain=domain) == expected)
 
 #==============================================================================
 def test_gelatize_3d_5():
@@ -116,7 +116,7 @@ def test_gelatize_3d_5():
 
     expr = dot(grad(v), grad(u))
     expr = BilinearForm((u,v), integral(domain, expr))
-    assert(gelatize(expr) == expected)
+    assert(gelatize(expr, domain=domain) == expected)
 
 #==============================================================================
 def test_gelatize_3d_6():
@@ -138,7 +138,7 @@ def test_gelatize_3d_6():
 
     expr = dot(grad(v), grad(u)) + dx1(u)*v + dx2(u)*v
     expr = BilinearForm((u,v), integral(domain, expr))
-    assert(gelatize(expr) == expected)
+    assert(gelatize(expr, domain=domain) == expected)
 
 #==============================================================================
 def test_gelatize_3d_7():
@@ -163,7 +163,7 @@ def test_gelatize_3d_7():
 
     expr = dot(b, grad(v)) * u
     expr = BilinearForm((u,v), integral(domain, expr))
-    assert(gelatize(expr) == expected)
+    assert(gelatize(expr, domain=domain) == expected)
 
 
 #==============================================================================

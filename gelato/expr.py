@@ -24,7 +24,7 @@ from .glt import (BasicGlt, Mass, Stiffness, Advection, Bilaplacian)
 __all__ = ('gelatize', 'GltExpr')
 
 #==============================================================================
-def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
+def gelatize(a, degrees=None, n_elements=None, evaluate=False, domain=None,
              human=False, expand=False):
 
     if not isinstance(a, BilinearForm):
@@ -33,7 +33,7 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
     dim = a.ldim
 
     # ... compute tensor form
-    expr = TensorExpr(a, mapping=mapping, expand=expand)
+    expr = TensorExpr(a, domain=domain, expand=expand)
     # ...
 
     # ...
@@ -119,8 +119,8 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
     # ...
 
     # ...
-    if mapping and human:
-        expr *= SymbolicDeterminant(mapping)
+    if domain.mapping and human:
+        expr *= SymbolicDeterminant(domain.mapping)
         expr  = SymbolicExpr(expr)
     # ...
 
@@ -176,14 +176,13 @@ class GltExpr(Expr):
 
     def __call__(self, *args, **kwargs):
 
-        mapping    = kwargs.pop('mapping',    None)
         human      = kwargs.pop('human',      True)
         degrees    = kwargs.pop('degrees',    None)
         n_elements = kwargs.pop('n_elements', None)
 
         expr =  gelatize( self.form,
                           degrees = degrees, n_elements = n_elements,
-                          mapping = mapping, human = human, evaluate = True)
+                          domain = self.form.domain, human = human, evaluate = True)
 
         dim = self.ldim
 

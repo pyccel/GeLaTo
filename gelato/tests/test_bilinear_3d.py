@@ -40,7 +40,7 @@ def test_bilinear_3d_mapping_1():
     expr = BilinearForm((u,v), integral(mapped_domain, expr))
 
     print('> input     >>> {0}'.format(expr))
-    print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
+    print('> gelatized >>> {0}'.format(gelatize(expr, domain=mapped_domain, human=True)))
 
 #==============================================================================
 # TODO it takes some time => optimize LogicalExpr
@@ -62,7 +62,7 @@ def test_bilinear_3d_mapping_2():
     expr = BilinearForm((u,v), integral(mapped_domain, expr))
 
     print('> input     >>> {0}'.format(expr))
-    print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
+    print('> gelatized >>> {0}'.format(gelatize(expr, domain=mapped_domain, human=True)))
 
 #==============================================================================
 # CLEAN UP SYMPY NAMESPACE

@@ -36,7 +36,7 @@ def test_bilinear_2d_1():
     expr = BilinearForm((u,v), integral(domain, expr))
 
     print('> input     >>> {0}'.format(expr))
-    print('> gelatized >>> {0}'.format(gelatize(expr)))
+    print('> gelatized >>> {0}'.format(gelatize(expr, domain=domain)))
 
 #==============================================================================
 def test_bilinear_2d_2():
@@ -50,7 +50,7 @@ def test_bilinear_2d_2():
     expr = BilinearForm((u,v), integral(domain, expr))
 
     print('> input     >>> {0}'.format(expr))
-    print('> gelatized >>> {0}'.format(gelatize(expr)))
+    print('> gelatized >>> {0}'.format(gelatize(expr, domain=domain)))
 
 #==============================================================================
 def test_bilinear_2d_3():
@@ -66,7 +66,7 @@ def test_bilinear_2d_3():
     expr = BilinearForm((u,v), integral(domain, expr))
 
     print('> input     >>> {0}'.format(expr))
-    print('> gelatized >>> {0}'.format(gelatize(expr)))
+    print('> gelatized >>> {0}'.format(gelatize(expr, domain=domain)))
 
 #==============================================================================
 def test_bilinear_2d_mapping_1():
@@ -86,7 +86,7 @@ def test_bilinear_2d_mapping_1():
     expr = BilinearForm((u,v), integral(mapped_domain, expr))
 
     print('> input     >>> {0}'.format(expr))
-    print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
+    print('> gelatized >>> {0}'.format(gelatize(expr, domain=mapped_domain, human=True)))
 
 #==============================================================================
 def test_bilinear_2d_mapping_2():
@@ -106,7 +106,7 @@ def test_bilinear_2d_mapping_2():
     expr = BilinearForm((u,v), integral(mapped_domain, expr))
 
     print('> input     >>> {0}'.format(expr))
-    print('> gelatized >>> {0}'.format(gelatize(expr, mapping=M, human=True)))
+    print('> gelatized >>> {0}'.format(gelatize(expr, domain=mapped_domain, human=True)))
 
 #==============================================================================
 # CLEAN UP SYMPY NAMESPACE

@@ -41,7 +41,7 @@ def test_gelatize_1d_1():
 
     expr = u*v
     expr = BilinearForm((u,v), integral(domain, expr))
-    assert(gelatize(expr) == expected)
+    assert(gelatize(expr, domain=domain) == expected)
 
 #==============================================================================
 def test_gelatize_1d_2():
@@ -59,7 +59,7 @@ def test_gelatize_1d_2():
 
     expr = dot(grad(v), grad(u))
     expr = BilinearForm((u,v), integral(domain, expr))
-    assert(gelatize(expr) == expected)
+    assert(gelatize(expr, domain=domain) == expected)
 
 #==============================================================================
 def test_gelatize_1d_3():
@@ -77,7 +77,7 @@ def test_gelatize_1d_3():
 
     expr = dx1(u) * v
     expr = BilinearForm((u,v), integral(domain, expr))
-    assert(gelatize(expr) == expected)
+    assert(gelatize(expr, domain=domain) == expected)
 
 #==============================================================================
 def test_gelatize_1d_4():
@@ -100,7 +100,7 @@ def test_gelatize_1d_4():
 
     expr = c1*v*u + c2*dx1(u)*v + c3*dx1(v)*u + c4*dx1(v)*dx1(u)
     expr = BilinearForm((u,v), integral(domain, expr))
-    assert(gelatize(expr) == expected)
+    assert(gelatize(expr, domain=domain) == expected)
 
 #==============================================================================
 # CLEAN UP SYMPY NAMESPACE
