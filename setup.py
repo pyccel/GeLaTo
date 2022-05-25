@@ -41,11 +41,11 @@ install_requires = [
     'matplotlib',
 
     # Our libraries from PyPi
-    'sympde>=0.10',
+    'sympde==0.10.9',
 ]
 
 # ...
-packages = find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"])
+packages = find_packages()
 # ...
 
 def setup_package():
