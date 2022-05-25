@@ -31,9 +31,10 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
         raise TypeError('> Expecting a BilinearForm')
 
     dim = a.ldim
+    domain = a.domain
 
     # ... compute tensor form
-    expr = TensorExpr(a, mapping=mapping, expand=expand)
+    expr = TensorExpr(a, domain=domain, mapping=mapping, expand=expand)
     # ...
 
     # ...
