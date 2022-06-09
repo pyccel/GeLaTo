@@ -41,7 +41,7 @@ install_requires = [
     'matplotlib',
 
     # Our libraries from PyPi
-    'sympde==0.10.0',
+    'sympde==0.9.5',
 ]
 
 # ...
