@@ -196,6 +196,33 @@ def test_gelatize_2d_7():
 #    print('> gelatized >>> {0}'.format(gelatize(expr, degrees=degrees)))
 
 #==============================================================================
+def test_gelatize_2d_8():
+
+    domain = Domain('Omega', dim=2)
+
+    V = ScalarFunctionSpace('V', domain)
+    u,v = elements_of(V, names='u,v')
+
+    bx = Constant('bx')
+    by = Constant('by')
+    b  = Tuple(bx, by)
+
+    expr = integral(domain, dot(b, grad(v)) * dot(b, grad(u)))
+    expr = BilinearForm((u,v), expr)
+
+    nx, ny = symbols('nx ny', integer=True)
+    px, py = symbols('px py', integer=True)
+    tx, ty = symbols('tx ty')
+
+    expected = bx**2*nx*Mass(py,ty)*Stiffness(px,tx)/ny + 2*bx*by*Advection(px,tx)*Advection(py,ty) + by**2*ny*Mass(px,tx)*Stiffness(py,ty)/nx
+    assert(gelatize(expr) == expected)
+
+
+    degrees = [3, 3]
+    print('> gelatized >>> {0}'.format(gelatize(expr, degrees=degrees)))
+
+
+#==============================================================================
 # CLEAN UP SYMPY NAMESPACE
 #==============================================================================
 
