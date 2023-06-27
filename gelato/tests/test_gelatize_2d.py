@@ -12,7 +12,7 @@ from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
 from sympde.topology import dx1, dx2, dx3
 from sympde.topology import ScalarFunctionSpace, VectorFunctionSpace
-from sympde.topology import Domain
+from sympde.topology import Domain, Square
 from sympde.topology import Mapping
 from sympde.topology import elements_of
 from sympde.expr import BilinearForm
@@ -161,8 +161,44 @@ def test_gelatize_2d_7():
     assert(gelatize(expr) == expected)
 
 #==============================================================================
+def test_gelatize_2d_8():
+    domain = Square('Omega', bounds1=(0,1), bounds2=(0,1))
+
+    V = ScalarFunctionSpace('V', domain)
+
+    u,v = elements_of(V, names='u,v')
+
+    expected = 0.0
+
+    expr = u*v
+    expr = BilinearForm((u,v), integral(domain.boundary, expr))
+
+    assert(gelatize(expr) == expected)
+
+#==============================================================================
+def test_gelatize_2d_9():
+    domain = Square('Omega', bounds1=(0,1), bounds2=(0,1))
+
+    V = ScalarFunctionSpace('V', domain)
+
+    u,v = elements_of(V, names='u,v')
+
+    nx, ny = symbols('nx ny', integer=True)
+    px, py = symbols('px py', integer=True)
+    tx, ty = symbols('tx ty')
+
+    expected = Mass(px,tx)*ny*Stiffness(py,ty)/nx + Mass(py,ty)*nx*Stiffness(px,tx)/ny
+
+    expr = dot(grad(v), grad(u))
+
+    expr = BilinearForm((u,v), integral(domain.boundary, u*v) +
+                        integral(domain, expr))
+
+    assert(gelatize(expr) == expected)
+
+#==============================================================================
 ## TODO
-#def test_gelatize_2d_8():
+#def test_gelatize_2d_10():
 #    domain = Domain('Omega', dim=DIM)
 #
 #    V = ScalarFunctionSpace('V', domain)

@@ -8,7 +8,7 @@ from sympy.core import Expr, Basic
 from sympy import simplify, expand
 
 from sympde.expr import BilinearForm
-from sympde.expr import TensorExpr
+from sympde.expr import TensorExpr, IntAdd
 
 from sympde.expr import Mass as MassForm
 from sympde.expr import Stiffness as StiffnessForm
@@ -16,7 +16,7 @@ from sympde.expr import Advection as AdvectionForm
 from sympde.expr import AdvectionT as AdvectionTForm
 from sympde.expr import Bilaplacian as BilaplacianForm
 from sympde.expr import Basic1dForm
-from sympde.topology import SymbolicExpr
+from sympde.topology import SymbolicExpr, Union
 from sympde.calculus.matrices import SymbolicDeterminant
 
 from .glt import (BasicGlt, Mass, Stiffness, Advection, Bilaplacian)
@@ -32,6 +32,22 @@ def gelatize(a, degrees=None, n_elements=None, evaluate=False, mapping=None,
 
     dim = a.ldim
     domain = a.domain
+
+    # ... set to zero if a only contains a boundary integral
+    if hasattr(domain, 'ext'):
+        return TensorExpr(0.)
+
+    # ... ignore the boundary integrals within the bilinear form
+    if isinstance(a.expr, IntAdd):
+        expr_list = []
+        for integ in a.expr.args:
+            if not hasattr(integ.domain, 'ext'):
+                expr_list.append(integ)
+                
+        if len(expr_list) == 0:
+            return TensorExpr(0.)
+        
+        a = BilinearForm(a.args[0], IntAdd(*expr_list))
 
     # ... compute tensor form
     expr = TensorExpr(a, domain=domain, mapping=mapping, expand=expand)

@@ -12,7 +12,7 @@ from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
 from sympde.topology import dx1, dx2, dx3
 from sympde.topology import ScalarFunctionSpace, VectorFunctionSpace
-from sympde.topology import Domain
+from sympde.topology import Domain, Cube
 from sympde.topology import Mapping
 from sympde.topology import elements_of
 from sympde.expr import BilinearForm
@@ -165,6 +165,43 @@ def test_gelatize_3d_7():
     expr = BilinearForm((u,v), integral(domain, expr))
     assert(gelatize(expr) == expected)
 
+#==============================================================================
+def test_gelatize_3d_8():
+    domain = Cube('Omega', bounds1=(0,1), bounds2=(0,1), bounds3=(0,1))
+
+    V = ScalarFunctionSpace('V', domain)
+
+    u,v = elements_of(V, names='u,v')
+
+    expected = 0.0
+
+    expr = u*v
+    expr = BilinearForm((u,v), integral(domain.boundary, expr))
+
+    assert(gelatize(expr) == expected)
+
+#==============================================================================
+def test_gelatize_3d_9():
+    domain = Cube('Omega', bounds1=(0,1), bounds2=(0,1), bounds3=(0,1))
+
+    V = ScalarFunctionSpace('V', domain)
+
+    u,v = elements_of(V, names='u,v')
+
+    nx, ny, nz = symbols('nx ny nz', integer=True)
+    px, py, pz = symbols('px py pz', integer=True)
+    tx, ty, tz = symbols('tx ty tz')
+
+    expected = ( nx*Mass(py,ty)*Mass(pz,tz)*Stiffness(px,tx)/(ny*nz) +
+                ny*Mass(px,tx)*Mass(pz,tz)*Stiffness(py,ty)/(nx*nz) +
+                nz*Mass(px,tx)*Mass(py,ty)*Stiffness(pz,tz)/(nx*ny))
+
+    expr = dot(grad(v), grad(u))
+
+    expr = BilinearForm((u,v), integral(domain.boundary, u*v) +
+                        integral(domain, expr))
+
+    assert(gelatize(expr) == expected)
 
 #==============================================================================
 ## TODO
