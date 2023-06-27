@@ -12,7 +12,7 @@ from sympde.calculus import grad, dot, inner, cross, rot, curl, div
 from sympde.calculus import laplace, hessian, bracket, convect
 from sympde.topology import dx, dy, dz, dx1, dx2, dx3
 from sympde.topology import ScalarFunctionSpace
-from sympde.topology import Domain
+from sympde.topology import Domain, Line
 from sympde.topology import elements_of
 from sympde.expr import BilinearForm
 from sympde.expr import integral
@@ -100,6 +100,42 @@ def test_gelatize_1d_4():
 
     expr = c1*v*u + c2*dx1(u)*v + c3*dx1(v)*u + c4*dx1(v)*dx1(u)
     expr = BilinearForm((u,v), integral(domain, expr))
+    assert(gelatize(expr) == expected)
+
+#==============================================================================
+def test_gelatize_1d_5():
+    domain = Line('Omega', bounds=(0,1))
+
+    V = ScalarFunctionSpace('V', domain)
+
+    u,v = elements_of(V, names='u,v')
+
+    expected = 0.0
+
+    expr = u*v
+    expr = BilinearForm((u,v), integral(domain.boundary, expr))
+
+    assert(gelatize(expr) == expected)
+
+#==============================================================================
+def test_gelatize_1d_6():
+    domain = Line('Omega', bounds=(0,1))
+
+    V = ScalarFunctionSpace('V', domain)
+
+    u,v = elements_of(V, names='u,v')
+
+    nx = symbols('nx', integer=True)
+    px = symbols('px', integer=True)
+    tx = symbols('tx')
+
+    expected = nx*Stiffness(px,tx)
+
+    expr = dot(grad(v), grad(u))
+
+    expr = BilinearForm((u,v), integral(domain.boundary, u*v) +
+                        integral(domain, expr))
+
     assert(gelatize(expr) == expected)
 
 #==============================================================================
