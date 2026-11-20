@@ -7,17 +7,17 @@ from sympy import S
 from sympy.core import Expr, Basic
 from sympy import simplify, expand
 
-from sympde.expr import BilinearForm
-from sympde.expr import TensorExpr
+from sympde.api import BilinearForm
+from sympde.api import TensorExpr
 
-from sympde.expr import Mass as MassForm
-from sympde.expr import Stiffness as StiffnessForm
-from sympde.expr import Advection as AdvectionForm
-from sympde.expr import AdvectionT as AdvectionTForm
-from sympde.expr import Bilaplacian as BilaplacianForm
-from sympde.expr import Basic1dForm
-from sympde.topology import SymbolicExpr
-from sympde.calculus.matrices import SymbolicDeterminant
+from sympde.api import Mass as MassForm
+from sympde.api import Stiffness as StiffnessForm
+from sympde.api import Advection as AdvectionForm
+from sympde.api import AdvectionT as AdvectionTForm
+from sympde.api import Bilaplacian as BilaplacianForm
+from sympde.api import Basic1dForm
+from sympde.api import SymbolicExpr
+from sympde.api import SymbolicDeterminant
 
 from .glt import (BasicGlt, Mass, Stiffness, Advection, Bilaplacian)
 
