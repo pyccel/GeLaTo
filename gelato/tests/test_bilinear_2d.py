@@ -7,16 +7,16 @@ from sympy import pi, cos, sin
 from sympy import srepr
 from sympy import I
 
-from sympde.core import Constant
-from sympde.calculus import grad, dot, inner, cross, rot, curl, div
-from sympde.calculus import laplace, hessian, bracket, convect
-from sympde.topology import (dx, dy, dz)
-from sympde.topology import ScalarFunctionSpace, VectorFunctionSpace
-from sympde.topology import Domain
-from sympde.topology import Mapping
-from sympde.topology import elements_of
-from sympde.expr import BilinearForm
-from sympde.expr import integral
+from sympde.api import Constant
+from sympde.api import grad, dot, inner, cross, rot, curl, div
+from sympde.api import laplace, hessian, bracket, convect
+from sympde.api import dx, dy, dz
+from sympde.api import ScalarFunctionSpace, VectorFunctionSpace
+from sympde.api import Domain
+from sympde.api import Mapping
+from sympde.api import elements_of
+from sympde.api import BilinearForm
+from sympde.api import integral
 
 from gelato import gelatize
 
