@@ -35,13 +35,14 @@ setup_args = dict(
 install_requires = [
 
     # Third-party libraries from PyPi
-    'sympy>=1.2',
+    'sympy>=1.12, <1.15',
     'numpy>=1.13',
     'scipy>=0.18',
     'matplotlib',
 
     # Our libraries from PyPi
-    'sympde>=0.10',
+    # TODO: replace the commit of SymPDE master by the next release
+    'sympde @ git+https://github.com/pyccel/sympde.git@b22ced9c0ebb78db31fea4fe70e27cc52e144000',
 ]
 
 # ...
