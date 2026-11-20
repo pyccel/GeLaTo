@@ -30,9 +30,9 @@ jobs:
 
       - name: Install GeLaTo
         run: |
-          python -m pip install .
+          python -m pip install . pytest
 
       - name: Test with pytest
         run: |
           cd
-          pytest --pyargs gelato
+          python -m pytest --pyargs gelato
